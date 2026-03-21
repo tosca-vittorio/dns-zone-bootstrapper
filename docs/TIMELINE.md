@@ -136,11 +136,12 @@ Implementare la prima validazione forte sull'input minimo certo del sistema: il 
 - il layer `domain` espone ora anche un risultato strutturato con `error_code` deterministici per i principali failure mode sintattici, propagati dal layer `application`;
 
 **Evidenze correnti**
-- `pytest -q` → `24 passed`;
+- `pytest -q` → `26 passed`;
 - `python -m pylint src tests` → `10.00/10`;
 - aggiunti `src/dns_zone_bootstrapper/domain/domain_validation.py` e `tests/test_domain_validation.py`;
 - aggiunti `src/dns_zone_bootstrapper/application/zone_apex_validation.py` e `tests/test_zone_apex_validation_use_case.py`;
-- avanzamento reale di `B0` consolidato nei commit `9670323`, `18141f5` e `f5f579d`.
+- coperti esplicitamente anche i failure mode `non_string_input` e `domain_too_long` nei test del layer `domain`;
+- avanzamento reale di `B0` consolidato nei commit `9670323`, `18141f5`, `f5f579d` e `4771e11`.
 
 ### B1 — Modello record DNS e profilo template fisso — ⬜
 **Obiettivo**  

@@ -29,6 +29,12 @@
 #### B0 — Validazione dominio apex (prima iterazione sintattica)
 > Ordinamento: `git log` (più recente → più vecchio) · focus su primo avanzamento reale del core engine.
 
+- **`4771e11` — `test(domain): cover remaining zone apex validation failures`**
+  - **Type:** `test` · **Categoria:** Domain / Validation tests
+  - **Cosa cambia:** completa la copertura del layer `domain` aggiungendo test espliciti per i failure mode `non_string_input` e `domain_too_long`, già supportati dalla validazione strutturata del dominio apex candidate.
+  - **Impatto:** rende `B0` più difendibile e più completo sul piano dei test, senza modificare il comportamento del codice e senza aprire nuovo scope oltre la validazione sintattica corrente.
+  - **Evidenze:** `pytest -q` → `26 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`f5f579d` — `feat(domain): add structured zone apex validation errors`**
   - **Type:** `feat` · **Categoria:** Domain / Validation
   - **Cosa cambia:** evolve la validazione del dominio apex da semplice predicato booleano a risultato strutturato con `error_code` deterministici per i principali failure mode sintattici, mantenendo un wrapper booleano compatibile e aggiornando i test del layer `domain` e del layer `application`.
