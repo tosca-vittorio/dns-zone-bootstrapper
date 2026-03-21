@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dns-zone-bootstrapper"
+version = "0.1.0"
+description = "Prototype engine to generate Cloudflare-importable BIND zone files from a domain input and configurable DNS profiles."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "Vittorio Toscano" }
+]
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "typer",
+  "pydantic",
+  "jinja2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+  "pylint",
+]
+
+[project.scripts]
+dns-zone-cli = "dns_zone_bootstrapper.interfaces.cli.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
