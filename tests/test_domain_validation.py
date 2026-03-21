@@ -62,3 +62,26 @@ def test_validate_zone_apex_candidate_returns_success_result() -> None:
         is_valid=True,
         error_code=None,
     )
+
+def test_validate_zone_apex_candidate_rejects_non_string_input() -> None:
+    """Reject non-string inputs with a deterministic error code."""
+    result = validate_zone_apex_candidate(None)  # type: ignore[arg-type]
+
+    assert result == ZoneApexCandidateValidationResult(
+        is_valid=False,
+        error_code="non_string_input",
+    )
+
+
+def test_validate_zone_apex_candidate_rejects_domain_longer_than_253_chars() -> None:
+    """Reject inputs longer than the maximum allowed DNS name length."""
+    long_label = "a" * 63
+    domain = f"{long_label}.{long_label}.{long_label}.{long_label}.com"
+
+    result = validate_zone_apex_candidate(domain)
+
+    assert len(domain) > 253
+    assert result == ZoneApexCandidateValidationResult(
+        is_valid=False,
+        error_code="domain_too_long",
+    )
