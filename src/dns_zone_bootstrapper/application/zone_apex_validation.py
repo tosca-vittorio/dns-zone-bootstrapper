@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from dns_zone_bootstrapper.domain.domain_validation import (
-    is_valid_zone_apex_candidate,
+    validate_zone_apex_candidate,
 )
 
 
@@ -21,13 +21,12 @@ class ZoneApexValidationResult:
 
 def validate_zone_apex_input(input_value: str) -> ZoneApexValidationResult:
     """Validate a zone apex input and return a minimal structured result."""
-    is_valid = is_valid_zone_apex_candidate(input_value)
-    zone_apex = input_value if is_valid else None
-    error_code = None if is_valid else "invalid_zone_apex_candidate"
+    validation_result = validate_zone_apex_candidate(input_value)
+    zone_apex = input_value if validation_result.is_valid else None
 
     return ZoneApexValidationResult(
         input_value=input_value,
-        is_valid=is_valid,
+        is_valid=validation_result.is_valid,
         zone_apex=zone_apex,
-        error_code=error_code,
+        error_code=validation_result.error_code,
     )

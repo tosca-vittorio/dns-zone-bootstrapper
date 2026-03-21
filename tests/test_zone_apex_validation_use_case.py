@@ -18,13 +18,13 @@ def test_validate_zone_apex_input_returns_structured_success() -> None:
     )
 
 
-def test_validate_zone_apex_input_returns_structured_failure() -> None:
-    """Return a structured failure result for an invalid zone apex input."""
+def test_validate_zone_apex_input_propagates_specific_failure_reason() -> None:
+    """Return a structured failure result with a specific error code."""
     result = validate_zone_apex_input(" example.com ")
 
     assert result == ZoneApexValidationResult(
         input_value=" example.com ",
         is_valid=False,
         zone_apex=None,
-        error_code="invalid_zone_apex_candidate",
+        error_code="surrounding_whitespace",
     )
