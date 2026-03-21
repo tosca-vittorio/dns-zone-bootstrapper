@@ -131,12 +131,15 @@ Implementare la prima validazione forte sull'input minimo certo del sistema: il 
 **Stato operativo**
 - introdotto un primo validatore sintattico del dominio apex candidate in modulo domain dedicato;
 - coperti casi minimi di input valido e non valido tramite test automatici;
-- questa prima iterazione valida solo la forma sintattica DNS/hostname dell'input e non risolve ancora public suffix o registrable domain reali.
+- introdotto un primo use case applicativo minimale framework-agnostic che consuma il validatore domain e restituisce un esito strutturato semplice;
+- questa iterazione valida ancora solo la forma sintattica DNS/hostname dell'input e non risolve public suffix o registrable domain reali.
 
 **Evidenze correnti**
-- `pytest -q` → `14 passed`;
+- `pytest -q` → `16 passed`;
 - `python -m pylint src tests` → `10.00/10`;
-- aggiunti `src/dns_zone_bootstrapper/domain/domain_validation.py` e `tests/test_domain_validation.py`.
+- aggiunti `src/dns_zone_bootstrapper/domain/domain_validation.py` e `tests/test_domain_validation.py`;
+- aggiunti `src/dns_zone_bootstrapper/application/zone_apex_validation.py` e `tests/test_zone_apex_validation_use_case.py`;
+- avanzamento reale di `B0` consolidato nei commit `9670323` e `18141f5`.
 
 ### B1 — Modello record DNS e profilo template fisso — ⬜
 **Obiettivo**  

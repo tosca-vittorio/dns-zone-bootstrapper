@@ -29,6 +29,12 @@
 #### B0 — Validazione dominio apex (prima iterazione sintattica)
 > Ordinamento: `git log` (più recente → più vecchio) · focus su primo avanzamento reale del core engine.
 
+- **`18141f5` — `feat(application): add minimal zone apex validation use case`**
+  - **Type:** `feat` · **Categoria:** Application / Use case
+  - **Cosa cambia:** introduce il primo use case applicativo minimale per la validazione dello zone apex input, con risultato strutturato semplice e test dedicati nel layer `application`.
+  - **Impatto:** rende `B0` più maturo trasformando la validazione da predicato domain isolato a primo contratto applicativo framework-agnostic, senza ancora aprire scope su public suffix, template DNS o superfici web.
+  - **Evidenze:** `pytest -q` → `16 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`9670323` — `feat(domain): add initial apex domain candidate validator`**
   - **Type:** `feat` · **Categoria:** Domain / Validation
   - **Cosa cambia:** aggiunge il primo validatore sintattico del dominio apex candidate nel layer `domain` e introduce test automatici minimi per casi validi e non validi.
