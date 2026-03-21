@@ -3,23 +3,34 @@
 ## Branch: [development]
 
 ### [Unreleased]
-- Bootstrap del repository per il progetto `dns-zone-bootstrapper`.
-- Inizializzazione dei documenti owner (`TIMELINE.md`, `ROADMAP.md`, `ARCHITECTURE.md`, `CHANGELOG.md`).
-- Definizione della baseline Python-first con package `src/`, superfici tecniche minime e verifiche locali iniziali.
-- Promozione di `TIMELINE.md` a documento operativo centrale, senza dipendere da un backlog separato esterno.
-- Ricezione del file reale di riferimento fornito dall'azienda e congelamento del contratto v1 della task.
-- Conferma dei vincoli v1:
-  - deliverable principale = pagina web;
-  - input utente = solo dominio;
-  - valori restanti = fissi per ora;
-  - output = file `.txt` pronto per import Cloudflare;
-  - preview non necessaria;
-  - nessuna preferenza di stack imposta dall'azienda.
-- Ricollocazione del file reale di riferimento in area locale privata gitignored (`samples/private/company_reference/`) per evitare tracciamento grezzo nel repository.
-- Riallineamento di `README.md`, `ROADMAP.md`, `TIMELINE.md` e `ARCHITECTURE.md` al nuovo stato del progetto.
-- Decisione di governance: `pylint` promosso a quality gate della baseline dev del progetto.
-- Decisione di governance: `requirements.txt` mantenuto come freeze operativo versionato, da aggiornare solo a checkpoint significativi dell'ambiente.
-- Verificato il baseline dev environment tramite `python -m pip install -e ".[dev]"`.
-- Eseguiti con esito verde i quality gate iniziali: `pytest` (`4 passed`) e `pylint` (`10.00/10` su `src` e `tests`).
-- Creata e verificata `.venv` locale pulita come baseline isolata del progetto.
-- Rigenerato `requirements.txt` dalla `.venv` pulita, eliminando il freeze non affidabile derivato dal Python globale.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`) e prima iterazione del core su `B0` con validazione sintattica iniziale del dominio apex candidate.
+
+#### A0 — Bootstrap repository, baseline qualità e chiusura documentale
+> Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`a0787f4` — `docs(project): sync owner docs and README after bootstrap closure`**
+  - **Type:** `docs` · **Categoria:** Owner docs / Governance
+  - **Cosa cambia:** riallinea `README.md`, `TIMELINE.md`, `ROADMAP.md`, `ARCHITECTURE.md` e `CHANGELOG.md` alla baseline reale del progetto dopo la chiusura del bootstrap, congelando il contratto v1, la direzione Python-first/web-first e la chiusura sostanziale di `A0`.
+  - **Impatto:** rende i documenti owner coerenti con lo stato reale del repository e trasforma `A0` in un blocco difendibile sia tecnicamente sia documentalmente.
+
+- **`64278ee` — `feat(bootstrap): add python package skeleton and quality baseline`**
+  - **Type:** `feat` · **Categoria:** Bootstrap / Baseline tecnica
+  - **Cosa cambia:** introduce lo skeleton Python del progetto, la struttura `src/`, i package base, gli entrypoint tecnici iniziali, i test bootstrap, `.gitignore`, `pyproject.toml` e `requirements.txt` come freeze operativo.
+  - **Impatto:** crea la baseline tecnica minima del repository, abilita i quality gate iniziali e rende il progetto realmente eseguibile e verificabile in locale.
+
+**Snapshot quality gate consolidato del bootstrap**
+- `.venv` locale pulita creata e verificata;
+- `python -m pip install -e ".[dev]"` eseguito con successo;
+- `pytest -q` → `4 passed`;
+- `python -m pylint src` → `10.00/10`;
+- `python -m pylint tests` → `10.00/10`;
+- `requirements.txt` rigenerato dalla `.venv` pulita, eliminando il freeze non affidabile derivato dal Python globale.
+
+#### B0 — Validazione dominio apex (prima iterazione sintattica)
+> Ordinamento: `git log` (più recente → più vecchio) · focus su primo avanzamento reale del core engine.
+
+- **`9670323` — `feat(domain): add initial apex domain candidate validator`**
+  - **Type:** `feat` · **Categoria:** Domain / Validation
+  - **Cosa cambia:** aggiunge il primo validatore sintattico del dominio apex candidate nel layer `domain` e introduce test automatici minimi per casi validi e non validi.
+  - **Impatto:** apre formalmente `B0` con una prima regola forte framework-agnostic sull’input utente della v1, mantenendo però il perimetro conservativo: validazione sintattica DNS/hostname senza ancora risolvere public suffix o registrable domain reali.
+  - **Evidenze:** `pytest -q` → `14 passed`; `python -m pylint src tests` → `10.00/10`.

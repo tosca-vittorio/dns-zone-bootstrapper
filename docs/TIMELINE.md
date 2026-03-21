@@ -48,14 +48,14 @@ Creare baseline del repository, package Python, owner docs e superfici tecniche 
 - `python -m pylint src` → `10.00/10`;
 - `python -m pylint tests` → `10.00/10`;
 - `dns-zone-cli doctor` → `dns-zone-bootstrapper: CLI bootstrap OK`;
-- `git status -sb` mostra bootstrap documentale e strutturale ancora non committato;
+- bootstrap tecnico e documentale consolidato nei commit `64278ee` e `a0787f4`, entrambi già pubblicati su `origin/development`;
 - `requirements.txt` presente localmente come parte del freeze effettuato;
 - artefatto reale di riferimento fornito dall'azienda ricollocato localmente in `samples/private/company_reference/testdomain.com.txt`.
 - baseline dev verificata in `.venv` locale isolata (`python -m venv .venv`, install `-e ".[dev]"`, gate verdi);
 
 **Nota di chiusura A0**
-- bootstrap repository, owner docs, baseline dev isolata e freeze operativo risultano verificati;
-- il prossimo lavoro può aprire formalmente `B0`, mentre il consolidamento Git resta da eseguire in commit atomici coerenti.
+- bootstrap repository, owner docs, baseline dev isolata e freeze operativo risultano verificati e consolidati a commit;
+- `A0` è chiuso anche a livello Git/remoto e il progetto può proseguire su `B0`.
 
 ### A1 — Discovery vincoli Cloudflare + mailcow — ✅
 **Obiettivo**  
@@ -113,7 +113,7 @@ La derivazione tecnica campo-per-campo del template viene demandata al `Cycle B`
 
 ## Cycle B — Core engine
 
-### B0 — Validazione dominio apex — ⬜
+### B0 — Validazione dominio apex — 🟡
 **Obiettivo**  
 Implementare la prima validazione forte sull'input minimo certo del sistema: il dominio apex.
 
@@ -127,6 +127,16 @@ Implementare la prima validazione forte sull'input minimo certo del sistema: il 
 - introdurre il validatore di dominio apex;
 - definire i primi casi validi/non validi;
 - collegare il validatore a un use case applicativo minimo ma framework-agnostic.
+
+**Stato operativo**
+- introdotto un primo validatore sintattico del dominio apex candidate in modulo domain dedicato;
+- coperti casi minimi di input valido e non valido tramite test automatici;
+- questa prima iterazione valida solo la forma sintattica DNS/hostname dell'input e non risolve ancora public suffix o registrable domain reali.
+
+**Evidenze correnti**
+- `pytest -q` → `14 passed`;
+- `python -m pylint src tests` → `10.00/10`;
+- aggiunti `src/dns_zone_bootstrapper/domain/domain_validation.py` e `tests/test_domain_validation.py`.
 
 ### B1 — Modello record DNS e profilo template fisso — ⬜
 **Obiettivo**  
