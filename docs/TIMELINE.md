@@ -4,9 +4,9 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: freeze documentale post-clarifica requisiti + preparazione avvio del core
+- Fase corrente: `B0` sostanzialmente chiuso e consolidato; preparazione apertura operativa di `B1`
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: chiudere l'allineamento dei documenti owner e preparare l'avvio di `B0` e `B1`
+- Obiettivo immediato: congelare la chiusura di `B0` nella timeline e preparare la derivazione del primo profilo DNS fisso da template reale per `B1`
 
 ## Legenda stati
 
@@ -113,7 +113,7 @@ La derivazione tecnica campo-per-campo del template viene demandata al `Cycle B`
 
 ## Cycle B — Core engine
 
-### B0 — Validazione dominio apex — 🟡
+### B0 — Validazione dominio apex — ✅
 **Obiettivo**  
 Implementare la prima validazione forte sull'input minimo certo del sistema: il dominio apex.
 
@@ -142,6 +142,11 @@ Implementare la prima validazione forte sull'input minimo certo del sistema: il 
 - aggiunti `src/dns_zone_bootstrapper/application/zone_apex_validation.py` e `tests/test_zone_apex_validation_use_case.py`;
 - coperti esplicitamente anche i failure mode `non_string_input` e `domain_too_long` nei test del layer `domain`;
 - avanzamento reale di `B0` consolidato nei commit `9670323`, `18141f5`, `f5f579d` e `4771e11`.
+
+**Nota di chiusura B0**
+- la DoD minima del blocco risulta soddisfatta sul repository reale;
+- la validazione del dominio apex è ora coperta da layer `domain`, use case `application`, errori strutturati deterministici e test espliciti sui principali failure mode sintattici;
+- `B0` si considera chiuso come blocco di validazione sintattica framework-agnostic, mentre tutto ciò che riguarda template DNS, record profile e rendering resta demandato ai blocchi successivi.
 
 ### B1 — Modello record DNS e profilo template fisso — ⬜
 **Obiettivo**  
