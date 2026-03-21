@@ -133,13 +133,14 @@ Implementare la prima validazione forte sull'input minimo certo del sistema: il 
 - coperti casi minimi di input valido e non valido tramite test automatici;
 - introdotto un primo use case applicativo minimale framework-agnostic che consuma il validatore domain e restituisce un esito strutturato semplice;
 - questa iterazione valida ancora solo la forma sintattica DNS/hostname dell'input e non risolve public suffix o registrable domain reali.
+- il layer `domain` espone ora anche un risultato strutturato con `error_code` deterministici per i principali failure mode sintattici, propagati dal layer `application`;
 
 **Evidenze correnti**
-- `pytest -q` → `16 passed`;
+- `pytest -q` → `24 passed`;
 - `python -m pylint src tests` → `10.00/10`;
 - aggiunti `src/dns_zone_bootstrapper/domain/domain_validation.py` e `tests/test_domain_validation.py`;
 - aggiunti `src/dns_zone_bootstrapper/application/zone_apex_validation.py` e `tests/test_zone_apex_validation_use_case.py`;
-- avanzamento reale di `B0` consolidato nei commit `9670323` e `18141f5`.
+- avanzamento reale di `B0` consolidato nei commit `9670323`, `18141f5` e `f5f579d`.
 
 ### B1 — Modello record DNS e profilo template fisso — ⬜
 **Obiettivo**  
