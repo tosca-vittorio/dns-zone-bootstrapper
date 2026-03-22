@@ -8,6 +8,12 @@
 #### B1 — Modello record DNS e profilo template fisso (baseline iniziale)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
+- **`1411bea` — `refactor(templates): formalize semantic rdata template metadata`**
+  - **Type:** `refactor` · **Categoria:** Templates / Semantic RDATA metadata
+  - **Cosa cambia:** introduce nel model layer un value object dedicato per il `rdata`, formalizzando in modo esplicito metadata semantici (`kind`) e template string (`template`) del payload DNS e aggiornando il profilo `public_safe_candidate` di conseguenza, con test dedicato sul freeze della superficie `rdata_kind`.
+  - **Impatto:** riduce la dipendenza da logica implicita “stringly-typed” nella lettura del profilo `B1`, rende il modello più coerente e prepara meglio il terreno al futuro renderer senza aprire ancora `B2`.
+  - **Evidenze:** `pytest -q` → `33 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`afdf577` — `refactor(templates): narrow fixed profile model vocabularies`**
   - **Type:** `refactor` · **Categoria:** Templates / Model vocabulary narrowing
   - **Cosa cambia:** restringe nel file `profile_model.py` il vocabolario del model layer introducendo alias tipizzati dedicati per `RecordClass` e `ManualFlag`, sostituendo i campi generici `str` in `DnsRecordTemplate`.

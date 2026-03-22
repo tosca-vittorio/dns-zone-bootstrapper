@@ -4,7 +4,7 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1` aperto operativamente con baseline code-only del profilo DNS fisso public-safe corretta semanticamente sul naming rispetto al template reale, irrigidita da test espliciti di freeze su contratto e superfici principali e ora ulteriormente ristretta nel model layer sui vocabolari `RecordClass` e `ManualFlag`; `B0` chiuso e consolidato
+- Fase corrente: `B1` aperto operativamente con baseline code-only del profilo DNS fisso public-safe corretta semanticamente sul naming rispetto al template reale, irrigidita da test espliciti di freeze su contratto e superfici principali, ristretta nel model layer sui vocabolari `RecordClass` e `ManualFlag` e ora formalizzata meglio sulla semantica del `rdata` tramite metadata espliciti; `B0` chiuso e consolidato
 - Baseline contrattuale v1: confermata con l'azienda
 - Obiettivo immediato: chiarire e chiudere il minimo gap strutturale residuo di `B1` prima di `B2`, mantenendo separati renderer, web/UI e refactor larghi
 
@@ -163,9 +163,10 @@ Definire la rappresentazione logica minima del template DNS fisso derivato dal f
 - aggiunto un test esplicito che congela la superficie placeholder ammessa nel profilo corrente, verificando la presenza controllata di `{apex_slug}` e `{apex_fqdn}` e l'assenza di `{apex}` nei `rdata_template`.
 - aggiunto un test esplicito che congela la superficie `rdata_template` fixed-only non derivata dal dominio, proteggendo i valori fissi correnti del profilo public-safe.
 - aggiunto un restringimento esplicito del model layer: `record_class` è ora tipizzato come `Literal["IN"]` e `manual_flag` come `Literal["token_like_value"]`, allineando il modello agli invarianti già presenti nel profilo corrente e già difesi dai test.
+- formalizzata la semantica del `rdata` nel model layer tramite un value object dedicato, separando in modo esplicito `kind` e `template` senza lasciare la derivazione implicita nella sola stringa del `rdata_template`.
 
 **Evidenze correnti**
-- `pytest -q` → `32 passed`;
+- `pytest -q` → `33 passed`;
 - `python -m pylint src tests` → `10.00/10`;
 - aggiunti `src/dns_zone_bootstrapper/templates/profile_model.py`, `src/dns_zone_bootstrapper/templates/profiles/public_safe_candidate.py` e `tests/test_public_safe_candidate_profile.py`;
 - baseline `B1` consolidata nel commit `cf943e6`;
@@ -174,6 +175,7 @@ Definire la rappresentazione logica minima del template DNS fisso derivato dal f
 - freeze della superficie placeholder consolidato nel commit `c4a31b6`.
 - freeze della superficie fixed-only `rdata_template` consolidato nel commit `532487a`.
 - restringimento del vocabolario del model layer consolidato nel commit `afdf577`.
+- formalizzazione semantica del `rdata` consolidata nel commit `1411bea`.
 
 **Nota di stato B1**
 - il blocco è aperto in modo sostanziale ma non ancora chiuso;
