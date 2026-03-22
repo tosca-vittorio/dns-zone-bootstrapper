@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di un failure path applicativo aggiuntivo su input overlong.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong e vuoto.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`ebe3221` — `test(application): cover empty bind zone input failure`**
+  - **Type:** `test` · **Categoria:** Application / Failure path coverage
+  - **Cosa cambia:** estende `tests/test_bind_zone_generation_use_case.py` con un test dedicato su input apex vuoto, verificando nel use case `generate_bind_zone_file` la propagazione di `error_code="empty_input"` e l'assenza di `zone_file_text`.
+  - **Impatto:** amplia ulteriormente la robustezza del boundary `application` sul failure path minimo più vicino all'input reale utente, senza modificare il runtime del package.
+  - **Evidenze:** `python -m pytest -q` → `40 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`97d3e83` — `test(application): cover overlong bind zone input failure`**
   - **Type:** `test` · **Categoria:** Application / Failure path coverage
