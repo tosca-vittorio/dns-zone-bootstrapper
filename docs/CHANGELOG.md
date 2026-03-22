@@ -3,7 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate e hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile e apertura minima di `B2` con primo renderer BIND verificato.
+
+#### B2 — Renderer BIND zone file (apertura minima)
+> Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`641065e` — `feat(renderers): add minimal BIND zone file renderer`**
+  - **Type:** `feat` · **Categoria:** Renderers / BIND zone file
+  - **Cosa cambia:** introduce `src/dns_zone_bootstrapper/renderers/bind_zone_renderer.py` con una funzione pura che renderizza il profilo DNS fisso a testo BIND a partire da `zone_apex` e `FixedDnsProfile`, gestendo owner FQDN, risoluzione placeholder, quoting dei record `TXT`, annotazioni opzionali `cf_tags` e raggruppamento per tipo record; aggiunge inoltre `tests/test_bind_zone_renderer.py` con un contratto testuale esplicito sul profilo `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
+  - **Impatto:** apre sostanzialmente `B2` con un primo contratto di rendering framework-agnostic, separato da CLI/web/application, e prepara il terreno a successivi test golden o confronti più realistici senza reintrodurre dipendenze runtime dagli asset privati locali.
+  - **Evidenze:** `python -m pytest -q` → `34 passed`; `python -m pylint src tests` → `10.00/10`.
 
 #### B1 — Modello record DNS e profilo template fisso (baseline iniziale)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.

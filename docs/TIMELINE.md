@@ -4,9 +4,9 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1` chiuso e consolidato come baseline code-only del profilo DNS fisso public-safe, semanticamente allineata al template reale, irrigidita da freeze test su contratto e superfici principali e formalizzata nel model layer su vocabolari chiusi e metadata espliciti del `rdata`; `B2` non ancora avviato
+- Fase corrente: `B1` chiuso e consolidato come baseline code-only del profilo DNS fisso public-safe, semanticamente allineata al template reale, irrigidita da freeze test su contratto e superfici principali e formalizzata nel model layer su vocabolari chiusi e metadata espliciti del `rdata`; `B2` aperto con un primo renderer BIND minimale già verificato da test dedicato e quality gates globali
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: aprire `B2` con il primo contratto minimo del renderer BIND, mantenendo separati rendering, web/UI e refactor larghi
+- Obiettivo immediato: consolidare documentalmente l'apertura minima di `B2` e proseguire poi con l'hardening controllato del renderer BIND e dei test sul testo generato, mantenendo separati rendering, web/UI e refactor larghi
 
 ## Legenda stati
 
@@ -184,14 +184,21 @@ Definire la rappresentazione logica minima del template DNS fisso derivato dal f
 - il model layer esprime ora in modo più rigoroso sia i vocabolari chiusi sia i metadata semantici del `rdata`, riducendo la dipendenza da logica implicita prima dell’apertura del renderer;
 - `B1` si considera chiuso; il passo successivo corretto è `B2`, dedicato al renderer BIND e ai primi test sul testo generato.
 
-### B2 — Renderer BIND zone file — ⬜
-**Obiettivo**  
+### B2 — Renderer BIND zone file — 🟡
+**Obiettivo**
 Produrre il renderer del file di zona in formato coerente con l'import Cloudflare.
 
-**Primo lavoro previsto**
-- introdurre una funzione o servizio di rendering separato;
-- mantenere il rendering indipendente dall'interfaccia;
-- preparare test confrontabili sul testo generato.
+**Stato operativo**
+- introdotto `src/dns_zone_bootstrapper/renderers/bind_zone_renderer.py` con una funzione pura `render_bind_zone_file(zone_apex, profile)` separata dalle interfacce;
+- implementate nel renderer minimo le regole iniziali di risoluzione owner FQDN, placeholder `{apex}`, `{apex_fqdn}`, `{apex_slug}`, quoting dei record `TXT`, annotazioni `cf_tags` e raggruppamento per tipo record;
+- aggiunto `tests/test_bind_zone_renderer.py` con contratto testuale esplicito sul profilo `PUBLIC_SAFE_FIXED_DNS_PROFILE`;
+- verificate assenza di regressioni e qualità globale con `python -m pytest -q` → `34 passed` e `python -m pylint src tests` → `10.00/10`;
+- avanzamento tecnico consolidato nel commit `641065e`.
+
+**Nota di stato B2**
+- il blocco non è ancora chiuso, perché il renderer è stato aperto solo nella sua forma minima e mancano ancora estensioni controllate di copertura e confronto testuale;
+- `B2` non è più da considerare non avviato: esiste ora un primo contratto framework-agnostic di rendering testato e versionato sul branch;
+- il prossimo passo corretto resta l'hardening del testo generato senza aprire nello stesso blocco scope su UI/web o refactor larghi.
 
 ### B3 — Test del generatore e preparazione fixture reali — ⬜
 **Obiettivo**  
