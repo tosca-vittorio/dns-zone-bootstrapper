@@ -4,9 +4,9 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1` chiuso e consolidato come baseline code-only del profilo DNS fisso public-safe, semanticamente allineata al template reale, irrigidita da freeze test su contratto e superfici principali e formalizzata nel model layer su vocabolari chiusi e metadata espliciti del `rdata`; `B2` aperto con un primo renderer BIND minimale già verificato da test dedicato e quality gates globali, poi irrigidito con golden file public-safe esterno e con test esplicito sulla resa dei placeholder derivati
+- Fase corrente: `B1` chiuso e consolidato come baseline code-only del profilo DNS fisso public-safe, semanticamente allineata al template reale, irrigidita da freeze test su contratto e superfici principali e formalizzata nel model layer su vocabolari chiusi e metadata espliciti del `rdata`; `B2` aperto con renderer BIND minimale già verificato da test dedicato e quality gates globali, poi irrigidito con golden file public-safe esterno, con test esplicito sulla resa dei placeholder derivati e infine esteso con un primo boundary `application` framework-agnostic per la generazione del file di zona a partire dallo zone apex input
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: registrare documentalmente l'ulteriore hardening di `B2` sui placeholder derivati e proseguire poi con estensioni controllate della copertura testuale del renderer BIND, mantenendo separati rendering, web/UI e refactor larghi
+- Obiettivo immediato: registrare documentalmente l'introduzione del boundary applicativo minimo di generazione BIND e proseguire poi con hardening controllato di `B2`, mantenendo separati application, renderer, web/UI e refactor larghi
 
 ## Legenda stati
 
@@ -194,13 +194,16 @@ Produrre il renderer del file di zona in formato coerente con l'import Cloudflar
 - aggiunto `tests/test_bind_zone_renderer.py` con contratto testuale esplicito sul profilo `PUBLIC_SAFE_FIXED_DNS_PROFILE`;
 - esternalizzato l'expected public-safe del renderer in `tests/golden/public_safe_candidate.bind.txt`, rendendo il confronto testuale più auditabile e manutenibile;
 - aggiunto un test esplicito che congela la resa dei placeholder derivati su un apex diverso dal golden corrente, verificando `apex_slug`, `apex_fqdn` e l'assenza di newline finale;
-- verificate assenza di regressioni e qualità globale con `python -m pytest -q` → `35 passed` e `python -m pylint src tests` → `10.00/10`;
-- avanzamento tecnico consolidato nei commit `641065e`, `514f278` e `43d7d37`.
+- introdotto `src/dns_zone_bootstrapper/application/bind_zone_generation.py` con il use case `generate_bind_zone_file(input_value)`, che valida l'input apex, usa il profilo fisso `PUBLIC_SAFE_FIXED_DNS_PROFILE`, orchestra il renderer BIND e restituisce un esito strutturato con `zone_file_text` sul percorso di successo;
+- aggiunto `tests/test_bind_zone_generation_use_case.py` con copertura esplicita del percorso applicativo di successo sul golden public-safe e del failure path con propagazione dell'`error_code` e assenza di testo renderizzato;
+- verificate assenza di regressioni e qualità globale con `python -m pytest -q` → `37 passed` e `python -m pylint src tests` → `10.00/10`;
+- avanzamento tecnico consolidato nei commit `641065e`, `514f278`, `43d7d37` e `2898fbb`.
+
 
 **Nota di stato B2**
-- il blocco non è ancora chiuso, perché il renderer è stato aperto solo nella sua forma minima e manca ancora estendere in modo controllato copertura e confronti testuali;
-- `B2` non è più da considerare non avviato: esiste ora un primo contratto framework-agnostic di rendering testato e versionato sul branch, con expected public-safe esterno congelato in golden file e con copertura esplicita della resa dei placeholder derivati;
-- il prossimo passo corretto resta l'hardening del testo generato senza aprire nello stesso blocco scope su UI/web o refactor larghi.
+- il blocco non è ancora chiuso, perché pur esistendo ora sia il renderer minimo sia un primo boundary `application`, mancano ancora estensioni controllate della copertura, confronti più realistici e integrazioni verso superfici esterne;
+- `B2` non è più da considerare solo un blocco di rendering isolato: esiste ora un primo contratto framework-agnostic end-to-end nel core, che parte dallo zone apex input, valida l'input e produce il testo BIND usando il profilo fisso public-safe;
+- il prossimo passo corretto resta l'hardening controllato del generatore nel core, senza aprire nello stesso blocco scope su UI/web o refactor larghi.
 
 ### B3 — Test del generatore e preparazione fixture reali — ⬜
 **Obiettivo**  

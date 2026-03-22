@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, primo hardening del contratto testuale tramite golden file esterno e copertura esplicita dei placeholder derivati.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, e introduzione del boundary applicativo minimo di generazione del file BIND.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`2898fbb` — `feat(application): add fixed bind zone generation use case`**
+  - **Type:** `feat` · **Categoria:** Application / BIND generation use case
+  - **Cosa cambia:** introduce `src/dns_zone_bootstrapper/application/bind_zone_generation.py` con un use case framework-agnostic che parte dallo `zone_apex` input, riusa la validazione applicativa esistente, consuma il profilo fisso `PUBLIC_SAFE_FIXED_DNS_PROFILE`, invoca il renderer BIND e restituisce un risultato strutturato con `zone_file_text`; aggiunge inoltre `tests/test_bind_zone_generation_use_case.py` con copertura del caso di successo e del failure path con propagazione di `error_code`.
+  - **Impatto:** rende `B2` più maturo trasformando il renderer da funzione core isolata a primo contratto applicativo di generazione end-to-end nel package, senza aprire ancora scope su CLI/web o su fixture reali.
+  - **Evidenze:** `python -m pytest -q` → `37 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`43d7d37` — `test(renderers): cover derived placeholder rendering`**
   - **Type:** `test` · **Categoria:** Renderers / Derived placeholder coverage
