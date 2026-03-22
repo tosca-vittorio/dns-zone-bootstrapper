@@ -7,6 +7,7 @@ from dns_zone_bootstrapper.templates.profile_model import (
     APEX_SLUG_PLACEHOLDER,
     DnsRecordTemplate,
     FixedDnsProfile,
+    RdataTemplateSpec,
 )
 
 _PROFILE_NAME = "public_safe_candidate"
@@ -28,7 +29,10 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="@",
             ttl=1,
             record_class="IN",
-            rdata_template=_FIXED_A_TARGET,
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=_FIXED_A_TARGET,
+            ),
             cf_proxied=True,
         ),
         DnsRecordTemplate(
@@ -36,7 +40,10 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="autoconfig",
             ttl=1,
             record_class="IN",
-            rdata_template=_FIXED_MAIL_HOST,
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=_FIXED_MAIL_HOST,
+            ),
             cf_proxied=False,
         ),
         DnsRecordTemplate(
@@ -44,7 +51,10 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="autodiscover",
             ttl=1,
             record_class="IN",
-            rdata_template=_FIXED_MAIL_HOST,
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=_FIXED_MAIL_HOST,
+            ),
             cf_proxied=False,
         ),
         DnsRecordTemplate(
@@ -52,8 +62,11 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="brevo1._domainkey",
             ttl=1,
             record_class="IN",
-            rdata_template=(
-                f"b1.{APEX_SLUG_PLACEHOLDER}.dkim.{_FIXED_PROVIDER_ZONE}."
+            rdata=RdataTemplateSpec(
+                kind="apex_slug_derived",
+                template=(
+                    f"b1.{APEX_SLUG_PLACEHOLDER}.dkim.{_FIXED_PROVIDER_ZONE}."
+                ),
             ),
             cf_proxied=False,
         ),
@@ -62,8 +75,11 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="brevo2._domainkey",
             ttl=1,
             record_class="IN",
-            rdata_template=(
-                f"b2.{APEX_SLUG_PLACEHOLDER}.dkim.{_FIXED_PROVIDER_ZONE}."
+            rdata=RdataTemplateSpec(
+                kind="apex_slug_derived",
+                template=(
+                    f"b2.{APEX_SLUG_PLACEHOLDER}.dkim.{_FIXED_PROVIDER_ZONE}."
+                ),
             ),
             cf_proxied=False,
         ),
@@ -72,7 +88,10 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="www",
             ttl=1,
             record_class="IN",
-            rdata_template=APEX_FQDN_PLACEHOLDER,
+            rdata=RdataTemplateSpec(
+                kind="apex_fqdn_derived",
+                template=APEX_FQDN_PLACEHOLDER,
+            ),
             cf_proxied=True,
         ),
         DnsRecordTemplate(
@@ -80,23 +99,32 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="@",
             ttl=1,
             record_class="IN",
-            rdata_template=f"10 {_FIXED_MAIL_HOST}",
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=f"10 {_FIXED_MAIL_HOST}",
+            ),
         ),
         DnsRecordTemplate(
             record_type="SRV",
             owner_template="_autodiscover._tcp",
             ttl=1,
             record_class="IN",
-            rdata_template=f"0 1 443 {_FIXED_MAIL_HOST}",
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=f"0 1 443 {_FIXED_MAIL_HOST}",
+            ),
         ),
         DnsRecordTemplate(
             record_type="TXT",
             owner_template="dkim._domainkey",
             ttl=1,
             record_class="IN",
-            rdata_template=(
-                "v=DKIM1;k=rsa;t=s;s=email;"
-                f"p={_FIXED_DKIM_PUBLIC_KEY}"
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=(
+                    "v=DKIM1;k=rsa;t=s;s=email;"
+                    f"p={_FIXED_DKIM_PUBLIC_KEY}"
+                ),
             ),
         ),
         DnsRecordTemplate(
@@ -104,24 +132,19 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="_dmarc",
             ttl=1,
             record_class="IN",
-            rdata_template=f"v=DMARC1; p=none; rua={_FIXED_DMARC_RUA}",
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=f"v=DMARC1; p=none; rua={_FIXED_DMARC_RUA}",
+            ),
         ),
         DnsRecordTemplate(
             record_type="TXT",
             owner_template="_domainkey",
             ttl=1,
             record_class="IN",
-            rdata_template="t=y; o=~;",
-        ),
-        DnsRecordTemplate(
-            record_type="TXT",
-            owner_template="@",
-            ttl=1,
-            record_class="IN",
-            rdata_template=(
-                "v=spf1 a mx "
-                f"ip4:{_FIXED_SPF_IPV4} "
-                f"include:{_FIXED_SPF_INCLUDE} -all"
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template="t=y; o=~;",
             ),
         ),
         DnsRecordTemplate(
@@ -129,7 +152,24 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="@",
             ttl=1,
             record_class="IN",
-            rdata_template=f"brevo-code:{_FIXED_VERIFICATION_CODE}",
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=(
+                    "v=spf1 a mx "
+                    f"ip4:{_FIXED_SPF_IPV4} "
+                    f"include:{_FIXED_SPF_INCLUDE} -all"
+                ),
+            ),
+        ),
+        DnsRecordTemplate(
+            record_type="TXT",
+            owner_template="@",
+            ttl=1,
+            record_class="IN",
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template=f"brevo-code:{_FIXED_VERIFICATION_CODE}",
+            ),
             manual_flag="token_like_value",
         ),
     ),

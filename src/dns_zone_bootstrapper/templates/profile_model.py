@@ -8,10 +8,19 @@ from typing import Literal
 RecordType = Literal["A", "CNAME", "MX", "SRV", "TXT"]
 RecordClass = Literal["IN"]
 ManualFlag = Literal["token_like_value"]
+RdataKind = Literal["fixed", "apex_fqdn_derived", "apex_slug_derived"]
 
 APEX_PLACEHOLDER = "{apex}"
 APEX_FQDN_PLACEHOLDER = "{apex_fqdn}"
 APEX_SLUG_PLACEHOLDER = "{apex_slug}"
+
+@dataclass(frozen=True, slots=True)
+class RdataTemplateSpec:
+    """Semantic template metadata for a record RDATA payload."""
+
+    kind: RdataKind
+    template: str
+
 
 @dataclass(frozen=True, slots=True)
 class DnsRecordTemplate:
@@ -21,9 +30,20 @@ class DnsRecordTemplate:
     owner_template: str
     ttl: int
     record_class: RecordClass
-    rdata_template: str
+    rdata: RdataTemplateSpec
     cf_proxied: bool | None = None
     manual_flag: ManualFlag | None = None
+
+    @property
+    def rdata_kind(self) -> RdataKind:
+        """Expose the semantic kind of the RDATA template."""
+        return self.rdata.kind
+
+    @property
+    def rdata_template(self) -> str:
+        """Expose the rendered template string of the RDATA payload."""
+        return self.rdata.template
+
 
 @dataclass(frozen=True, slots=True)
 class FixedDnsProfile:

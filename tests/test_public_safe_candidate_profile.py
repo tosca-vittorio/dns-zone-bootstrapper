@@ -121,6 +121,29 @@ def test_public_safe_profile_freezes_placeholder_surface() -> None:
 
     assert all("{apex}" not in record.rdata_template for record in profile.records)
 
+def test_public_safe_profile_freezes_rdata_kind_surface() -> None:
+    """Freeze semantic RDATA kinds for the current B1 profile."""
+    profile = PUBLIC_SAFE_FIXED_DNS_PROFILE
+
+    assert [
+        (record.record_type, record.owner_template, record.rdata_kind)
+        for record in profile.records
+    ] == [
+        ("A", "@", "fixed"),
+        ("CNAME", "autoconfig", "fixed"),
+        ("CNAME", "autodiscover", "fixed"),
+        ("CNAME", "brevo1._domainkey", "apex_slug_derived"),
+        ("CNAME", "brevo2._domainkey", "apex_slug_derived"),
+        ("CNAME", "www", "apex_fqdn_derived"),
+        ("MX", "@", "fixed"),
+        ("SRV", "_autodiscover._tcp", "fixed"),
+        ("TXT", "dkim._domainkey", "fixed"),
+        ("TXT", "_dmarc", "fixed"),
+        ("TXT", "_domainkey", "fixed"),
+        ("TXT", "@", "fixed"),
+        ("TXT", "@", "fixed"),
+    ]
+
 def test_public_safe_profile_freezes_fixed_rdata_surface() -> None:
     """Freeze the fixed non-placeholder RDATA surface of the current B1 profile."""
     profile = PUBLIC_SAFE_FIXED_DNS_PROFILE
