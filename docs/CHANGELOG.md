@@ -8,6 +8,12 @@
 #### B1 — Modello record DNS e profilo template fisso (baseline iniziale)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
+- **`43c3c3b` — `fix(templates): align public-safe profile naming to reference template`**
+  - **Type:** `fix` · **Categoria:** Templates / Profile semantic alignment
+  - **Cosa cambia:** riallinea nel profilo `public_safe_candidate` il naming dei selector DKIM da `provider1/provider2` a `brevo1/brevo2` e il prefisso del record TXT token-like da `verification-code:` a `brevo-code:`, aggiornando di conseguenza i test associati.
+  - **Impatto:** rende la baseline runtime di `B1` più fedele al template fisso reale senza reintrodurre valori privati o dipendenze da snapshot locali; resta invariata la natura public-safe e versionabile del profilo.
+  - **Evidenze:** `pytest -q` → `29 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`cf943e6` — `feat(templates): add public-safe fixed DNS profile baseline`**
   - **Type:** `feat` · **Categoria:** Templates / Profile model
   - **Cosa cambia:** introduce `profile_model.py` con i data model versionabili per record e profilo DNS fisso, aggiunge `public_safe_candidate.py` come primo profilo public-safe sanificato e aggiunge `tests/test_public_safe_candidate_profile.py` per verificare shape minima, assenza di `SOA` e placeholder derivati dal dominio.
