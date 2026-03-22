@@ -8,6 +8,12 @@
 #### B1 — Modello record DNS e profilo template fisso (baseline iniziale)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
+- **`c4a31b6` — `test(templates): freeze public-safe placeholder surface`**
+  - **Type:** `test` · **Categoria:** Templates / Placeholder contract freeze
+  - **Cosa cambia:** aggiunge un test esplicito che congela la superficie placeholder ammessa nel profilo `public_safe_candidate`, verificando i soli casi attesi sui record `brevo1._domainkey`, `brevo2._domainkey` e `www`, oltre all'assenza di `{apex}` nei `rdata_template`.
+  - **Impatto:** rende `B1` più difendibile contro drift silenziosi nella semantica dei placeholder prima dell'apertura del renderer, senza modificare il runtime del package.
+  - **Evidenze:** `pytest -q` → `31 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`87a1e67` — `test(templates): freeze public-safe profile contract`**
   - **Type:** `test` · **Categoria:** Templates / Contract freeze
   - **Cosa cambia:** aggiunge un test esplicito che congela l'inventario record, l'ordine corrente, i flag `cf_proxied` e l'unicità del record TXT con `manual_flag` nel profilo `public_safe_candidate`.
