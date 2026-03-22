@@ -120,3 +120,34 @@ def test_public_safe_profile_freezes_placeholder_surface() -> None:
     ]
 
     assert all("{apex}" not in record.rdata_template for record in profile.records)
+
+def test_public_safe_profile_freezes_fixed_rdata_surface() -> None:
+    """Freeze the fixed non-placeholder RDATA surface of the current B1 profile."""
+    profile = PUBLIC_SAFE_FIXED_DNS_PROFILE
+
+    fixed_rdata_records = [
+        (record.record_type, record.owner_template, record.rdata_template)
+        for record in profile.records
+        if "{" not in record.rdata_template and "}" not in record.rdata_template
+    ]
+
+    assert fixed_rdata_records == [
+        ("A", "@", "__FIXED_A_TARGET__"),
+        ("CNAME", "autoconfig", "__FIXED_MAIL_HOST__."),
+        ("CNAME", "autodiscover", "__FIXED_MAIL_HOST__."),
+        ("MX", "@", "10 __FIXED_MAIL_HOST__."),
+        ("SRV", "_autodiscover._tcp", "0 1 443 __FIXED_MAIL_HOST__."),
+        (
+            "TXT",
+            "dkim._domainkey",
+            "v=DKIM1;k=rsa;t=s;s=email;p=__FIXED_DKIM_PUBLIC_KEY__",
+        ),
+        ("TXT", "_dmarc", "v=DMARC1; p=none; rua=mailto:__FIXED_DMARC_RUA__"),
+        ("TXT", "_domainkey", "t=y; o=~;"),
+        (
+            "TXT",
+            "@",
+            "v=spf1 a mx ip4:__FIXED_SPF_IPV4__ include:__FIXED_SPF_INCLUDE__ -all",
+        ),
+        ("TXT", "@", "brevo-code:__FIXED_VERIFICATION_CODE__"),
+    ]
