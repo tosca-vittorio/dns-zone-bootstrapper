@@ -51,3 +51,17 @@ def test_generate_bind_zone_file_renders_non_golden_valid_apex_end_to_end() -> N
     assert result.zone_file_text is not None
 
     assert_alpha_zone_derived_rendering(result.zone_file_text)
+
+def test_generate_bind_zone_file_propagates_domain_too_long_failure_without_text() -> None:
+    """Return a structured failure result and no rendered text for an overlong apex."""
+    input_value = ".".join(["a" * 63] * 4)
+
+    result = generate_bind_zone_file(input_value)
+
+    assert result == BindZoneFileGenerationResult(
+        input_value=input_value,
+        is_valid=False,
+        zone_apex=None,
+        error_code="domain_too_long",
+        zone_file_text=None,
+    )
