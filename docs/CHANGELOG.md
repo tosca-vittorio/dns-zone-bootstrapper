@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate e apertura sostanziale di `B1` con prima baseline versionabile del profilo DNS fisso.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate e hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile.
 
 #### B1 — Modello record DNS e profilo template fisso (baseline iniziale)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`87a1e67` — `test(templates): freeze public-safe profile contract`**
+  - **Type:** `test` · **Categoria:** Templates / Contract freeze
+  - **Cosa cambia:** aggiunge un test esplicito che congela l'inventario record, l'ordine corrente, i flag `cf_proxied` e l'unicità del record TXT con `manual_flag` nel profilo `public_safe_candidate`.
+  - **Impatto:** rende `B1` più auditabile e riduce il rischio di drift silenzioso del contratto del profilo prima della successiva formalizzazione tecnica, senza modificare il runtime del package.
+  - **Evidenze:** `pytest -q` → `30 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`43c3c3b` — `fix(templates): align public-safe profile naming to reference template`**
   - **Type:** `fix` · **Categoria:** Templates / Profile semantic alignment
