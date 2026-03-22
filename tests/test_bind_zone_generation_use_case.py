@@ -65,3 +65,15 @@ def test_generate_bind_zone_file_propagates_domain_too_long_failure_without_text
         error_code="domain_too_long",
         zone_file_text=None,
     )
+
+def test_generate_bind_zone_file_propagates_empty_input_failure_without_text() -> None:
+    """Return a structured failure result and no rendered text for empty input."""
+    result = generate_bind_zone_file("")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="",
+        is_valid=False,
+        zone_apex=None,
+        error_code="empty_input",
+        zone_file_text=None,
+    )
