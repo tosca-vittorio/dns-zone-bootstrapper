@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile e apertura minima di `B2` con primo renderer BIND verificato.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato e primo hardening del contratto testuale tramite golden file esterno.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`514f278` — `test(renderers): externalize public-safe BIND golden output`**
+  - **Type:** `test` · **Categoria:** Renderers / Golden contract
+  - **Cosa cambia:** introduce `tests/golden/public_safe_candidate.bind.txt` come golden file public-safe del renderer BIND e alleggerisce `tests/test_bind_zone_renderer.py`, che ora legge l'expected esterno invece di mantenere il contratto testuale inline.
+  - **Impatto:** rende il confronto del testo generato più auditabile, manutenibile e pronto a futuri confronti golden senza modificare il comportamento runtime del renderer.
+  - **Evidenze:** `python -m pytest -q` → `34 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`641065e` — `feat(renderers): add minimal BIND zone file renderer`**
   - **Type:** `feat` · **Categoria:** Renderers / BIND zone file
