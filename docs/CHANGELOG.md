@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, e introduzione del boundary applicativo minimo di generazione del file BIND.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND e deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`6742c0e` — `test(application): share bind zone assertions across core paths`**
+  - **Type:** `test` · **Categoria:** Application / Renderer shared assertions
+  - **Cosa cambia:** introduce `tests/shared_bind_zone_assertions.py` e `tests/__init__.py`, riusa le stesse assertion sul rendering derivato in `tests/test_bind_zone_renderer.py` e `tests/test_bind_zone_generation_use_case.py`, e aggiunge nel layer `application` un test end-to-end su apex valido non-golden (`alpha-zone.example.org`).
+  - **Impatto:** rende `B2` più solido e più pulito sul piano test-side, perché difende lo stesso contratto derivato lungo due percorsi del core senza duplicazione letterale e senza alterare il runtime del package.
+  - **Evidenze:** `python -m pytest -q` → `38 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`2898fbb` — `feat(application): add fixed bind zone generation use case`**
   - **Type:** `feat` · **Categoria:** Application / BIND generation use case
