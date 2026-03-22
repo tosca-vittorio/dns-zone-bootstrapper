@@ -102,3 +102,21 @@ def test_public_safe_profile_freezes_current_record_contract() -> None:
     assert flagged_records[0].record_type == "TXT"
     assert flagged_records[0].owner_template == "@"
     assert flagged_records[0].rdata_template == "brevo-code:__FIXED_VERIFICATION_CODE__"
+
+def test_public_safe_profile_freezes_placeholder_surface() -> None:
+    """Freeze the allowed placeholder surface used by the current B1 profile."""
+    profile = PUBLIC_SAFE_FIXED_DNS_PROFILE
+
+    placeholder_records = [
+        (record.owner_template, record.rdata_template)
+        for record in profile.records
+        if "{" in record.rdata_template or "}" in record.rdata_template
+    ]
+
+    assert placeholder_records == [
+        ("brevo1._domainkey", f"b1.{APEX_SLUG_PLACEHOLDER}.dkim.__FIXED_PROVIDER_ZONE__."),
+        ("brevo2._domainkey", f"b2.{APEX_SLUG_PLACEHOLDER}.dkim.__FIXED_PROVIDER_ZONE__."),
+        ("www", APEX_FQDN_PLACEHOLDER),
+    ]
+
+    assert all("{apex}" not in record.rdata_template for record in profile.records)
