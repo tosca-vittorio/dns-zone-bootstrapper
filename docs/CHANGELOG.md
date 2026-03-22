@@ -8,6 +8,12 @@
 #### B1 — Modello record DNS e profilo template fisso (baseline iniziale)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
+- **`afdf577` — `refactor(templates): narrow fixed profile model vocabularies`**
+  - **Type:** `refactor` · **Categoria:** Templates / Model vocabulary narrowing
+  - **Cosa cambia:** restringe nel file `profile_model.py` il vocabolario del model layer introducendo alias tipizzati dedicati per `RecordClass` e `ManualFlag`, sostituendo i campi generici `str` in `DnsRecordTemplate`.
+  - **Impatto:** porta nel modello centrale due invarianti già veri nel profilo `B1` corrente e già protetti dai test, riducendo la superficie di drift silenzioso prima dell’apertura del renderer senza modificare il comportamento runtime del profilo public-safe.
+  - **Evidenze:** `pytest -q` → `32 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`532487a` — `test(templates): freeze public-safe fixed rdata surface`**
   - **Type:** `test` · **Categoria:** Templates / Fixed RDATA contract freeze
   - **Cosa cambia:** aggiunge un test esplicito che congela la superficie `rdata_template` fixed-only non derivata dal dominio nel profilo `public_safe_candidate`, verificando i valori fissi correnti di record `A`, `CNAME`, `MX`, `SRV` e `TXT`.

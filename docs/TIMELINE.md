@@ -4,9 +4,9 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1` aperto operativamente con baseline code-only del profilo DNS fisso public-safe corretta semanticamente sul naming rispetto al template reale e ora irrigidita da un test di freeze del contratto corrente; `B0` chiuso e consolidato
+- Fase corrente: `B1` aperto operativamente con baseline code-only del profilo DNS fisso public-safe corretta semanticamente sul naming rispetto al template reale, irrigidita da test espliciti di freeze su contratto e superfici principali e ora ulteriormente ristretta nel model layer sui vocabolari `RecordClass` e `ManualFlag`; `B0` chiuso e consolidato
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: riallineare gli owner docs al freeze della superficie RDATA fixed-only del profilo `B1` e mantenere aperta la successiva formalizzazione del profilo/template in vista di `B2`
+- Obiettivo immediato: chiarire e chiudere il minimo gap strutturale residuo di `B1` prima di `B2`, mantenendo separati renderer, web/UI e refactor larghi
 
 ## Legenda stati
 
@@ -162,6 +162,7 @@ Definire la rappresentazione logica minima del template DNS fisso derivato dal f
 - aggiunto un test esplicito che congela inventario record, ordine corrente, flag `cf_proxied` e unicità del record TXT con `manual_flag`.
 - aggiunto un test esplicito che congela la superficie placeholder ammessa nel profilo corrente, verificando la presenza controllata di `{apex_slug}` e `{apex_fqdn}` e l'assenza di `{apex}` nei `rdata_template`.
 - aggiunto un test esplicito che congela la superficie `rdata_template` fixed-only non derivata dal dominio, proteggendo i valori fissi correnti del profilo public-safe.
+- aggiunto un restringimento esplicito del model layer: `record_class` è ora tipizzato come `Literal["IN"]` e `manual_flag` come `Literal["token_like_value"]`, allineando il modello agli invarianti già presenti nel profilo corrente e già difesi dai test.
 
 **Evidenze correnti**
 - `pytest -q` → `32 passed`;
@@ -172,6 +173,7 @@ Definire la rappresentazione logica minima del template DNS fisso derivato dal f
 - freeze contrattuale del profilo consolidato nel commit `87a1e67`.
 - freeze della superficie placeholder consolidato nel commit `c4a31b6`.
 - freeze della superficie fixed-only `rdata_template` consolidato nel commit `532487a`.
+- restringimento del vocabolario del model layer consolidato nel commit `afdf577`.
 
 **Nota di stato B1**
 - il blocco è aperto in modo sostanziale ma non ancora chiuso;
