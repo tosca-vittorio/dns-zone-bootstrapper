@@ -2,6 +2,10 @@
 
 from pathlib import Path
 
+from tests.shared_bind_zone_assertions import (
+    assert_alpha_zone_derived_rendering,
+)
+
 from dns_zone_bootstrapper.renderers.bind_zone_renderer import (
     render_bind_zone_file,
 )
@@ -30,20 +34,4 @@ def test_render_bind_zone_file_resolves_derived_placeholders_for_non_golden_apex
         profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
     )
 
-    lines = rendered.splitlines()
-
-    assert (
-        "brevo1._domainkey.alpha-zone.example.org. 1 IN CNAME "
-        "b1.alpha-zone-example-org.dkim.__FIXED_PROVIDER_ZONE__. "
-        "; cf_tags=cf-proxied:false"
-    ) in lines
-    assert (
-        "brevo2._domainkey.alpha-zone.example.org. 1 IN CNAME "
-        "b2.alpha-zone-example-org.dkim.__FIXED_PROVIDER_ZONE__. "
-        "; cf_tags=cf-proxied:false"
-    ) in lines
-    assert (
-        "www.alpha-zone.example.org. 1 IN CNAME "
-        "alpha-zone.example.org. ; cf_tags=cf-proxied:true"
-    ) in lines
-    assert not rendered.endswith("\n")
+    assert_alpha_zone_derived_rendering(rendered)

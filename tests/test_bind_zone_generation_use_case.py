@@ -2,6 +2,10 @@
 
 from pathlib import Path
 
+from tests.shared_bind_zone_assertions import (
+    assert_alpha_zone_derived_rendering,
+)
+
 from dns_zone_bootstrapper.application.bind_zone_generation import (
     BindZoneFileGenerationResult,
     generate_bind_zone_file,
@@ -35,3 +39,15 @@ def test_generate_bind_zone_file_propagates_validation_failure_without_text() ->
         error_code="surrounding_whitespace",
         zone_file_text=None,
     )
+
+def test_generate_bind_zone_file_renders_non_golden_valid_apex_end_to_end() -> None:
+    """Render a valid non-golden apex end-to-end through the application use case."""
+    result = generate_bind_zone_file("alpha-zone.example.org")
+
+    assert result.input_value == "alpha-zone.example.org"
+    assert result.is_valid is True
+    assert result.zone_apex == "alpha-zone.example.org"
+    assert result.error_code is None
+    assert result.zone_file_text is not None
+
+    assert_alpha_zone_derived_rendering(result.zone_file_text)
