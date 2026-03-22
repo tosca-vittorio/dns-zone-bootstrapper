@@ -4,9 +4,9 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B0` sostanzialmente chiuso e consolidato; preparazione apertura operativa di `B1`
+- Fase corrente: `B1` aperto operativamente con prima baseline code-only del profilo DNS fisso public-safe; `B0` chiuso e consolidato
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: congelare la chiusura di `B0` nella timeline e preparare la derivazione del primo profilo DNS fisso da template reale per `B1`
+- Obiettivo immediato: riallineare gli owner docs dopo il primo baseline versionabile di `B1` e preparare la successiva formalizzazione del profilo/template in vista di `B2`
 
 ## Legenda stati
 
@@ -148,15 +148,27 @@ Implementare la prima validazione forte sull'input minimo certo del sistema: il 
 - la validazione del dominio apex è ora coperta da layer `domain`, use case `application`, errori strutturati deterministici e test espliciti sui principali failure mode sintattici;
 - `B0` si considera chiuso come blocco di validazione sintattica framework-agnostic, mentre tutto ciò che riguarda template DNS, record profile e rendering resta demandato ai blocchi successivi.
 
-### B1 — Modello record DNS e profilo template fisso — ⬜
-**Obiettivo**  
+### B1 — Modello record DNS e profilo template fisso — 🟡
+**Obiettivo**
 Definire la rappresentazione logica minima del template DNS fisso derivato dal file reale di riferimento.
 
-**Primo lavoro previsto**
-- separare ciò che deriva dal dominio da ciò che resta fisso;
-- introdurre una struttura dati iniziale per il profilo;
-- mantenere il template fuori dalla web app;
-- preparare il terreno per eventuali futuri campi variabili.
+**Stato operativo**
+- introdotti data model versionabili per record template e profilo DNS fisso nel package `templates`;
+- introdotto un primo profilo `public_safe_candidate` sanificato e versionabile, coerente con la struttura del template reale ma privo di valori operativi privati;
+- mantenuta la separazione tra placeholder derivati dal dominio (`{apex_fqdn}`, `{apex_slug}`) e valori fissi candidati;
+- escluso lo `SOA` dalla baseline `B1` e mantenuta fuori dal runtime la dipendenza dagli snapshot privati locali;
+- aggiunto un test dedicato che verifica shape minima, assenza di `SOA` e presenza dei placeholder derivati.
+
+**Evidenze correnti**
+- `pytest -q` → `29 passed`;
+- `python -m pylint src tests` → `10.00/10`;
+- aggiunti `src/dns_zone_bootstrapper/templates/profile_model.py`, `src/dns_zone_bootstrapper/templates/profiles/public_safe_candidate.py` e `tests/test_public_safe_candidate_profile.py`;
+- baseline `B1` consolidata nel commit `cf943e6`.
+
+**Nota di stato B1**
+- il blocco è aperto in modo sostanziale ma non ancora chiuso;
+- esiste ora una prima rappresentazione runtime versionabile del profilo DNS fisso, public-safe e indipendente dai file privati locali;
+- restano fuori scope in questa iterazione il renderer BIND, la serializzazione finale per Cloudflare e la superficie web.
 
 ### B2 — Renderer BIND zone file — ⬜
 **Obiettivo**  
