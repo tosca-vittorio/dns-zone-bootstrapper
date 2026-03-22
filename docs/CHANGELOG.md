@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato e primo hardening del contratto testuale tramite golden file esterno.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, primo hardening del contratto testuale tramite golden file esterno e copertura esplicita dei placeholder derivati.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`43d7d37` — `test(renderers): cover derived placeholder rendering`**
+  - **Type:** `test` · **Categoria:** Renderers / Derived placeholder coverage
+  - **Cosa cambia:** estende `tests/test_bind_zone_renderer.py` con un test dedicato su un apex diverso dal golden corrente (`alpha-zone.example.org`), congelando la resa di `apex_slug`, `apex_fqdn` e l'assenza di newline finale nel testo generato.
+  - **Impatto:** rende `B2` più difendibile contro drift silenziosi nella logica di rendering dei placeholder derivati, senza modificare il comportamento runtime del renderer.
+  - **Evidenze:** `python -m pytest -q` → `35 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`514f278` — `test(renderers): externalize public-safe BIND golden output`**
   - **Type:** `test` · **Categoria:** Renderers / Golden contract
