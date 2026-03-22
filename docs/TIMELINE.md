@@ -6,7 +6,7 @@
 - Branch operativo: `development`
 - Fase corrente: `B1` aperto operativamente con baseline code-only del profilo DNS fisso public-safe corretta semanticamente sul naming rispetto al template reale e ora irrigidita da un test di freeze del contratto corrente; `B0` chiuso e consolidato
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: riallineare gli owner docs al freeze della superficie placeholder ammessa nel profilo `B1` e mantenere aperta la successiva formalizzazione del profilo/template in vista di `B2`
+- Obiettivo immediato: riallineare gli owner docs al freeze della superficie RDATA fixed-only del profilo `B1` e mantenere aperta la successiva formalizzazione del profilo/template in vista di `B2`
 
 ## Legenda stati
 
@@ -161,20 +161,22 @@ Definire la rappresentazione logica minima del template DNS fisso derivato dal f
 - aggiunto un test dedicato che verifica shape minima, assenza di `SOA` e presenza dei placeholder derivati.
 - aggiunto un test esplicito che congela inventario record, ordine corrente, flag `cf_proxied` e unicità del record TXT con `manual_flag`.
 - aggiunto un test esplicito che congela la superficie placeholder ammessa nel profilo corrente, verificando la presenza controllata di `{apex_slug}` e `{apex_fqdn}` e l'assenza di `{apex}` nei `rdata_template`.
+- aggiunto un test esplicito che congela la superficie `rdata_template` fixed-only non derivata dal dominio, proteggendo i valori fissi correnti del profilo public-safe.
 
 **Evidenze correnti**
-- `pytest -q` → `31 passed`;
+- `pytest -q` → `32 passed`;
 - `python -m pylint src tests` → `10.00/10`;
 - aggiunti `src/dns_zone_bootstrapper/templates/profile_model.py`, `src/dns_zone_bootstrapper/templates/profiles/public_safe_candidate.py` e `tests/test_public_safe_candidate_profile.py`;
 - baseline `B1` consolidata nel commit `cf943e6`;
 - riallineamento semantico minimale del profilo consolidato nel commit `43c3c3b`.
 - freeze contrattuale del profilo consolidato nel commit `87a1e67`.
 - freeze della superficie placeholder consolidato nel commit `c4a31b6`.
+- freeze della superficie fixed-only `rdata_template` consolidato nel commit `532487a`.
 
 **Nota di stato B1**
 - il blocco è aperto in modo sostanziale ma non ancora chiuso;
 - esiste ora una prima rappresentazione runtime versionabile del profilo DNS fisso, public-safe, indipendente dai file privati locali e più fedele al naming del template reale;
-- il contratto corrente del profilo è ora più rigido e auditabile grazie a test espliciti su inventario, ordine, flag e superficie placeholder ammessa, ma il blocco non è ancora chiuso;
+- il contratto corrente del profilo è ora più rigido e auditabile grazie a test espliciti su inventario, ordine, flag, superficie placeholder ammessa e superficie fixed-only dei `rdata_template`, ma il blocco non è ancora chiuso;
 - restano fuori scope in questa iterazione il renderer BIND, la serializzazione finale per Cloudflare e la superficie web.
 
 ### B2 — Renderer BIND zone file — ⬜

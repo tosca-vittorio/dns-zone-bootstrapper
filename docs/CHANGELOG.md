@@ -8,6 +8,12 @@
 #### B1 — Modello record DNS e profilo template fisso (baseline iniziale)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
+- **`532487a` — `test(templates): freeze public-safe fixed rdata surface`**
+  - **Type:** `test` · **Categoria:** Templates / Fixed RDATA contract freeze
+  - **Cosa cambia:** aggiunge un test esplicito che congela la superficie `rdata_template` fixed-only non derivata dal dominio nel profilo `public_safe_candidate`, verificando i valori fissi correnti di record `A`, `CNAME`, `MX`, `SRV` e `TXT`.
+  - **Impatto:** rende `B1` più difendibile contro drift silenziosi nei valori fissi del profilo prima dell'apertura del renderer, senza modificare il runtime del package.
+  - **Evidenze:** `pytest -q` → `32 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`c4a31b6` — `test(templates): freeze public-safe placeholder surface`**
   - **Type:** `test` · **Categoria:** Templates / Placeholder contract freeze
   - **Cosa cambia:** aggiunge un test esplicito che congela la superficie placeholder ammessa nel profilo `public_safe_candidate`, verificando i soli casi attesi sui record `brevo1._domainkey`, `brevo2._domainkey` e `www`, oltre all'assenza di `{apex}` nei `rdata_template`.
