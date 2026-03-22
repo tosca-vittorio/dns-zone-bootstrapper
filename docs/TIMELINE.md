@@ -198,12 +198,12 @@ Produrre il renderer del file di zona in formato coerente con l'import Cloudflar
 - aggiunto `tests/test_bind_zone_generation_use_case.py` con copertura esplicita del percorso applicativo di successo sul golden public-safe e del failure path con propagazione dell'`error_code` e assenza di testo renderizzato;
 - aggiunto un test end-to-end su apex valido non-golden (`alpha-zone.example.org`) nel layer `application`, verificando che il generatore produca lo stesso contratto derivato già congelato nel renderer puro;
 - estratto `tests/shared_bind_zone_assertions.py` come helper test-side condiviso, riusato da `tests/test_bind_zone_renderer.py` e `tests/test_bind_zone_generation_use_case.py` per evitare duplicazione letterale delle assertion e mantenere allineato il contratto verificato attraverso i due percorsi del core;
-- verificate assenza di regressioni e qualità globale con `python -m pytest -q` → `38 passed` e `python -m pylint src tests` → `10.00/10`;
-- avanzamento tecnico consolidato nei commit `641065e`, `514f278`, `43d7d37`, `2898fbb` e `6742c0e`.
-
+- verificate assenza di regressioni e qualità globale con `python -m pytest -q` → `39 passed` e `python -m pylint src tests` → `10.00/10`;
+- avanzamento tecnico consolidato nei commit `641065e`, `514f278`, `43d7d37`, `2898fbb`, `6742c0e` e `97d3e83`.
+- estesa la copertura del use case `generate_bind_zone_file` con un failure path sintattico aggiuntivo su apex overlong, verificando la propagazione di `error_code="domain_too_long"` e l'assenza di testo renderizzato;
 
 **Nota di stato B2**
-- il blocco non è ancora chiuso, perché pur esistendo ora sia il renderer minimo sia un primo boundary `application`, mancano ancora estensioni controllate della copertura, confronti più realistici e integrazioni verso superfici esterne;
+- il blocco non è ancora chiuso, perché pur esistendo ora sia il renderer minimo sia un primo boundary `application` con copertura estesa anche a un failure path sintattico overlong, mancano ancora ulteriori estensioni controllate della copertura, confronti più realistici e integrazioni verso superfici esterne;
 - `B2` non è più da considerare solo un blocco di rendering isolato: esiste ora un primo contratto framework-agnostic end-to-end nel core, che parte dallo zone apex input, valida l'input e produce il testo BIND usando il profilo fisso public-safe, con resa derivata su apex non-golden difesa in modo coerente sia nel renderer sia nel use case applicativo tramite assertion condivise nel solo layer test;
 - il prossimo passo corretto resta l'hardening controllato del generatore nel core, senza aprire nello stesso blocco scope su UI/web o refactor larghi.
 
