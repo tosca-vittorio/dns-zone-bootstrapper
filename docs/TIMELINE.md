@@ -4,9 +4,9 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1` aperto operativamente con baseline code-only del profilo DNS fisso public-safe corretta semanticamente sul naming rispetto al template reale, irrigidita da test espliciti di freeze su contratto e superfici principali, ristretta nel model layer sui vocabolari `RecordClass` e `ManualFlag` e ora formalizzata meglio sulla semantica del `rdata` tramite metadata espliciti; `B0` chiuso e consolidato
+- Fase corrente: `B1` chiuso e consolidato come baseline code-only del profilo DNS fisso public-safe, semanticamente allineata al template reale, irrigidita da freeze test su contratto e superfici principali e formalizzata nel model layer su vocabolari chiusi e metadata espliciti del `rdata`; `B2` non ancora avviato
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: chiarire e chiudere il minimo gap strutturale residuo di `B1` prima di `B2`, mantenendo separati renderer, web/UI e refactor larghi
+- Obiettivo immediato: aprire `B2` con il primo contratto minimo del renderer BIND, mantenendo separati rendering, web/UI e refactor larghi
 
 ## Legenda stati
 
@@ -148,7 +148,7 @@ Implementare la prima validazione forte sull'input minimo certo del sistema: il 
 - la validazione del dominio apex è ora coperta da layer `domain`, use case `application`, errori strutturati deterministici e test espliciti sui principali failure mode sintattici;
 - `B0` si considera chiuso come blocco di validazione sintattica framework-agnostic, mentre tutto ciò che riguarda template DNS, record profile e rendering resta demandato ai blocchi successivi.
 
-### B1 — Modello record DNS e profilo template fisso — 🟡
+### B1 — Modello record DNS e profilo template fisso — ✅
 **Obiettivo**
 Definire la rappresentazione logica minima del template DNS fisso derivato dal file reale di riferimento.
 
@@ -177,11 +177,12 @@ Definire la rappresentazione logica minima del template DNS fisso derivato dal f
 - restringimento del vocabolario del model layer consolidato nel commit `afdf577`.
 - formalizzazione semantica del `rdata` consolidata nel commit `1411bea`.
 
-**Nota di stato B1**
-- il blocco è aperto in modo sostanziale ma non ancora chiuso;
-- esiste ora una prima rappresentazione runtime versionabile del profilo DNS fisso, public-safe, indipendente dai file privati locali e più fedele al naming del template reale;
-- il contratto corrente del profilo è ora più rigido e auditabile grazie a test espliciti su inventario, ordine, flag, superficie placeholder ammessa e superficie fixed-only dei `rdata_template`, ma il blocco non è ancora chiuso;
-- restano fuori scope in questa iterazione il renderer BIND, la serializzazione finale per Cloudflare e la superficie web.
+**Nota di chiusura B1**
+- la DoD sostanziale del blocco risulta soddisfatta sul repository reale;
+- il profilo `public_safe_candidate` costituisce ora una baseline runtime versionabile, public-safe, indipendente dagli asset privati locali e semanticamente allineata al template reale di riferimento;
+- il contratto del profilo è difeso da test espliciti su shape minima, inventario, ordine, flag, superficie placeholder ammessa, superficie fixed-only dei `rdata_template` e semantica del `rdata`;
+- il model layer esprime ora in modo più rigoroso sia i vocabolari chiusi sia i metadata semantici del `rdata`, riducendo la dipendenza da logica implicita prima dell’apertura del renderer;
+- `B1` si considera chiuso; il passo successivo corretto è `B2`, dedicato al renderer BIND e ai primi test sul testo generato.
 
 ### B2 — Renderer BIND zone file — ⬜
 **Obiettivo**  
