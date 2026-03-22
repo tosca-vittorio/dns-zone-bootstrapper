@@ -51,3 +51,54 @@ def test_public_safe_profile_marks_token_like_txt_record() -> None:
         verification_records[0].rdata_template
         == "brevo-code:__FIXED_VERIFICATION_CODE__"
     )
+
+def test_public_safe_profile_freezes_current_record_contract() -> None:
+    """Freeze the current B1 record inventory, order and flags."""
+    profile = PUBLIC_SAFE_FIXED_DNS_PROFILE
+
+    assert [
+        (record.record_type, record.owner_template)
+        for record in profile.records
+    ] == [
+        ("A", "@"),
+        ("CNAME", "autoconfig"),
+        ("CNAME", "autodiscover"),
+        ("CNAME", "brevo1._domainkey"),
+        ("CNAME", "brevo2._domainkey"),
+        ("CNAME", "www"),
+        ("MX", "@"),
+        ("SRV", "_autodiscover._tcp"),
+        ("TXT", "dkim._domainkey"),
+        ("TXT", "_dmarc"),
+        ("TXT", "_domainkey"),
+        ("TXT", "@"),
+        ("TXT", "@"),
+    ]
+
+    assert [
+        (record.record_type, record.owner_template, record.cf_proxied)
+        for record in profile.records
+    ] == [
+        ("A", "@", True),
+        ("CNAME", "autoconfig", False),
+        ("CNAME", "autodiscover", False),
+        ("CNAME", "brevo1._domainkey", False),
+        ("CNAME", "brevo2._domainkey", False),
+        ("CNAME", "www", True),
+        ("MX", "@", None),
+        ("SRV", "_autodiscover._tcp", None),
+        ("TXT", "dkim._domainkey", None),
+        ("TXT", "_dmarc", None),
+        ("TXT", "_domainkey", None),
+        ("TXT", "@", None),
+        ("TXT", "@", None),
+    ]
+
+    flagged_records = [
+        record for record in profile.records if record.manual_flag is not None
+    ]
+    assert len(flagged_records) == 1
+    assert flagged_records[0].manual_flag == "token_like_value"
+    assert flagged_records[0].record_type == "TXT"
+    assert flagged_records[0].owner_template == "@"
+    assert flagged_records[0].rdata_template == "brevo-code:__FIXED_VERIFICATION_CODE__"
