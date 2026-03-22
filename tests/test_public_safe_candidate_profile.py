@@ -27,11 +27,11 @@ def test_public_safe_profile_keeps_domain_derived_placeholders() -> None:
 
     assert by_owner["www"].rdata_template == APEX_FQDN_PLACEHOLDER
     assert (
-        by_owner["provider1._domainkey"].rdata_template
+        by_owner["brevo1._domainkey"].rdata_template
         == f"b1.{APEX_SLUG_PLACEHOLDER}.dkim.__FIXED_PROVIDER_ZONE__."
     )
     assert (
-        by_owner["provider2._domainkey"].rdata_template
+        by_owner["brevo2._domainkey"].rdata_template
         == f"b2.{APEX_SLUG_PLACEHOLDER}.dkim.__FIXED_PROVIDER_ZONE__."
     )
 
@@ -49,5 +49,5 @@ def test_public_safe_profile_marks_token_like_txt_record() -> None:
     assert verification_records[0].owner_template == "@"
     assert (
         verification_records[0].rdata_template
-        == "verification-code:__FIXED_VERIFICATION_CODE__"
+        == "brevo-code:__FIXED_VERIFICATION_CODE__"
     )

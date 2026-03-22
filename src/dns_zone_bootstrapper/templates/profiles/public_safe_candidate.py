@@ -49,7 +49,7 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
         ),
         DnsRecordTemplate(
             record_type="CNAME",
-            owner_template="provider1._domainkey",
+            owner_template="brevo1._domainkey",
             ttl=1,
             record_class="IN",
             rdata_template=(
@@ -59,7 +59,7 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
         ),
         DnsRecordTemplate(
             record_type="CNAME",
-            owner_template="provider2._domainkey",
+            owner_template="brevo2._domainkey",
             ttl=1,
             record_class="IN",
             rdata_template=(
@@ -129,7 +129,7 @@ PUBLIC_SAFE_FIXED_DNS_PROFILE = FixedDnsProfile(
             owner_template="@",
             ttl=1,
             record_class="IN",
-            rdata_template=f"verification-code:{_FIXED_VERIFICATION_CODE}",
+            rdata_template=f"brevo-code:{_FIXED_VERIFICATION_CODE}",
             manual_flag="token_like_value",
         ),
     ),
