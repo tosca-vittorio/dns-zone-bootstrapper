@@ -206,12 +206,13 @@ Produrre il renderer del file di zona in formato coerente con l'import Cloudflar
 - estesa ulteriormente la copertura del use case `generate_bind_zone_file` con un failure path sintattico aggiuntivo su apex con label vuota, verificando la propagazione di `error_code="empty_label"` e l'assenza di testo renderizzato;
 - estesa ulteriormente la copertura del use case `generate_bind_zone_file` con un failure path sintattico aggiuntivo su apex con label non valida, verificando la propagazione di `error_code="invalid_label"` e l'assenza di testo renderizzato;
 - estesa ulteriormente la copertura del use case `generate_bind_zone_file` con un failure path sintattico aggiuntivo su input apex non stringa, verificando la propagazione di `error_code="non_string_input"` e l'assenza di testo renderizzato;
-- verificate assenza di regressioni e qualità globale con `python -m pytest -q` → `46 passed` e `python -m pylint src tests` → `10.00/10`;
-- avanzamento tecnico consolidato nei commit `641065e`, `514f278`, `43d7d37`, `2898fbb`, `6742c0e`, `97d3e83`, `ebe3221`, `558c533`, `ef25219`, `ca8e2e0`, `9b2957d`, `7aad215` e `afa92bd`.
+- estesa la copertura del renderer BIND con un test mirato sul quoting dei record `TXT`, verificando esplicitamente che l'output renderizzato mantenga il payload tra doppi apici per record testuali rappresentativi del profilo public-safe;
+- verificate assenza di regressioni e qualità globale con `python -m pytest -q` → `47 passed` e `python -m pylint src tests` → `10.00/10`;
+- avanzamento tecnico consolidato nei commit `641065e`, `514f278`, `43d7d37`, `2898fbb`, `6742c0e`, `97d3e83`, `ebe3221`, `558c533`, `ef25219`, `ca8e2e0`, `9b2957d`, `7aad215`, `afa92bd` e `9c5910b`.
 
 **Nota di stato B2**
 - il blocco non è ancora chiuso, perché pur esistendo ora sia il renderer minimo sia un primo boundary `application` con copertura estesa anche ai failure path sintattici `domain_too_long`, `empty_input`, `missing_dot`, `leading_dot`, `trailing_dot`, `empty_label`, `invalid_label` e `non_string_input`, mancano ancora ulteriori estensioni controllate della copertura, confronti più realistici e integrazioni verso superfici esterne;
-- `B2` non è più da considerare solo un blocco di rendering isolato: esiste ora un primo contratto framework-agnostic end-to-end nel core, che parte dallo zone apex input, valida l'input e produce il testo BIND usando il profilo fisso public-safe, con resa derivata su apex non-golden difesa in modo coerente sia nel renderer sia nel use case applicativo tramite assertion condivise nel solo layer test;
+- `B2` non è più da considerare solo un blocco di rendering isolato: esiste ora un primo contratto framework-agnostic end-to-end nel core, che parte dallo zone apex input, valida l'input e produce il testo BIND usando il profilo fisso public-safe, con resa derivata su apex non-golden difesa in modo coerente sia nel renderer sia nel use case applicativo tramite assertion condivise nel solo layer test, e con copertura esplicita anche del quoting dei record `TXT` nel renderer.
 - il prossimo passo corretto resta l'hardening controllato del generatore nel core, senza aprire nello stesso blocco scope su UI/web o refactor larghi.
 
 ### B3 — Test del generatore e preparazione fixture reali — ⬜
