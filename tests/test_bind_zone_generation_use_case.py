@@ -77,3 +77,15 @@ def test_generate_bind_zone_file_propagates_empty_input_failure_without_text() -
         error_code="empty_input",
         zone_file_text=None,
     )
+
+def test_generate_bind_zone_file_propagates_missing_dot_failure_without_text() -> None:
+    """Return a structured failure result and no rendered text for apex without dot."""
+    result = generate_bind_zone_file("testdomain")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="testdomain",
+        is_valid=False,
+        zone_apex=None,
+        error_code="missing_dot",
+        zone_file_text=None,
+    )
