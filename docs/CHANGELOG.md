@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT` e sulle annotazioni `cf_tags`.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT`, sulle annotazioni `cf_tags` e su un freeze esplicito della presenza, unicità e ordine dei section headers del renderer BIND.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`bc4f648` — `test(renderer): freeze bind section header order`**
+  - **Type:** `test` · **Categoria:** Renderer / Section header contract freeze
+  - **Cosa cambia:** estende `tests/test_bind_zone_renderer.py` con un test dedicato che congela esplicitamente presenza, unicità e ordine dei section headers `A`, `CNAME`, `MX`, `SRV` e `TXT` nell'output BIND del profilo public-safe.
+  - **Impatto:** rende più esplicito e più difendibile il contratto corrente del renderer sui blocchi sezione dell'output, riducendo il rischio di drift silenzioso su headers e ordering senza modificare il runtime del package.
+  - **Evidenze:** `python -m pytest -q` → `49 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`f97cd44` — `test(renderer): cover cf tags bind zone annotations`**
   - **Type:** `test` · **Categoria:** Renderer / Contract coverage
