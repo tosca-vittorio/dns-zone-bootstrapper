@@ -35,3 +35,22 @@ def test_render_bind_zone_file_resolves_derived_placeholders_for_non_golden_apex
     )
 
     assert_alpha_zone_derived_rendering(rendered)
+
+def test_render_bind_zone_file_quotes_txt_records_in_output() -> None:
+    """Quote TXT record payloads in rendered BIND output."""
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
+
+    expected_txt_lines = (
+        'testdomain.com. 1 IN TXT "brevo-code:__FIXED_VERIFICATION_CODE__"',
+        (
+            'testdomain.com. 1 IN TXT '
+            '"v=spf1 a mx ip4:__FIXED_SPF_IPV4__ '
+            'include:__FIXED_SPF_INCLUDE__ -all"'
+        ),
+    )
+
+    for expected_line in expected_txt_lines:
+        assert expected_line in rendered
