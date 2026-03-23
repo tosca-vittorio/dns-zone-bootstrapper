@@ -54,3 +54,21 @@ def test_render_bind_zone_file_quotes_txt_records_in_output() -> None:
 
     for expected_line in expected_txt_lines:
         assert expected_line in rendered
+
+def test_render_bind_zone_file_renders_cf_tags_annotations() -> None:
+    """Render cf_tags annotations for proxied and non-proxied records."""
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
+
+    expected_lines = (
+        "testdomain.com. 1 IN A __FIXED_A_TARGET__ ; cf_tags=cf-proxied:true",
+        (
+            "autoconfig.testdomain.com. 1 IN CNAME "
+            "__FIXED_MAIL_HOST__. ; cf_tags=cf-proxied:false"
+        ),
+    )
+
+    for expected_line in expected_lines:
+        assert expected_line in rendered
