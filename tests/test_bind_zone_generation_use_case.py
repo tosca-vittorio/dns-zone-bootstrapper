@@ -125,3 +125,15 @@ def test_generate_bind_zone_file_propagates_empty_label_failure_without_text() -
         error_code="empty_label",
         zone_file_text=None,
     )
+
+def test_generate_bind_zone_file_propagates_invalid_label_failure_without_text() -> None:
+    """Return a structured failure result and no rendered text for apex with invalid label."""
+    result = generate_bind_zone_file("te_st.domain.com")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="te_st.domain.com",
+        is_valid=False,
+        zone_apex=None,
+        error_code="invalid_label",
+        zone_file_text=None,
+    )
