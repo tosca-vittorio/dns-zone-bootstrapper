@@ -113,3 +113,15 @@ def test_generate_bind_zone_file_propagates_trailing_dot_failure_without_text() 
         error_code="trailing_dot",
         zone_file_text=None,
     )
+
+def test_generate_bind_zone_file_propagates_empty_label_failure_without_text() -> None:
+    """Return a structured failure result and no rendered text for apex with empty label."""
+    result = generate_bind_zone_file("test..domain.com")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="test..domain.com",
+        is_valid=False,
+        zone_apex=None,
+        error_code="empty_label",
+        zone_file_text=None,
+    )
