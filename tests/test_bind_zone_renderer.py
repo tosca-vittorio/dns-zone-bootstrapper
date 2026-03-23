@@ -72,3 +72,25 @@ def test_render_bind_zone_file_renders_cf_tags_annotations() -> None:
 
     for expected_line in expected_lines:
         assert expected_line in rendered
+
+def test_render_bind_zone_file_groups_sections_in_expected_order() -> None:
+    """Render section headers once and in the expected record-type order."""
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
+
+    expected_headers = (
+        ";; A Records",
+        ";; CNAME Records",
+        ";; MX Records",
+        ";; SRV Records",
+        ";; TXT Records",
+    )
+
+    last_index = -1
+    for header in expected_headers:
+        assert rendered.count(header) == 1
+        current_index = rendered.index(header)
+        assert current_index > last_index
+        last_index = current_index
