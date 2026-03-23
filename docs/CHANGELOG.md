@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT`.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT` e sulle annotazioni `cf_tags`.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`f97cd44` — `test(renderer): cover cf tags bind zone annotations`**
+  - **Type:** `test` · **Categoria:** Renderer / Contract coverage
+  - **Cosa cambia:** estende `tests/test_bind_zone_renderer.py` con un test mirato che verifica esplicitamente la resa delle annotazioni `cf_tags` nell'output BIND renderizzato, coprendo sia il caso `cf-proxied:true` sia il caso `cf-proxied:false`.
+  - **Impatto:** rafforza ulteriormente il contratto del renderer su una parte semantica load-bearing dell'output emesso, senza modificare il runtime del package.
+  - **Evidenze:** `python -m pytest -q` → `48 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`9c5910b` — `test(renderer): cover txt quoting bind zone output`**
   - **Type:** `test` · **Categoria:** Renderer / Contract coverage
