@@ -101,3 +101,15 @@ def test_generate_bind_zone_file_propagates_leading_dot_failure_without_text() -
         error_code="leading_dot",
         zone_file_text=None,
     )
+
+def test_generate_bind_zone_file_propagates_trailing_dot_failure_without_text() -> None:
+    """Return a structured failure result and no rendered text for apex with trailing dot."""
+    result = generate_bind_zone_file("testdomain.com.")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="testdomain.com.",
+        is_valid=False,
+        zone_apex=None,
+        error_code="trailing_dot",
+        zone_file_text=None,
+    )
