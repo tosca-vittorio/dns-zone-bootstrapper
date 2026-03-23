@@ -137,3 +137,15 @@ def test_generate_bind_zone_file_propagates_invalid_label_failure_without_text()
         error_code="invalid_label",
         zone_file_text=None,
     )
+
+def test_generate_bind_zone_file_propagates_non_string_input_failure_without_text() -> None:
+    """Return a structured failure result and no rendered text for non-string apex input."""
+    result = generate_bind_zone_file(None)
+
+    assert result == BindZoneFileGenerationResult(
+        input_value=None,
+        is_valid=False,
+        zone_apex=None,
+        error_code="non_string_input",
+        zone_file_text=None,
+    )
