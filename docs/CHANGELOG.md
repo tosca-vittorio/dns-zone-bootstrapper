@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT`, sulle annotazioni `cf_tags` e su un freeze esplicito della presenza, unicità e ordine dei section headers del renderer BIND.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT`, sulle annotazioni `cf_tags`, su un freeze esplicito della presenza, unicità e ordine dei section headers del renderer BIND e sull'assenza di annotazioni `cf_tags` per record senza stato proxy esplicito.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`1840aab` — `test(renderer): cover missing cf tags bind zone output`**
+  - **Type:** `test` · **Categoria:** Renderer / Cloudflare annotation contract coverage
+  - **Cosa cambia:** estende `tests/test_bind_zone_renderer.py` con un test dedicato che verifica esplicitamente l'assenza di annotazioni `cf_tags` nell'output BIND per record del profilo public-safe privi di stato proxy esplicito, coprendo casi rappresentativi come `MX` e `TXT`.
+  - **Impatto:** rende più completo e più difendibile il contratto del renderer sulle annotazioni Cloudflare, perché congela non solo i casi `cf-proxied:true/false` ma anche l'omissione corretta delle annotazioni quando il proxy state non è definito, senza modificare il runtime del package.
+  - **Evidenze:** `python -m pytest -q` → `50 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`bc4f648` — `test(renderer): freeze bind section header order`**
   - **Type:** `test` · **Categoria:** Renderer / Section header contract freeze
