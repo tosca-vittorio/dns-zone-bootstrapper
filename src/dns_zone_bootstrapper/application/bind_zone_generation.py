@@ -14,19 +14,17 @@ from dns_zone_bootstrapper.templates.profiles.public_safe_candidate import (
     PUBLIC_SAFE_FIXED_DNS_PROFILE,
 )
 
-
 @dataclass(frozen=True, slots=True)
 class BindZoneFileGenerationResult:
     """Structured result returned by the bind zone generation use case."""
 
-    input_value: str
+    input_value: object
     is_valid: bool
     zone_apex: str | None
     error_code: str | None
     zone_file_text: str | None
 
-
-def generate_bind_zone_file(input_value: str) -> BindZoneFileGenerationResult:
+def generate_bind_zone_file(input_value: object) -> BindZoneFileGenerationResult:
     """Validate the input apex and render the fixed BIND zone file on success."""
     validation_result = validate_zone_apex_input(input_value)
 

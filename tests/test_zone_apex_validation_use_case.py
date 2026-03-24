@@ -17,7 +17,6 @@ def test_validate_zone_apex_input_returns_structured_success() -> None:
         error_code=None,
     )
 
-
 def test_validate_zone_apex_input_propagates_specific_failure_reason() -> None:
     """Return a structured failure result with a specific error code."""
     result = validate_zone_apex_input(" example.com ")
@@ -27,4 +26,15 @@ def test_validate_zone_apex_input_propagates_specific_failure_reason() -> None:
         is_valid=False,
         zone_apex=None,
         error_code="surrounding_whitespace",
+    )
+
+def test_validate_zone_apex_input_propagates_non_string_input_failure() -> None:
+    """Return a structured failure result for non-string zone apex input."""
+    result = validate_zone_apex_input(None)
+
+    assert result == ZoneApexValidationResult(
+        input_value=None,
+        is_valid=False,
+        zone_apex=None,
+        error_code="non_string_input",
     )

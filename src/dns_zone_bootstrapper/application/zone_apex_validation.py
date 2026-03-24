@@ -13,13 +13,13 @@ from dns_zone_bootstrapper.domain.domain_validation import (
 class ZoneApexValidationResult:
     """Structured result returned by the zone apex validation use case."""
 
-    input_value: str
+    input_value: object
     is_valid: bool
     zone_apex: str | None
     error_code: str | None
 
 
-def validate_zone_apex_input(input_value: str) -> ZoneApexValidationResult:
+def validate_zone_apex_input(input_value: object) -> ZoneApexValidationResult:
     """Validate a zone apex input and return a minimal structured result."""
     validation_result = validate_zone_apex_candidate(input_value)
     zone_apex = input_value if validation_result.is_valid else None
