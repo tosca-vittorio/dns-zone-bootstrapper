@@ -72,19 +72,28 @@ def _render_record_line(record: DnsRecordTemplate, zone_apex: str) -> str:
         f"{record.record_type} {formatted_rdata}{cf_tags}"
     )
 
-
 def render_bind_zone_file(zone_apex: str, profile: FixedDnsProfile) -> str:
     """Render a fixed DNS profile as a BIND zone file candidate."""
-    lines: list[str] = []
-    current_record_type: str | None = None
+    records_by_type: dict[str, list[DnsRecordTemplate]] = {
+        record_type: [] for record_type in _SECTION_TITLES
+    }
 
     for record in profile.records:
-        if record.record_type != current_record_type:
-            if lines:
-                lines.append("")
-            lines.append(_get_section_title(record.record_type))
-            current_record_type = record.record_type
+        _get_section_title(record.record_type)
+        records_by_type[record.record_type].append(record)
 
-        lines.append(_render_record_line(record, zone_apex))
+    lines: list[str] = []
+
+    for record_type, section_title in _SECTION_TITLES.items():
+        section_records = records_by_type[record_type]
+        if not section_records:
+            continue
+
+        if lines:
+            lines.append("")
+        lines.append(section_title)
+
+        for record in section_records:
+            lines.append(_render_record_line(record, zone_apex))
 
     return "\n".join(lines)

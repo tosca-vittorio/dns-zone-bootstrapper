@@ -134,6 +134,48 @@ def test_render_bind_zone_file_omits_cf_tags_when_proxy_state_is_absent() -> Non
         not in rendered
     )
 
+def test_render_bind_zone_file_groups_interleaved_record_types_once_per_section() -> None:
+    """Group interleaved record types into one canonical section per supported type."""
+    base_records = PUBLIC_SAFE_FIXED_DNS_PROFILE.records
+    interleaved_profile = FixedDnsProfile(
+        profile_name="interleaved_profile",
+        records=(
+            base_records[8],   # TXT
+            base_records[0],   # A
+            base_records[6],   # MX
+            base_records[1],   # CNAME
+            base_records[7],   # SRV
+            base_records[9],   # TXT
+            base_records[2],   # CNAME
+            base_records[10],  # TXT
+            base_records[3],   # CNAME
+            base_records[11],  # TXT
+            base_records[4],   # CNAME
+            base_records[12],  # TXT
+            base_records[5],   # CNAME
+        ),
+    )
+
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=interleaved_profile,
+    )
+
+    expected_headers = (
+        ";; A Records",
+        ";; CNAME Records",
+        ";; MX Records",
+        ";; SRV Records",
+        ";; TXT Records",
+    )
+
+    last_index = -1
+    for header in expected_headers:
+        assert rendered.count(header) == 1
+        current_index = rendered.index(header)
+        assert current_index > last_index
+        last_index = current_index
+
 def test_render_bind_zone_file_raises_explicit_error_for_unsupported_record_type() -> None:
     """Raise a deterministic error when the profile contains an unsupported record type."""
     invalid_record = replace(
