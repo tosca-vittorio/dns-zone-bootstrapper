@@ -12,6 +12,9 @@ from dns_zone_bootstrapper.application.bind_zone_generation import (
     generate_bind_zone_file,
 )
 
+from dns_zone_bootstrapper.templates.profiles.public_safe_candidate import (
+    PUBLIC_SAFE_FIXED_DNS_PROFILE,
+)
 
 def test_generate_bind_zone_file_returns_structured_success_with_rendered_text() -> None:
     """Return a structured success result with the rendered BIND text."""
@@ -28,6 +31,25 @@ def test_generate_bind_zone_file_returns_structured_success_with_rendered_text()
         zone_file_text=expected_text,
     )
 
+def test_generate_bind_zone_file_calls_renderer_with_validated_apex_and_fixed_profile() -> None:
+    """Call the renderer with the validated apex and the fixed public-safe profile."""
+    with patch(
+        "dns_zone_bootstrapper.application.bind_zone_generation.render_bind_zone_file",
+        return_value=";; mocked bind zone output",
+    ) as mocked_renderer:
+        result = generate_bind_zone_file("testdomain.com")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="testdomain.com",
+        is_valid=True,
+        zone_apex="testdomain.com",
+        error_code=None,
+        zone_file_text=";; mocked bind zone output",
+    )
+    mocked_renderer.assert_called_once_with(
+        zone_apex="testdomain.com",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
 
 def test_generate_bind_zone_file_propagates_validation_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for invalid input."""
