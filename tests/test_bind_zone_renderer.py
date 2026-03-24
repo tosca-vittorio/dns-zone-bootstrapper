@@ -176,6 +176,50 @@ def test_render_bind_zone_file_groups_interleaved_record_types_once_per_section(
         assert current_index > last_index
         last_index = current_index
 
+def test_render_bind_zone_file_preserves_relative_order_within_same_section() -> None:
+    """Preserve the input relative order of same-type records within a section."""
+    base_records = PUBLIC_SAFE_FIXED_DNS_PROFILE.records
+    z_third_cname = replace(base_records[1], owner_template="z-third")
+    a_first_cname = replace(base_records[1], owner_template="a-first")
+    m_second_cname = replace(base_records[1], owner_template="m-second")
+
+    interleaved_profile = FixedDnsProfile(
+        profile_name="relative_order_profile",
+        records=(
+            base_records[8],    # TXT
+            z_third_cname,      # CNAME
+            base_records[0],    # A
+            a_first_cname,      # CNAME
+            base_records[6],    # MX
+            m_second_cname,     # CNAME
+        ),
+    )
+
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=interleaved_profile,
+    )
+
+    cname_section = rendered.split(
+        ";; CNAME Records\n",
+        maxsplit=1,
+    )[1].split(
+        "\n\n;; MX Records",
+        maxsplit=1,
+    )[0]
+
+    expected_owner_sequence = (
+        "z-third.testdomain.com. 1 IN CNAME ",
+        "a-first.testdomain.com. 1 IN CNAME ",
+        "m-second.testdomain.com. 1 IN CNAME ",
+    )
+
+    last_index = -1
+    for owner_line_prefix in expected_owner_sequence:
+        current_index = cname_section.index(owner_line_prefix)
+        assert current_index > last_index
+        last_index = current_index
+
 def test_render_bind_zone_file_raises_explicit_error_for_unsupported_record_type() -> None:
     """Raise a deterministic error when the profile contains an unsupported record type."""
     invalid_record = replace(
