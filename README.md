@@ -1,6 +1,6 @@
 # DNS Zone Bootstrapper
 
-Prototipo Python per generare file di zona DNS in formato BIND, pronti per l'import su Cloudflare, a partire da un dominio in input e da un template DNS fisso derivato da un file reale di riferimento fornito dall'azienda, con focus iniziale su automazione orientata a mailcow.
+Prototipo Python per generare file di zona DNS in formato BIND, pronti per l'import su Cloudflare, a partire da un dominio in input e da un template DNS fisso derivato da un file reale di riferimento, con focus iniziale su automazione orientata.
 
 ## Fase corrente
 

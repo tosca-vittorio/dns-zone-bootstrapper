@@ -3,10 +3,16 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT`, sulle annotazioni `cf_tags`, su un freeze esplicito della presenza, unicità e ordine dei section headers del renderer BIND e sull'assenza di annotazioni `cf_tags` per record senza stato proxy esplicito.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT`, sulle annotazioni `cf_tags`, su un freeze esplicito della presenza, unicità e ordine dei section headers del renderer BIND, sull'assenza di annotazioni `cf_tags` per record senza stato proxy esplicito e sul failure path esplicito per `record_type` non supportato.
 
 #### B2 — Renderer BIND zone file (apertura minima)
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`bff112d` — `test(renderer): harden unsupported bind record type failure`**
+  - **Type:** `test` · **Categoria:** Renderer / Failure contract hardening
+  - **Cosa cambia:** rende esplicito nel renderer BIND il failure path per `record_type` non supportato introducendo un `ValueError` deterministico al posto del precedente `KeyError` implicito sul mapping `_SECTION_TITLES`, ed estende `tests/test_bind_zone_renderer.py` con un test dedicato che congela il comportamento su un record artificiale con tipo `AAAA`.
+  - **Impatto:** rende il contratto del renderer più difendibile e più leggibile sul piano semantico, perché in caso di profilo malformato o futuro drift fuori vocabolario il fallimento non dipende più da un errore accidentale di lookup ma da un errore esplicito e intenzionale, senza aprire nuovo scope su `application`, CLI o web.
+  - **Evidenze:** `python -m pytest -q` → `51 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`1840aab` — `test(renderer): cover missing cf tags bind zone output`**
   - **Type:** `test` · **Categoria:** Renderer / Cloudflare annotation contract coverage
