@@ -244,6 +244,27 @@ def test_render_bind_zone_file_omits_empty_sections_for_partial_profile() -> Non
     assert ";; MX Records" not in rendered
     assert ";; SRV Records" not in rendered
 
+
+def test_render_bind_zone_file_avoids_spurious_blank_lines_for_single_section_profile() -> None:
+    """Avoid leading, trailing, and repeated blank lines for single-section output."""
+    base_records = PUBLIC_SAFE_FIXED_DNS_PROFILE.records
+    single_section_profile = FixedDnsProfile(
+        profile_name="single_section_profile",
+        records=(
+            base_records[8],   # TXT
+        ),
+    )
+
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=single_section_profile,
+    )
+
+    assert rendered.startswith(";; TXT Records\n")
+    assert not rendered.startswith("\n")
+    assert not rendered.endswith("\n")
+    assert "\n\n" not in rendered
+
 def test_render_bind_zone_file_raises_explicit_error_for_unsupported_record_type() -> None:
     """Raise a deterministic error when the profile contains an unsupported record type."""
     invalid_record = replace(
