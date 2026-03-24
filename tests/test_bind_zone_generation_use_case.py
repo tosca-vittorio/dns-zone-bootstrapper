@@ -1,6 +1,7 @@
 """Tests for the bind zone generation application use case."""
 
 from pathlib import Path
+from unittest.mock import patch
 
 from tests.shared_bind_zone_assertions import (
     assert_alpha_zone_derived_rendering,
@@ -40,6 +41,7 @@ def test_generate_bind_zone_file_propagates_validation_failure_without_text() ->
         zone_file_text=None,
     )
 
+
 def test_generate_bind_zone_file_renders_non_golden_valid_apex_end_to_end() -> None:
     """Render a valid non-golden apex end-to-end through the application use case."""
     result = generate_bind_zone_file("alpha-zone.example.org")
@@ -51,6 +53,26 @@ def test_generate_bind_zone_file_renders_non_golden_valid_apex_end_to_end() -> N
     assert result.zone_file_text is not None
 
     assert_alpha_zone_derived_rendering(result.zone_file_text)
+
+
+def test_generate_bind_zone_file_returns_structured_renderer_failure() -> None:
+    """Return a structured failure result when the renderer fails internally."""
+    with patch(
+        "dns_zone_bootstrapper.application.bind_zone_generation.render_bind_zone_file",
+        side_effect=ValueError(
+            "Unsupported record_type for BIND renderer: AAAA",
+        ),
+    ):
+        result = generate_bind_zone_file("testdomain.com")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="testdomain.com",
+        is_valid=False,
+        zone_apex="testdomain.com",
+        error_code="renderer_failure",
+        zone_file_text=None,
+    )
+
 
 def test_generate_bind_zone_file_propagates_domain_too_long_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for an overlong apex."""
@@ -66,6 +88,7 @@ def test_generate_bind_zone_file_propagates_domain_too_long_failure_without_text
         zone_file_text=None,
     )
 
+
 def test_generate_bind_zone_file_propagates_empty_input_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for empty input."""
     result = generate_bind_zone_file("")
@@ -77,6 +100,7 @@ def test_generate_bind_zone_file_propagates_empty_input_failure_without_text() -
         error_code="empty_input",
         zone_file_text=None,
     )
+
 
 def test_generate_bind_zone_file_propagates_missing_dot_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for apex without dot."""
@@ -90,6 +114,7 @@ def test_generate_bind_zone_file_propagates_missing_dot_failure_without_text() -
         zone_file_text=None,
     )
 
+
 def test_generate_bind_zone_file_propagates_leading_dot_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for apex with leading dot."""
     result = generate_bind_zone_file(".testdomain.com")
@@ -101,6 +126,7 @@ def test_generate_bind_zone_file_propagates_leading_dot_failure_without_text() -
         error_code="leading_dot",
         zone_file_text=None,
     )
+
 
 def test_generate_bind_zone_file_propagates_trailing_dot_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for apex with trailing dot."""
@@ -114,6 +140,7 @@ def test_generate_bind_zone_file_propagates_trailing_dot_failure_without_text() 
         zone_file_text=None,
     )
 
+
 def test_generate_bind_zone_file_propagates_empty_label_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for apex with empty label."""
     result = generate_bind_zone_file("test..domain.com")
@@ -126,6 +153,7 @@ def test_generate_bind_zone_file_propagates_empty_label_failure_without_text() -
         zone_file_text=None,
     )
 
+
 def test_generate_bind_zone_file_propagates_invalid_label_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for apex with invalid label."""
     result = generate_bind_zone_file("te_st.domain.com")
@@ -137,6 +165,7 @@ def test_generate_bind_zone_file_propagates_invalid_label_failure_without_text()
         error_code="invalid_label",
         zone_file_text=None,
     )
+
 
 def test_generate_bind_zone_file_propagates_non_string_input_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for non-string apex input."""

@@ -42,10 +42,19 @@ def generate_bind_zone_file(input_value: str) -> BindZoneFileGenerationResult:
     zone_apex = validation_result.zone_apex
     assert zone_apex is not None
 
-    zone_file_text = render_bind_zone_file(
-        zone_apex=zone_apex,
-        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
-    )
+    try:
+        zone_file_text = render_bind_zone_file(
+            zone_apex=zone_apex,
+            profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+        )
+    except ValueError:
+        return BindZoneFileGenerationResult(
+            input_value=input_value,
+            is_valid=False,
+            zone_apex=zone_apex,
+            error_code="renderer_failure",
+            zone_file_text=None,
+        )
 
     return BindZoneFileGenerationResult(
         input_value=input_value,
