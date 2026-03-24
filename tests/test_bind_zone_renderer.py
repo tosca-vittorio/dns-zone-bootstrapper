@@ -244,6 +244,39 @@ def test_render_bind_zone_file_omits_empty_sections_for_partial_profile() -> Non
     assert ";; MX Records" not in rendered
     assert ";; SRV Records" not in rendered
 
+def test_render_bind_zone_file_uses_exactly_one_blank_line_between_populated_sections() -> None:
+    """Separate consecutive populated sections with exactly one blank line."""
+    base_records = PUBLIC_SAFE_FIXED_DNS_PROFILE.records
+    multi_section_profile = FixedDnsProfile(
+        profile_name="multi_section_profile",
+        records=(
+            base_records[0],   # A
+            base_records[6],   # MX
+            base_records[8],   # TXT
+        ),
+    )
+
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=multi_section_profile,
+    )
+
+    expected = "\n".join(
+        (
+            ";; A Records",
+            "testdomain.com. 1 IN A __FIXED_A_TARGET__ ; cf_tags=cf-proxied:true",
+            "",
+            ";; MX Records",
+            "testdomain.com. 1 IN MX 10 __FIXED_MAIL_HOST__.",
+            "",
+            ";; TXT Records",
+            'dkim._domainkey.testdomain.com. 1 IN TXT "v=DKIM1;k=rsa;t=s;s=email;p=__FIXED_DKIM_PUBLIC_KEY__"',
+        ),
+    )
+
+    assert rendered == expected
+    assert rendered.count("\n\n") == 2
+    assert "\n\n\n" not in rendered
 
 def test_render_bind_zone_file_avoids_spurious_blank_lines_for_single_section_profile() -> None:
     """Avoid leading, trailing, and repeated blank lines for single-section output."""
