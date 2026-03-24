@@ -270,7 +270,10 @@ def test_render_bind_zone_file_uses_exactly_one_blank_line_between_populated_sec
             "testdomain.com. 1 IN MX 10 __FIXED_MAIL_HOST__.",
             "",
             ";; TXT Records",
-            'dkim._domainkey.testdomain.com. 1 IN TXT "v=DKIM1;k=rsa;t=s;s=email;p=__FIXED_DKIM_PUBLIC_KEY__"',
+            (
+                'dkim._domainkey.testdomain.com. 1 IN TXT '
+                '"v=DKIM1;k=rsa;t=s;s=email;p=__FIXED_DKIM_PUBLIC_KEY__"'
+            ),
         ),
     )
 
