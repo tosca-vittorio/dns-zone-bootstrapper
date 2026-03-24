@@ -220,6 +220,30 @@ def test_render_bind_zone_file_preserves_relative_order_within_same_section() ->
         assert current_index > last_index
         last_index = current_index
 
+def test_render_bind_zone_file_omits_empty_sections_for_partial_profile() -> None:
+    """Omit unsupported-empty sections when the profile contains only a subset of record types."""
+    base_records = PUBLIC_SAFE_FIXED_DNS_PROFILE.records
+    partial_profile = FixedDnsProfile(
+        profile_name="partial_profile",
+        records=(
+            base_records[0],   # A
+            base_records[8],   # TXT
+            base_records[9],   # TXT
+        ),
+    )
+
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=partial_profile,
+    )
+
+    assert ";; A Records" in rendered
+    assert ";; TXT Records" in rendered
+
+    assert ";; CNAME Records" not in rendered
+    assert ";; MX Records" not in rendered
+    assert ";; SRV Records" not in rendered
+
 def test_render_bind_zone_file_raises_explicit_error_for_unsupported_record_type() -> None:
     """Raise a deterministic error when the profile contains an unsupported record type."""
     invalid_record = replace(
