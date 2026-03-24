@@ -94,3 +94,29 @@ def test_render_bind_zone_file_groups_sections_in_expected_order() -> None:
         current_index = rendered.index(header)
         assert current_index > last_index
         last_index = current_index
+
+def test_render_bind_zone_file_omits_cf_tags_when_proxy_state_is_absent() -> None:
+    """Omit cf_tags annotations for records without an explicit proxy state."""
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
+
+    expected_lines = (
+        "testdomain.com. 1 IN MX 10 __FIXED_MAIL_HOST__.",
+        (
+            'dkim._domainkey.testdomain.com. 1 IN TXT '
+            '"v=DKIM1;k=rsa;t=s;s=email;'
+            'p=__FIXED_DKIM_PUBLIC_KEY__"'
+        ),
+    )
+
+    for expected_line in expected_lines:
+        assert expected_line in rendered
+
+    assert "testdomain.com. 1 IN MX 10 __FIXED_MAIL_HOST__. ; cf_tags=" not in rendered
+    assert (
+        'dkim._domainkey.testdomain.com. 1 IN TXT '
+        '"v=DKIM1;k=rsa;t=s;s=email;p=__FIXED_DKIM_PUBLIC_KEY__" ; cf_tags='
+        not in rendered
+    )
