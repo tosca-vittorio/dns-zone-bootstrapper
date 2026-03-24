@@ -45,7 +45,7 @@ def generate_bind_zone_file(input_value: object) -> BindZoneFileGenerationResult
             zone_apex=zone_apex,
             profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
         )
-    except ValueError:
+    except (ValueError, RuntimeError):
         return BindZoneFileGenerationResult(
             input_value=input_value,
             is_valid=False,

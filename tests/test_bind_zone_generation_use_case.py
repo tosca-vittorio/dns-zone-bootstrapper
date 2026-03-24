@@ -73,6 +73,21 @@ def test_generate_bind_zone_file_returns_structured_renderer_failure() -> None:
         zone_file_text=None,
     )
 
+def test_generate_bind_zone_file_returns_structured_renderer_failure_for_non_value_error() -> None:
+    """Return a structured failure result also for non-ValueError renderer failures."""
+    with patch(
+        "dns_zone_bootstrapper.application.bind_zone_generation.render_bind_zone_file",
+        side_effect=RuntimeError("Unexpected renderer failure"),
+    ):
+        result = generate_bind_zone_file("testdomain.com")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="testdomain.com",
+        is_valid=False,
+        zone_apex="testdomain.com",
+        error_code="renderer_failure",
+        zone_file_text=None,
+    )
 
 def test_generate_bind_zone_file_propagates_domain_too_long_failure_without_text() -> None:
     """Return a structured failure result and no rendered text for an overlong apex."""
