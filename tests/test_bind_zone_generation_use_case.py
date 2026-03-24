@@ -193,3 +193,20 @@ def test_generate_bind_zone_file_propagates_non_string_input_failure_without_tex
         error_code="non_string_input",
         zone_file_text=None,
     )
+
+
+def test_generate_bind_zone_file_does_not_call_renderer_on_validation_failure() -> None:
+    """Do not invoke the renderer when apex validation fails."""
+    with patch(
+        "dns_zone_bootstrapper.application.bind_zone_generation.render_bind_zone_file",
+    ) as mocked_renderer:
+        result = generate_bind_zone_file(" testdomain.com ")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value=" testdomain.com ",
+        is_valid=False,
+        zone_apex=None,
+        error_code="surrounding_whitespace",
+        zone_file_text=None,
+    )
+    mocked_renderer.assert_not_called()
