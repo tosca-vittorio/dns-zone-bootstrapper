@@ -16,6 +16,16 @@ _SECTION_TITLES = {
 }
 
 
+def _get_section_title(record_type: str) -> str:
+    """Return the section header for a supported record type."""
+    try:
+        return _SECTION_TITLES[record_type]
+    except KeyError as exc:
+        raise ValueError(
+            f"Unsupported record_type for BIND renderer: {record_type}",
+        ) from exc
+
+
 def _render_owner(owner_template: str, zone_apex: str) -> str:
     """Render the owner name as an absolute FQDN."""
     if owner_template == "@":
@@ -72,7 +82,7 @@ def render_bind_zone_file(zone_apex: str, profile: FixedDnsProfile) -> str:
         if record.record_type != current_record_type:
             if lines:
                 lines.append("")
-            lines.append(_SECTION_TITLES[record.record_type])
+            lines.append(_get_section_title(record.record_type))
             current_record_type = record.record_type
 
         lines.append(_render_record_line(record, zone_apex))

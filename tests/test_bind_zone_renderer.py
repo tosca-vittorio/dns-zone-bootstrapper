@@ -1,6 +1,10 @@
 """Tests for the BIND zone renderer."""
 
+from dataclasses import replace
 from pathlib import Path
+from typing import cast
+
+import pytest
 
 from tests.shared_bind_zone_assertions import (
     assert_alpha_zone_derived_rendering,
@@ -8,6 +12,11 @@ from tests.shared_bind_zone_assertions import (
 
 from dns_zone_bootstrapper.renderers.bind_zone_renderer import (
     render_bind_zone_file,
+)
+from dns_zone_bootstrapper.templates.profile_model import (
+    FixedDnsProfile,
+    RecordType,
+    RdataTemplateSpec,
 )
 from dns_zone_bootstrapper.templates.profiles.public_safe_candidate import (
     PUBLIC_SAFE_FIXED_DNS_PROFILE,
@@ -36,6 +45,7 @@ def test_render_bind_zone_file_resolves_derived_placeholders_for_non_golden_apex
 
     assert_alpha_zone_derived_rendering(rendered)
 
+
 def test_render_bind_zone_file_quotes_txt_records_in_output() -> None:
     """Quote TXT record payloads in rendered BIND output."""
     rendered = render_bind_zone_file(
@@ -55,6 +65,7 @@ def test_render_bind_zone_file_quotes_txt_records_in_output() -> None:
     for expected_line in expected_txt_lines:
         assert expected_line in rendered
 
+
 def test_render_bind_zone_file_renders_cf_tags_annotations() -> None:
     """Render cf_tags annotations for proxied and non-proxied records."""
     rendered = render_bind_zone_file(
@@ -72,6 +83,7 @@ def test_render_bind_zone_file_renders_cf_tags_annotations() -> None:
 
     for expected_line in expected_lines:
         assert expected_line in rendered
+
 
 def test_render_bind_zone_file_groups_sections_in_expected_order() -> None:
     """Render section headers once and in the expected record-type order."""
@@ -94,6 +106,7 @@ def test_render_bind_zone_file_groups_sections_in_expected_order() -> None:
         current_index = rendered.index(header)
         assert current_index > last_index
         last_index = current_index
+
 
 def test_render_bind_zone_file_omits_cf_tags_when_proxy_state_is_absent() -> None:
     """Omit cf_tags annotations for records without an explicit proxy state."""
@@ -120,3 +133,28 @@ def test_render_bind_zone_file_omits_cf_tags_when_proxy_state_is_absent() -> Non
         '"v=DKIM1;k=rsa;t=s;s=email;p=__FIXED_DKIM_PUBLIC_KEY__" ; cf_tags='
         not in rendered
     )
+
+def test_render_bind_zone_file_raises_explicit_error_for_unsupported_record_type() -> None:
+    """Raise a deterministic error when the profile contains an unsupported record type."""
+    invalid_record = replace(
+        PUBLIC_SAFE_FIXED_DNS_PROFILE.records[0],
+        record_type=cast(RecordType, "AAAA"),
+        rdata=RdataTemplateSpec(
+            kind="fixed",
+            template="::1",
+        ),
+        cf_proxied=None,
+    )
+    invalid_profile = FixedDnsProfile(
+        profile_name="invalid_profile",
+        records=(invalid_record,),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Unsupported record_type for BIND renderer: AAAA",
+    ):
+        render_bind_zone_file(
+            zone_apex="testdomain.com",
+            profile=invalid_profile,
+        )
