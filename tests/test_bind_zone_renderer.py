@@ -340,3 +340,28 @@ def test_render_bind_zone_file_raises_explicit_error_for_unsupported_record_type
             zone_apex="testdomain.com",
             profile=invalid_profile,
         )
+
+def test_non_golden_renderer_golden_differs_only_by_expected_derived_tokens() -> None:
+    """Freeze that the non-golden renderer golden differs only by derived apex tokens."""
+    golden_dir = Path(__file__).parent / "golden"
+
+    baseline_text = (golden_dir / "public_safe_candidate.bind.txt").read_text(
+        encoding="utf-8"
+    )
+    non_golden_text = (
+        golden_dir / "public_safe_candidate.alpha-zone-example-org.bind.txt"
+    ).read_text(encoding="utf-8")
+
+    assert "alpha-zone.example.org." not in baseline_text
+    assert "alpha-zone-example-org" not in baseline_text
+
+    assert "testdomain.com." not in non_golden_text
+    assert "testdomain-com" not in non_golden_text
+
+    normalized_non_golden_text = (
+        non_golden_text
+        .replace("alpha-zone.example.org.", "testdomain.com.")
+        .replace("alpha-zone-example-org", "testdomain-com")
+    )
+
+    assert normalized_non_golden_text == baseline_text
