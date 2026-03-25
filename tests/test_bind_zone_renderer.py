@@ -35,6 +35,21 @@ def test_render_bind_zone_file_returns_expected_public_safe_text() -> None:
 
     assert rendered == expected
 
+def test_render_bind_zone_file_returns_expected_non_golden_public_safe_text() -> None:
+    """Render the public-safe fixed profile as expected BIND text for a non-golden apex."""
+    rendered = render_bind_zone_file(
+        zone_apex="alpha-zone.example.org",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
+
+    golden_path = (
+        Path(__file__).parent
+        / "golden"
+        / "public_safe_candidate.alpha-zone-example-org.bind.txt"
+    )
+    expected = golden_path.read_text(encoding="utf-8")
+
+    assert rendered == expected
 
 def test_render_bind_zone_file_resolves_derived_placeholders_for_non_golden_apex() -> None:
     """Resolve derived placeholders correctly for an apex different from the golden one."""

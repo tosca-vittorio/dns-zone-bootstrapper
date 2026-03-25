@@ -1,0 +1,22 @@
+;; A Records
+alpha-zone.example.org. 1 IN A __FIXED_A_TARGET__ ; cf_tags=cf-proxied:true
+
+;; CNAME Records
+autoconfig.alpha-zone.example.org. 1 IN CNAME __FIXED_MAIL_HOST__. ; cf_tags=cf-proxied:false
+autodiscover.alpha-zone.example.org. 1 IN CNAME __FIXED_MAIL_HOST__. ; cf_tags=cf-proxied:false
+brevo1._domainkey.alpha-zone.example.org. 1 IN CNAME b1.alpha-zone-example-org.dkim.__FIXED_PROVIDER_ZONE__. ; cf_tags=cf-proxied:false
+brevo2._domainkey.alpha-zone.example.org. 1 IN CNAME b2.alpha-zone-example-org.dkim.__FIXED_PROVIDER_ZONE__. ; cf_tags=cf-proxied:false
+www.alpha-zone.example.org. 1 IN CNAME alpha-zone.example.org. ; cf_tags=cf-proxied:true
+
+;; MX Records
+alpha-zone.example.org. 1 IN MX 10 __FIXED_MAIL_HOST__.
+
+;; SRV Records
+_autodiscover._tcp.alpha-zone.example.org. 1 IN SRV 0 1 443 __FIXED_MAIL_HOST__.
+
+;; TXT Records
+dkim._domainkey.alpha-zone.example.org. 1 IN TXT "v=DKIM1;k=rsa;t=s;s=email;p=__FIXED_DKIM_PUBLIC_KEY__"
+_dmarc.alpha-zone.example.org. 1 IN TXT "v=DMARC1; p=none; rua=mailto:__FIXED_DMARC_RUA__"
+_domainkey.alpha-zone.example.org. 1 IN TXT "t=y; o=~;"
+alpha-zone.example.org. 1 IN TXT "v=spf1 a mx ip4:__FIXED_SPF_IPV4__ include:__FIXED_SPF_INCLUDE__ -all"
+alpha-zone.example.org. 1 IN TXT "brevo-code:__FIXED_VERIFICATION_CODE__"
