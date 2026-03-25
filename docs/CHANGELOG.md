@@ -4,16 +4,23 @@
 
 ### [Unreleased]
 > Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento di `B0` sulla validazione sintattica del dominio apex candidate, hardening progressivo di `B1` sul profilo DNS fisso public-safe versionabile, apertura minima di `B2` con primo renderer BIND verificato, hardening del contratto testuale tramite golden file esterno e placeholder derivati, introduzione del boundary applicativo minimo di generazione del file BIND, deduplicazione qualitativa delle assertion condivise tra renderer puro e use case applicativo e copertura di failure path applicativi aggiuntivi su input overlong, vuoto, privo di dot, con dot iniziale, con dot finale, con label vuota, con label non valida e su input non stringa, oltre a una copertura renderer-focused sul quoting dei record `TXT`, sulle annotazioni `cf_tags`, su un freeze esplicito della presenza, unicità e ordine dei section headers del renderer BIND, sull'assenza di annotazioni `cf_tags` per record senza stato proxy esplicito, sul failure path esplicito per `record_type` non supportato, sulla gestione strutturata del failure interno del renderer nel boundary `application` con `error_code="renderer_failure"`, sull'indipendenza del grouping delle sezioni rispetto all'ordine del profilo tramite test su record interleaved e fix runtime dedicato, sul riallineamento del contratto dichiarato del layer `application` ai failure strutturati su input non stringa già supportati a runtime, sull'hardening del failure translation boundary applicativo anche per `RuntimeError` interni del renderer e sul freeze esplicito del contratto di short-circuit applicativo che evita l'invocazione del renderer sui failure di validazione input, sul freeze esplicito del success-call contract del boundary `application`, che congela l'invocazione del renderer con `zone_apex` validato e `PUBLIC_SAFE_FIXED_DNS_PROFILE`, sul freeze esplicito dell'ordine relativo intra-sezione dei record dello stesso tipo nel renderer BIND, sul freeze esplicito dell'omissione delle sezioni vuote nel renderer BIND quando il profilo contiene solo un sottoinsieme dei record supportati, sul freeze esplicito dell'assenza di blank line spurie nel renderer BIND su output a sezione unica e sul freeze esplicito della separazione tramite esattamente una sola blank line tra sezioni popolate consecutive del renderer BIND.
-> Ultimo consolidamento `B2`: freeze esplicito application-side del renderer failure boundary sul percorso non-golden, così che il boundary `application` risulti difeso anche sulla traduzione strutturata dei failure del renderer con apex validato preservato e non solo sui success path.
+> Ultimo consolidamento `B2`: freeze esplicito application-side del failure-call contract sul percorso non-golden, così che il boundary `application` risulti difeso non solo sulla traduzione strutturata del failure del renderer con apex validato preservato, ma anche sull'invocazione del renderer con `zone_apex` validato e `PUBLIC_SAFE_FIXED_DNS_PROFILE` durante il failure path.
 
 #### B2 — Renderer BIND zone file
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`8f8530d` — `test(application): freeze non-golden renderer failure call contract`**
+  - **Type:** `test` · **Categoria:** Application / Non-golden renderer failure-call contract freeze
+  - **Cosa cambia:** irrigidisce `tests/test_bind_zone_generation_use_case.py` sul failure path non-golden di `generate_bind_zone_file("alpha-zone.example.org")`, congelando non solo il risultato strutturato di `renderer_failure` ma anche l'invocazione del renderer una sola volta con `zone_apex="alpha-zone.example.org"` e `profile=PUBLIC_SAFE_FIXED_DNS_PROFILE` quando `render_bind_zone_file(...)` fallisce con `RuntimeError`.
+  - **Impatto:** rende `B2` più difendibile sul lato `application`, perché il percorso non-golden di failure non è più protetto soltanto sul risultato restituito ma anche sul contratto esplicito di orchestrazione verso il renderer, senza modificare il runtime del package e senza aprire nuovo scope su renderer runtime, CLI, web o fixture reali.
+  - **Evidenze:** `python -m pytest -q tests/test_bind_zone_generation_use_case.py` → `19 passed`; `python -m pytest -q` → `67 passed`; `python -m pylint src tests` → `10.00/10`.
 
 - **`68e6690` — `test(application): freeze non-golden renderer failure boundary`**
   - **Type:** `test` · **Categoria:** Application / Non-golden renderer failure boundary freeze
   - **Cosa cambia:** estende `tests/test_bind_zone_generation_use_case.py` con un test dedicato che, per `alpha-zone.example.org`, patcha `render_bind_zone_file(...)` con un `RuntimeError`, congela la traduzione strutturata in `error_code="renderer_failure"` e verifica la preservazione di `zone_apex="alpha-zone.example.org"` con `zone_file_text=None`.
   - **Impatto:** rende `B2` più difendibile sul lato `application`, perché il percorso non-golden viene ora protetto anche sul boundary di failure del renderer e non solo sul risultato di successo o sul contratto di orchestrazione, senza modificare il runtime del package e senza aprire nuovo scope su renderer runtime, CLI, web o fixture reali.
   - **Evidenze:** `python -m pytest -q tests/test_bind_zone_generation_use_case.py` → `19 passed`; `python -m pytest -q` → `67 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`65b4692` — `test(application): freeze non-golden success call contract`**
   - **Type:** `test` · **Categoria:** Application / Non-golden success-call contract freeze
   - **Cosa cambia:** estende `tests/test_bind_zone_generation_use_case.py` con un test dedicato che, per `alpha-zone.example.org`, patcha `render_bind_zone_file(...)`, congela la corretta invocazione del renderer con `zone_apex="alpha-zone.example.org"` e `profile=PUBLIC_SAFE_FIXED_DNS_PROFILE`, e verifica la propagazione del testo mocked nel `BindZoneFileGenerationResult` di successo.
@@ -68,20 +75,17 @@
   - **Impatto:** rende il renderer più difendibile sul piano contrattuale, perché la pulizia strutturale minima dell'output su profili a sezione unica non resta più solo implicita nell'implementazione corrente ma viene protetta da un test mirato, senza aprire nuovo scope su `application`, `domain`, CLI o web.
   - **Evidenze:** `python -m pytest -q` → `60 passed`; `python -m pylint src tests` → `10.00/10`.
 
-
 - **`666efe7` — `test(renderer): freeze empty section omission`**
   - **Type:** `test` · **Categoria:** Renderer / Empty section omission contract freeze
   - **Cosa cambia:** estende `tests/test_bind_zone_renderer.py` con un test dedicato che congela esplicitamente, nel renderer BIND, l'omissione delle sezioni vuote quando il profilo contiene solo un sottoinsieme dei record supportati, verificando l'emissione delle sole sezioni presenti in un profilo parziale `A`/`TXT`.
   - **Impatto:** rende il renderer più difendibile sul piano contrattuale, perché l'assenza di header vuoti e di sezioni non presenti nel profilo non resta più solo implicita nell'implementazione corrente ma viene protetta da un test mirato, senza aprire nuovo scope su `application`, `domain`, CLI o web.
   - **Evidenze:** `python -m pytest -q` → `59 passed`; `python -m pylint src tests` → `10.00/10`.
 
-
 - **`2b0c015` — `test(renderer): freeze intra-section relative order`**
   - **Type:** `test` · **Categoria:** Renderer / Intra-section ordering contract freeze
   - **Cosa cambia:** estende `tests/test_bind_zone_renderer.py` con un test dedicato che congela esplicitamente, nel renderer BIND, la preservazione dell'ordine relativo di input dei record dello stesso tipo all'interno della sezione `CNAME`, anche in presenza di profilo interleaved.
   - **Impatto:** rende il renderer più difendibile sul piano contrattuale, perché l'ordine intra-sezione non resta più solo implicito nell'implementazione corrente ma viene protetto da un test mirato, senza aprire nuovo scope su `application`, `domain`, CLI o web.
   - **Evidenze:** `python -m pytest -q` → `58 passed`; `python -m pylint src tests` → `10.00/10`.
-
 
 - **`1857c1d` — `test(application): freeze renderer success-call contract`**
   - **Type:** `test` · **Categoria:** Application / Success-call contract freeze
@@ -112,7 +116,6 @@
   - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/renderers/bind_zone_renderer.py` affinché il renderer BIND raccolga prima i record per tipo supportato e poi li emetta nell'ordine canonico delle sezioni `A`, `CNAME`, `MX`, `SRV`, `TXT`, rendendo così il grouping indipendente dall'ordine di `profile.records`; estende inoltre `tests/test_bind_zone_renderer.py` con un test dedicato su profilo artificiale con record interleaved che congela unicità delle sezioni e ordering canonico anche quando i record in input non sono contigui per tipo.
   - **Impatto:** rende il contratto del renderer più robusto e più esplicito, perché l'apertura delle sezioni non dipende più implicitamente dall'ordine corrente del profilo public-safe ma da una logica interna deterministica del renderer, senza aprire nuovo scope su `application`, CLI o web.
   - **Evidenze:** `python -m pytest -q` → `53 passed`; `python -m pylint src tests` → `10.00/10`.
-
 
 - **`5cf0c05` — `test(application): harden bind zone renderer failure handling`**
   - **Type:** `test` · **Categoria:** Application / Renderer failure contract hardening
