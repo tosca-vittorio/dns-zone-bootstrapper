@@ -296,7 +296,7 @@ def test_generate_bind_zone_file_returns_structured_renderer_failure_for_non_gol
     with patch(
         "dns_zone_bootstrapper.application.bind_zone_generation.render_bind_zone_file",
         side_effect=RuntimeError("Unexpected non-golden renderer failure"),
-    ):
+    ) as mocked_renderer:
         result = generate_bind_zone_file("alpha-zone.example.org")
 
     assert result == BindZoneFileGenerationResult(
@@ -305,4 +305,8 @@ def test_generate_bind_zone_file_returns_structured_renderer_failure_for_non_gol
         zone_apex="alpha-zone.example.org",
         error_code="renderer_failure",
         zone_file_text=None,
+    )
+    mocked_renderer.assert_called_once_with(
+        zone_apex="alpha-zone.example.org",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
     )
