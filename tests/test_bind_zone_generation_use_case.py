@@ -16,6 +16,10 @@ from dns_zone_bootstrapper.templates.profiles.public_safe_candidate import (
     PUBLIC_SAFE_FIXED_DNS_PROFILE,
 )
 
+from dns_zone_bootstrapper.renderers.bind_zone_renderer import (
+    render_bind_zone_file,
+)
+
 def test_generate_bind_zone_file_returns_structured_success_with_rendered_text() -> None:
     """Return a structured success result with the rendered BIND text."""
     result = generate_bind_zone_file("testdomain.com")
@@ -76,6 +80,19 @@ def test_generate_bind_zone_file_renders_non_golden_valid_apex_end_to_end() -> N
 
     assert_alpha_zone_derived_rendering(result.zone_file_text)
 
+def test_generate_bind_zone_file_matches_renderer_full_text_for_non_golden_apex() -> None:
+    """Match the pure renderer full text for a valid non-golden apex."""
+    expected_text = render_bind_zone_file(
+        zone_apex="alpha-zone.example.org",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
+
+    result = generate_bind_zone_file("alpha-zone.example.org")
+
+    assert result.is_valid is True
+    assert result.zone_apex == "alpha-zone.example.org"
+    assert result.error_code is None
+    assert result.zone_file_text == expected_text
 
 def test_generate_bind_zone_file_returns_structured_renderer_failure() -> None:
     """Return a structured failure result when the renderer fails internally."""
