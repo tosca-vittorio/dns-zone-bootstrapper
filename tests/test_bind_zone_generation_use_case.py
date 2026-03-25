@@ -289,3 +289,20 @@ def test_generate_bind_zone_file_calls_renderer_with_non_golden_validated_apex_a
         zone_apex="alpha-zone.example.org",
         profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
     )
+
+def test_generate_bind_zone_file_returns_structured_renderer_failure_for_non_golden_valid_apex(
+) -> None:
+    """Return a structured renderer failure while preserving the validated non-golden apex."""
+    with patch(
+        "dns_zone_bootstrapper.application.bind_zone_generation.render_bind_zone_file",
+        side_effect=RuntimeError("Unexpected non-golden renderer failure"),
+    ):
+        result = generate_bind_zone_file("alpha-zone.example.org")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="alpha-zone.example.org",
+        is_valid=False,
+        zone_apex="alpha-zone.example.org",
+        error_code="renderer_failure",
+        zone_file_text=None,
+    )
