@@ -8,6 +8,12 @@
 #### B2 — Renderer BIND zone file
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
+- **`895e161` — `test(application): freeze non-golden full-text renderer parity`**
+  - **Type:** `test` · **Categoria:** Application / Non-golden full-text parity freeze
+  - **Cosa cambia:** estende `tests/test_bind_zone_generation_use_case.py` con un test dedicato che, per `alpha-zone.example.org`, confronta il `zone_file_text` prodotto da `generate_bind_zone_file(...)` con il testo completo restituito dal renderer puro `render_bind_zone_file(...)` invocato con `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
+  - **Impatto:** rende più difendibile il boundary `application` sul percorso non-golden, perché aggiunge un freeze esplicito di coerenza full-text cross-layer e non lascia più quel percorso coperto soltanto da assertion condivise su un sottoinsieme del contratto, senza modificare il runtime del package e senza aprire nuovo scope su CLI, web o fixture reali.
+  - **Evidenze:** `python -m pytest -q` → `62 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`5a52bc4` — `test(renderer): harden shared non-golden rendering contract`**
   - **Type:** `test` · **Categoria:** Renderer / Application / Shared non-golden contract hardening
   - **Cosa cambia:** irrigidisce `tests/shared_bind_zone_assertions.py`, che non congela più solo tre linee `CNAME` derivate e l'assenza di newline finale, ma anche presenza, unicità e ordine dei section headers `A`, `CNAME`, `MX`, `SRV`, `TXT`, un insieme rappresentativo cross-section di linee renderizzate per `alpha-zone.example.org` e l'assenza di placeholder raw residui `{apex}`, `{apex_fqdn}`, `{apex_slug}`; il contratto resta condiviso e riusato sia dal renderer puro sia dal use case `application`.
