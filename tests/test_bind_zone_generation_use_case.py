@@ -101,7 +101,7 @@ def test_generate_bind_zone_file_returns_structured_renderer_failure() -> None:
         side_effect=ValueError(
             "Unsupported record_type for BIND renderer: AAAA",
         ),
-    ):
+    ) as mocked_renderer:
         result = generate_bind_zone_file("testdomain.com")
 
     assert result == BindZoneFileGenerationResult(
@@ -110,6 +110,10 @@ def test_generate_bind_zone_file_returns_structured_renderer_failure() -> None:
         zone_apex="testdomain.com",
         error_code="renderer_failure",
         zone_file_text=None,
+    )
+    mocked_renderer.assert_called_once_with(
+        zone_apex="testdomain.com",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
     )
 
 def test_generate_bind_zone_file_returns_structured_renderer_failure_for_non_value_error() -> None:
