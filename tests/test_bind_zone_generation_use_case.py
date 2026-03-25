@@ -268,3 +268,24 @@ def test_generate_bind_zone_file_matches_non_golden_golden_file() -> None:
         error_code=None,
         zone_file_text=expected_text,
     )
+
+def test_generate_bind_zone_file_calls_renderer_with_non_golden_validated_apex_and_fixed_profile(
+) -> None:
+    """Call the renderer with the validated non-golden apex and the fixed public-safe profile."""
+    with patch(
+        "dns_zone_bootstrapper.application.bind_zone_generation.render_bind_zone_file",
+        return_value=";; mocked non-golden bind zone output",
+    ) as mocked_renderer:
+        result = generate_bind_zone_file("alpha-zone.example.org")
+
+    assert result == BindZoneFileGenerationResult(
+        input_value="alpha-zone.example.org",
+        is_valid=True,
+        zone_apex="alpha-zone.example.org",
+        error_code=None,
+        zone_file_text=";; mocked non-golden bind zone output",
+    )
+    mocked_renderer.assert_called_once_with(
+        zone_apex="alpha-zone.example.org",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
