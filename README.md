@@ -6,7 +6,7 @@ Prototipo Python per generare file di zona DNS in formato BIND, pronti per l'imp
 
 Il progetto si trova in fase di bootstrap, freeze documentale e preparazione del core applicativo.
 
-Il file reale di riferimento è stato ricevuto e il contratto v1 è stato chiarito con l'azienda.  
+Il file reale di riferimento è stato ricevuto e il contratto v1 è stato chiarito.  
 Per la prima versione, il comportamento atteso è il seguente:
 
 - deliverable principale: pagina web;

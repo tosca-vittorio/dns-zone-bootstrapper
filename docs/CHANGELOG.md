@@ -9,7 +9,7 @@
 #### B2 — Renderer BIND zone file
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
-- **`028bce4` — `docs(timeline): close B2 and prepare B3 opening`**
+- **`07272ff` — `docs(timeline): close B2 and prepare B3 opening`**
   - **Type:** `docs` · **Categoria:** Owner docs / Timeline / Cycle transition
   - **Cosa cambia:** aggiorna `docs/TIMELINE.md` chiudendo formalmente `B2`, riallineando fase corrente, obiettivo immediato, ultimo consolidamento e nota di chiusura del blocco, e prepara `B3` come prossimo step operativo del core.
   - **Impatto:** impedisce ulteriore hardening marginale dentro `B2`, fissa documentalmente la soglia di uscita del blocco e rende `B3` il prossimo contenitore corretto per fixture e confronti più realistici, senza aprire nello stesso passaggio scope su UI/web o refactor larghi.
