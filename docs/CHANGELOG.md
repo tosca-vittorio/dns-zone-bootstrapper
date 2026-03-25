@@ -8,6 +8,12 @@
 #### B2 — Renderer BIND zone file
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
+- **`f8c8331` — `test(renderer): freeze non-golden full-text golden output`**
+  - **Type:** `test` · **Categoria:** Renderer / Non-golden full-text golden freeze
+  - **Cosa cambia:** estende `tests/test_bind_zone_renderer.py` con un test dedicato che confronta l'output completo di `render_bind_zone_file(...)` per `alpha-zone.example.org` con un nuovo golden file dedicato `tests/golden/public_safe_candidate.alpha-zone-example-org.bind.txt`, introducendo così un freeze full-text indipendente del percorso non-golden del renderer puro.
+  - **Impatto:** rende più difendibile `B2` sul lato renderer, perché il percorso non-golden non dipende più soltanto da assertion condivise di sottoinsieme o da confronti mediati dal boundary `application`, senza modificare il runtime del package e senza aprire nuovo scope su CLI, web o fixture reali esterne.
+  - **Evidenze:** `python -m pytest -q` → `63 passed`; `python -m pylint src tests` → `10.00/10`.
+
 - **`895e161` — `test(application): freeze non-golden full-text renderer parity`**
   - **Type:** `test` · **Categoria:** Application / Non-golden full-text parity freeze
   - **Cosa cambia:** estende `tests/test_bind_zone_generation_use_case.py` con un test dedicato che, per `alpha-zone.example.org`, confronta il `zone_file_text` prodotto da `generate_bind_zone_file(...)` con il testo completo restituito dal renderer puro `render_bind_zone_file(...)` invocato con `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
