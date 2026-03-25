@@ -249,3 +249,18 @@ def test_generate_bind_zone_file_does_not_call_renderer_on_validation_failure() 
         zone_file_text=None,
     )
     mocked_renderer.assert_not_called()
+
+def test_generate_bind_zone_file_matches_non_golden_golden_file() -> None:
+    """Freeze the application non-golden path against its dedicated golden file."""
+    golden_path = (
+        Path(__file__).parent
+        / "golden"
+        / "public_safe_candidate.alpha-zone-example-org.bind.txt"
+    )
+    expected_text = golden_path.read_text(encoding="utf-8")
+
+    result = generate_bind_zone_file("alpha-zone.example.org")
+
+    assert result.error_code is None
+    assert result.zone_apex == "alpha-zone.example.org"
+    assert result.zone_file_text == expected_text
