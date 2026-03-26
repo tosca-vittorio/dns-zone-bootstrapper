@@ -2,6 +2,34 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
+def load_normalized_realistic_testdomain_golden(base_path: Path) -> str:
+    """Load the realistic-backed golden normalized to the public-safe runtime baseline."""
+    golden_path = (
+        base_path
+        / "golden"
+        / "public_safe_candidate.testdomain-com.bind.txt"
+    )
+    realistic_backed_text = golden_path.read_text(encoding="utf-8")
+
+    return (
+        realistic_backed_text
+        .replace("__SANITIZED_A_TARGET__", "__FIXED_A_TARGET__")
+        .replace("__SANITIZED_MAIL_HOST__", "__FIXED_MAIL_HOST__")
+        .replace("dkim.brevo.com.", "dkim.__FIXED_PROVIDER_ZONE__.")
+        .replace(
+            "rua=mailto:rua@dmarc.brevo.com",
+            "rua=mailto:__FIXED_DMARC_RUA__",
+        )
+        .replace("__SANITIZED_DKIM_PUBLIC_KEY__", "__FIXED_DKIM_PUBLIC_KEY__")
+        .replace("__SANITIZED_SPF_IPV4__", "__FIXED_SPF_IPV4__")
+        .replace("include:spf.brevo.com", "include:__FIXED_SPF_INCLUDE__")
+        .replace(
+            "__SANITIZED_VERIFICATION_CODE__",
+            "__FIXED_VERIFICATION_CODE__",
+        )
+    )
 
 def assert_alpha_zone_derived_rendering(zone_file_text: str) -> None:
     """Assert the shared non-golden rendering contract for alpha-zone.example.org."""

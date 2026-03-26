@@ -8,6 +8,7 @@ import pytest
 
 from tests.shared_bind_zone_assertions import (
     assert_alpha_zone_derived_rendering,
+    load_normalized_realistic_testdomain_golden,
 )
 
 from dns_zone_bootstrapper.renderers.bind_zone_renderer import (
@@ -22,7 +23,6 @@ from dns_zone_bootstrapper.templates.profiles.public_safe_candidate import (
     PUBLIC_SAFE_FIXED_DNS_PROFILE,
 )
 
-
 def test_render_bind_zone_file_returns_expected_public_safe_text() -> None:
     """Render the public-safe fixed profile as the expected BIND text."""
     rendered = render_bind_zone_file(
@@ -34,6 +34,20 @@ def test_render_bind_zone_file_returns_expected_public_safe_text() -> None:
     expected = golden_path.read_text(encoding="utf-8")
 
     assert rendered == expected
+
+def test_render_bind_zone_file_matches_realistic_testdomain_golden_after_normalization(
+) -> None:
+    """Freeze only the approved delta against the realistic-backed testdomain golden."""
+    rendered = render_bind_zone_file(
+        zone_apex="testdomain.com",
+        profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    )
+
+    normalized_expected = load_normalized_realistic_testdomain_golden(
+        Path(__file__).parent,
+    )
+
+    assert rendered == normalized_expected
 
 def test_render_bind_zone_file_returns_expected_non_golden_public_safe_text() -> None:
     """Render the public-safe fixed profile as expected BIND text for a non-golden apex."""
@@ -60,7 +74,6 @@ def test_render_bind_zone_file_resolves_derived_placeholders_for_non_golden_apex
 
     assert_alpha_zone_derived_rendering(rendered)
 
-
 def test_render_bind_zone_file_quotes_txt_records_in_output() -> None:
     """Quote TXT record payloads in rendered BIND output."""
     rendered = render_bind_zone_file(
@@ -80,7 +93,6 @@ def test_render_bind_zone_file_quotes_txt_records_in_output() -> None:
     for expected_line in expected_txt_lines:
         assert expected_line in rendered
 
-
 def test_render_bind_zone_file_renders_cf_tags_annotations() -> None:
     """Render cf_tags annotations for proxied and non-proxied records."""
     rendered = render_bind_zone_file(
@@ -98,7 +110,6 @@ def test_render_bind_zone_file_renders_cf_tags_annotations() -> None:
 
     for expected_line in expected_lines:
         assert expected_line in rendered
-
 
 def test_render_bind_zone_file_groups_sections_in_expected_order() -> None:
     """Render section headers once and in the expected record-type order."""
@@ -121,7 +132,6 @@ def test_render_bind_zone_file_groups_sections_in_expected_order() -> None:
         current_index = rendered.index(header)
         assert current_index > last_index
         last_index = current_index
-
 
 def test_render_bind_zone_file_omits_cf_tags_when_proxy_state_is_absent() -> None:
     """Omit cf_tags annotations for records without an explicit proxy state."""
