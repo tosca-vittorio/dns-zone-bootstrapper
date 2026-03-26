@@ -6,7 +6,7 @@
 - Branch operativo: `development`
 - Fase corrente: `B1` chiuso e consolidato come baseline code-only del profilo DNS fisso public-safe, semanticamente allineata al template reale, irrigidita da freeze test su contratto e superfici principali e formalizzata nel model layer su vocabolari chiusi e metadata espliciti del `rdata`; `B2` chiuso con renderer BIND minimale già verificato da test dedicato e quality gates globali, poi irrigidito con golden file public-safe esterno, con test esplicito sulla resa dei placeholder derivati, esteso con un primo boundary `application` framework-agnostic per la generazione del file di zona a partire dallo zone apex input, ulteriormente consolidato con hardening test-side condiviso tra renderer puro e use case applicativo end-to-end, con copertura applicativa aggiuntiva dei failure path `domain_too_long`, `empty_input`, `missing_dot`, `leading_dot`, `trailing_dot`, `empty_label`, `invalid_label` e `non_string_input` nel generatore BIND, con coverage renderer-focused esplicita sul quoting dei record `TXT`, sulle annotazioni `cf_tags`, sul freeze della presenza, unicità e ordine dei section headers del renderer BIND e sull'omissione delle annotazioni `cf_tags` per record senza stato proxy esplicito, con un failure contract esplicito e testato per `record_type` non supportato nel renderer, con gestione strutturata del failure path interno del renderer nel boundary `application` tramite `error_code="renderer_failure"`, con grouping delle sezioni del renderer reso indipendente dall'ordine di `profile.records`, difeso da test esplicito su record interleaved e verificato da quality gates globali aggiornati, con allineamento del contratto dichiarato del layer `application` ai failure strutturati su input non stringa già supportati a runtime, con hardening del boundary di traduzione dei failure interni del renderer anche per `RuntimeError` e con freeze test esplicito del contratto di short-circuit applicativo che impedisce l'invocazione del renderer quando la validazione dell'input fallisce e con freeze test esplicito del success-call contract del boundary `application`, che congela l'invocazione del renderer con `zone_apex` validato e `PUBLIC_SAFE_FIXED_DNS_PROFILE`, e con freeze test esplicito dell'ordine relativo dei record dello stesso tipo all'interno di una stessa sezione del renderer BIND e con freeze test esplicito dell'omissione delle sezioni vuote nel renderer BIND per profili parziali e con freeze test esplicito dell'assenza di blank line spurie nel renderer BIND su output a sezione unica e con freeze test esplicito della separazione tramite esattamente una sola blank line tra sezioni popolate consecutive del renderer BIND
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: aprire `B3` con un primo lavoro truth-first su fixture e confronti più realistici, mantenendo separati core, UI/web e refactor larghi
+- Obiettivo immediato: aprire operativamente `B3` sul piano documentale truth-first, registrando l'audit read-only già completato e fissando come primo passo concreto la creazione di una fixture versionata, public-safe e realistic-backed sotto `tests/golden`, senza toccare ancora runtime, UI/web o refactor larghi
 - Ultimo consolidamento `B2`: chiusura formale e documentale del blocco, con renderer e boundary `application` difesi su success path e failure path sia golden sia non-golden, inclusi i rispettivi success-call e failure-call contract verso `render_bind_zone_file(...)`, quality gates globali verdi (`67 passed`, `pylint 10.00/10`) e repository allineato a `origin/development`.
 
 ## Legenda stati
@@ -247,13 +247,28 @@ Produrre il renderer del file di zona in formato coerente con l'import Cloudflar
 - il confronto realistico read-only con il riferimento aziendale non ha evidenziato gap strutturali tali da giustificare ulteriore hardening immediato dentro `B2`;
 - `B2` si considera chiuso; il passo successivo corretto è `B3`, dedicato alla protezione del generatore con fixture e confronti più realistici, senza aprire nello stesso blocco scope su UI/web.
 
-### B3 — Test del generatore e preparazione fixture reali — ⬜
-**Obiettivo**  
-Proteggere il comportamento del generatore tramite test automatici e preparare l'ingresso di fixture reali.
+### B3 — Test del generatore e preparazione fixture reali — 🟡
+**Obiettivo**
+Proteggere il comportamento del generatore tramite test automatici e preparare l'ingresso di fixture realistiche versionabili, senza dipendere direttamente dagli artefatti privati gitignored.
 
 **Dipendenze**
 - file reale di riferimento già acquisito;
+- snapshot normalizzato locale del riferimento reale già disponibile;
 - eventuale laboratorio Cloudflare per export/import di verifica.
+
+**Stato operativo**
+- completato audit read-only tra golden public-safe versionato, file reale locale gitignored, snapshot normalizzato locale, profilo runtime `public_safe_candidate`, renderer e boundary `application`;
+- confermata parità strutturale e d'ordine del candidato v1 rispetto al riferimento reale, al netto del solo `SOA` presente nell'export reale e già fuori perimetro runtime/versionato;
+- confermato allineamento tra profilo runtime versionato e snapshot normalizzato su inventario, ordine, `cf_proxied`, `manual_flag` e `rdata_kind`;
+- verificato che `samples/private/` è gitignored e che le fixture realistiche locali non sono referenziate dai test versionati del repository;
+- identificato come primo passo corretto di `B3` la creazione di una fixture versionata, public-safe e realistic-backed sotto `tests/golden`, da usare come ponte verso il primo test snapshot-backed del generatore nel layer `application`.
+
+**Evidenze correnti**
+- `git status` → `nothing to commit, working tree clean`;
+- `git status -sb` → `## development...origin/development`;
+- `python -m pytest -q` → `67 passed`;
+- `python -m pylint src tests` → `10.00/10`;
+- audit read-only completato: delta residuo confinato a `SOA` extra nel riferimento reale e a valori sanitizzati/public-safe rispetto ai valori reali; nessun gap strutturale emerso sul candidato v1.
 
 ---
 
