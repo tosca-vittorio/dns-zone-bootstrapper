@@ -1,5 +1,7 @@
 """Bootstrap tests."""
 
+from unittest.mock import patch
+
 from typer.testing import CliRunner
 
 from dns_zone_bootstrapper import __version__
@@ -29,6 +31,19 @@ def test_cli_doctor_command() -> None:
     assert "dns-zone-bootstrapper: CLI bootstrap OK" in result.stdout
 
 
+def test_cli_web_command_starts_minimal_demo_entrypoint() -> None:
+    """CLI web subcommand starts the minimal demo entrypoint."""
+    with patch("dns_zone_bootstrapper.interfaces.cli.app.uvicorn.run") as mock_run:
+        result = runner.invoke(cli_app, ["web"])
+
+    assert result.exit_code == 0
+    mock_run.assert_called_once_with(
+        "dns_zone_bootstrapper.interfaces.web.app:app",
+        host="127.0.0.1",
+        port=8000,
+    )
+
+
 def test_web_metadata() -> None:
     """Web app metadata is present."""
     assert web_app.title == "DNS Zone Bootstrapper"
@@ -50,6 +65,7 @@ def test_web_root_returns_html_response_with_active_generation_flow() -> None:
     assert "generazione e download" in html
     assert ".txt" in html
     assert "già attivi" in html
+
 
 def test_web_generate_returns_html_error_for_invalid_empty_domain() -> None:
     """Generate route returns an HTML error page for invalid input."""
