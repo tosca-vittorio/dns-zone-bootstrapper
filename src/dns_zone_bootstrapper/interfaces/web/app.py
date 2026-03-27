@@ -91,9 +91,8 @@ def _render_home_page(
     </form>
 
 {error_block}    <p>
-      Stato corrente: superficie web minima chiusa in <strong>C0</strong>.
-      La generazione e il download diretto sono in apertura in
-      <strong>C1</strong>.
+      Stato corrente: demo web minima della v1 con generazione e download
+      diretto del file <strong>.txt</strong> già attivi.
     </p>
   </main>
 </body>

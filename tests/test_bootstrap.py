@@ -34,8 +34,8 @@ def test_web_metadata() -> None:
     assert web_app.title == "DNS Zone Bootstrapper"
 
 
-def test_web_root_returns_html_response_with_c1_entrypoint() -> None:
-    """Root route exposes the minimal HTML page with active C1 form."""
+def test_web_root_returns_html_response_with_active_generation_flow() -> None:
+    """Root route exposes the minimal HTML page with active generation flow."""
     response = root()
     html = response.body.decode("utf-8")
 
@@ -46,9 +46,10 @@ def test_web_root_returns_html_response_with_c1_entrypoint() -> None:
     assert 'action="/generate"' in html
     assert "Genera e scarica il file (.txt)" in html
     assert "disabled" not in html
-    assert "C0" in html
-    assert "C1" in html
-
+    assert "demo web minima della v1" in html
+    assert "generazione e download" in html
+    assert ".txt" in html
+    assert "già attivi" in html
 
 def test_web_generate_returns_html_error_for_invalid_empty_domain() -> None:
     """Generate route returns an HTML error page for invalid input."""
