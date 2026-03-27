@@ -4,10 +4,10 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1`, `B2`, `B3`, `C0` e `C1` chiusi e consolidati; `C2` è ora aperto tecnicamente con un primo micro-step già consolidato sulla coerenza della copy user-facing della demo web, mentre il packaging minimo resta non ancora avviato.
+- Fase corrente: `B1`, `B2`, `B3`, `C0`, `C1` e `C2` chiusi e consolidati; nessun blocco `D*` è stato ancora avviato.
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: proseguire `C2 — Rifinitura demo web e packaging minimo` con micro-step conservativi, mantenendo invariati stack e core applicativo già consolidati e senza aprire refactor larghi o hardening.
-- Ultimo consolidamento `C2`: primo incremento tecnico del blocco consolidato nel commit `cb99280` (`feat(web): refresh demo copy for active generation flow`), con riallineamento della copy della root `/` allo stato reale della demo web, aggiornamento del test bootstrap accoppiato e quality gates globali verdi (`python -m pytest -q` → `75 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
+- Obiettivo immediato: determinare in modo conservativo il prossimo micro-step corretto dopo la chiusura di `C2`, mantenendo invariati stack e core applicativo già consolidati e senza aprire nello stesso passaggio refactor larghi o blocchi `D*`.
+- Ultimo consolidamento `C2`: chiusura tecnica del blocco consolidata nel commit `c432feb` (`feat(cli): add minimal web demo entrypoint`), con aggiunta del subcommand `dns-zone-cli web` come entrypoint minimale installato per avviare la demo FastAPI, estensione di `tests/test_bootstrap.py` sul nuovo boundary CLI/web e quality gates globali verdi (`python -m pytest -q` → `76 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C0`: primo incremento tecnico del `Cycle C` consolidato nel commit `a702f0b` (`feat(web): add minimal C0 web page`), con root `/` convertita in pagina HTML minimale, endpoint `/health` preservato, test bootstrap web dedicati aggiunti e quality gates globali verdi (`python -m pytest -q` → `73 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `B3`: chiusura formale e documentale del blocco realistic-backed, a valle di tre incrementi tecnici consolidati (`d87feff`, `c98851b`, `6edb1e2`) e dell'audit read-only finale contro riferimento reale locale e snapshot normalizzato locale, con quality gates globali verdi (`python -m pytest -q` → `70 passed`, `python -m pylint src tests` → `10.00/10`) e branch allineato a `origin/development`.
 - Ultimo consolidamento `B2`: chiusura formale e documentale del blocco, con renderer e boundary `application` difesi su success path e failure path sia golden sia non-golden, inclusi i rispettivi success-call e failure-call contract verso `render_bind_zone_file(...)`, quality gates globali verdi (`67 passed`, `pylint 10.00/10`) e repository allineato a `origin/development`.
@@ -327,25 +327,25 @@ Permettere l'inserimento del dominio e il download diretto del file `.txt` gener
 - la superficie web della v1 consente ora sia l'inserimento del dominio sia il download diretto del file `.txt` generato;
 - il prossimo step corretto del `Cycle C` è `C2`, dedicato alla rifinitura della demo web e al packaging minimo.
 
-### C2 — Rifinitura demo web e packaging minimo — 🟡
-**Obiettivo**  
+### C2 — Rifinitura demo web e packaging minimo — ✅
+**Obiettivo**
 Rifinire in modo conservativo la demo web esistente e preparare un packaging minimo di esecuzione, senza toccare il core applicativo.
 
 **Stato operativo**
-- `C2` è stato aperto tecnicamente con un primo micro-step limitato alla coerenza della copy user-facing della root `/`;
-- `src/dns_zone_bootstrapper/interfaces/web/app.py` non presenta più il drift testuale che descriveva `C1` come ancora "in apertura" e dichiara ora correttamente generazione e download diretto del file `.txt` già attivi;
-- `tests/test_bootstrap.py` è stato riallineato al nuovo contratto testuale della pagina iniziale, senza toccare route pubbliche, core applicativo o packaging;
-- il packaging minimo resta fuori dal perimetro di questo primo avanzamento e non è ancora stato avviato.
+- `C2` è stato completato con due micro-step conservativi e verificabili, senza toccare il core applicativo;
+- nel primo micro-step la root `/` è stata riallineata allo stato reale della demo web, eliminando la copy obsoleta che descriveva `C1` come ancora "in apertura";
+- nel secondo micro-step la superficie installata del progetto espone ora il subcommand `dns-zone-cli web`, che avvia localmente la demo FastAPI tramite `uvicorn` con configurazione minima deterministica;
+- `tests/test_bootstrap.py` è stato esteso sia sul contratto testuale della root sia sul nuovo boundary CLI/web minimale, mantenendo invariati renderer, template, use case applicativi e route pubbliche già consolidate.
 
 **Evidenze correnti**
-- `python -m pytest -q` → `75 passed`;
+- `python -m pytest -q` → `76 passed`;
 - `python -m pylint src tests` → `10.00/10`;
-- primo avanzamento tecnico `C2` consolidato nel commit `cb99280` (`feat(web): refresh demo copy for active generation flow`).
+- primo avanzamento tecnico `C2` consolidato nel commit `cb99280` (`feat(web): refresh demo copy for active generation flow`);
+- secondo avanzamento tecnico `C2` consolidato nel commit `c432feb` (`feat(cli): add minimal web demo entrypoint`).
 
-**Nota di stato C2**
-- la demo web minima è ora riallineata allo stato reale del progetto sul piano della comunicazione user-facing;
-- `C2` resta correttamente aperto perché il packaging minimo non è ancora stato affrontato e non esistono ancora evidenze sufficienti per la chiusura del blocco.
-
+**Nota di chiusura C2**
+- la demo web minima della v1 è ora rifinita sia sul piano della comunicazione user-facing sia su quello del packaging minimo di avvio locale;
+- la DoD sostanziale del blocco risulta soddisfatta sul repository reale e `C2` si considera chiuso; l'eventuale blocco successivo dovrà essere determinato separatamente con un nuovo audit conservativo.
 ---
 
 ## Cycle D — Hardening

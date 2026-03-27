@@ -3,11 +3,17 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino alla chiusura realistic-backed di `B3`, chiusura dei primi due incrementi tecnici del `Cycle C` (`C0` e `C1`) e apertura tecnica di `C2` con un primo delta minimo di riallineamento della demo web rispetto allo stato reale, mantenendo ancora fuori perimetro il packaging minimo.
-> Ultimo consolidamento: primo incremento tecnico di `C2` consolidato nel commit `cb99280`, con riallineamento della copy user-facing della root `/`, aggiornamento del test bootstrap accoppiato e quality gates globali verdi (`75 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino alla chiusura realistic-backed di `B3` e chiusura del `Cycle C` fino a `C2`, con demo web riallineata allo stato reale e packaging minimo CLI per l'avvio locale della web demo.
+> Ultimo consolidamento: chiusura tecnica di `C2` consolidata nel commit `c432feb`, con aggiunta del subcommand `dns-zone-cli web`, estensione del bootstrap test sul nuovo entrypoint e quality gates globali verdi (`76 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
 
 #### C2 — Rifinitura demo web e packaging minimo
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`c432feb` — `feat(cli): add minimal web demo entrypoint`**
+  - **Type:** `feat` · **Categoria:** CLI / Minimal web demo packaging
+  - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/interfaces/cli/app.py` introducendo il subcommand `web`, che avvia la demo FastAPI tramite `uvicorn.run(...)` con entrypoint `dns_zone_bootstrapper.interfaces.web.app:app` e configurazione minima `127.0.0.1:8000`; estende inoltre `tests/test_bootstrap.py` con un test dedicato che congela il nuovo boundary CLI/web.
+  - **Impatto:** chiude il gap minimo di packaging emerso in `C2`, perché la superficie installata del progetto non espone più soltanto `doctor` ma anche un entrypoint ergonomico per avviare la demo web locale, senza toccare core, renderer o web adapter.
+  - **Evidenze:** `python -m pytest -q tests/test_bootstrap.py` → `10 passed`; `python -m pytest -q` → `76 passed`; `python -m pylint src tests` → `10.00/10`; commit `c432feb` pubblicato su `origin/development`.
 
 - **`cb99280` — `feat(web): refresh demo copy for active generation flow`**
   - **Type:** `feat` · **Categoria:** Web / Demo copy alignment

@@ -4,7 +4,7 @@ Prototipo Python per generare file di zona DNS in formato BIND, pronti per l'imp
 
 ## Fase corrente
 
-Il progetto ha chiuso il core engine fino a `B3` e ha consolidato i primi due incrementi tecnici del `Cycle C`, con pagina web minimale su FastAPI e flusso attivo di generazione e download diretto del file `.txt` nel blocco `C1`.
+Il progetto ha chiuso il core engine fino a `B3` e ha ora consolidato anche `C2`, con demo web minimale FastAPI allineata allo stato reale, flusso attivo di generazione e download diretto del file `.txt` e packaging minimo locale tramite subcommand `dns-zone-cli web`.
 
 Il file reale di riferimento è stato ricevuto e il contratto v1 è stato chiarito.  
 Per la prima versione, il comportamento atteso è il seguente:
@@ -38,6 +38,8 @@ tests/                         test e fixture golden
 python -m pip install -e ".[dev]"
 pytest -q
 dns-zone-cli doctor
+dns-zone-cli web
+# alternativa tecnica equivalente:
 python -m uvicorn dns_zone_bootstrapper.interfaces.web.app:app --reload
 ```
 
