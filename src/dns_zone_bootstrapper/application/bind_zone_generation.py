@@ -10,9 +10,10 @@ from dns_zone_bootstrapper.application.zone_apex_validation import (
 from dns_zone_bootstrapper.renderers.bind_zone_renderer import (
     render_bind_zone_file,
 )
-from dns_zone_bootstrapper.templates.profiles.public_safe_candidate import (
-    PUBLIC_SAFE_FIXED_DNS_PROFILE,
+from dns_zone_bootstrapper.templates.profile_resolver import (
+    resolve_active_fixed_dns_profile,
 )
+
 
 @dataclass(frozen=True, slots=True)
 class BindZoneFileGenerationResult:
@@ -23,6 +24,7 @@ class BindZoneFileGenerationResult:
     zone_apex: str | None
     error_code: str | None
     zone_file_text: str | None
+
 
 def generate_bind_zone_file(input_value: object) -> BindZoneFileGenerationResult:
     """Validate the input apex and render the fixed BIND zone file on success."""
@@ -43,7 +45,7 @@ def generate_bind_zone_file(input_value: object) -> BindZoneFileGenerationResult
     try:
         zone_file_text = render_bind_zone_file(
             zone_apex=zone_apex,
-            profile=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+            profile=resolve_active_fixed_dns_profile(),
         )
     except (ValueError, RuntimeError):
         return BindZoneFileGenerationResult(
