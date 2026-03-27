@@ -4,9 +4,10 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1`, `B2` e `B3` chiusi e consolidati; `Cycle C` attivato con `C0` chiuso come pagina web minimale FastAPI/HTML difesa da test bootstrap dedicati; `C1` non ancora avviato.
+- Fase corrente: `B1`, `B2` e `B3` chiusi e consolidati; `Cycle C` attivato con `C0` e `C1` chiusi come superficie web minimale FastAPI/HTML con generazione e download diretto del file `.txt`, entrambi difesi da test bootstrap dedicati; `C2` non ancora avviato.
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: aprire operativamente `C1 — Generazione e download del file` come step successivo del `Cycle C`, mantenendo invariati stack, core applicativo e pagina minima già consolidati e senza aprire nello stesso passaggio refactor larghi o hardening.
+- Obiettivo immediato: aprire operativamente `C2 — Rifinitura demo web e packaging minimo` come step successivo del `Cycle C`, mantenendo invariati stack e core applicativo già consolidati e senza aprire nello stesso passaggio refactor larghi o hardening.
+- Ultimo consolidamento `C1`: secondo incremento tecnico del `Cycle C` consolidato nel commit `7562486` (`feat(web): add C1 generation and download flow`), con route `/generate` collegata al use case `generate_bind_zone_file(...)`, ritorno `text/plain` con `Content-Disposition` sul success path, fallback HTML con errore user-facing sul failure path, test bootstrap web estesi e quality gates globali verdi (`python -m pytest -q` → `75 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C0`: primo incremento tecnico del `Cycle C` consolidato nel commit `a702f0b` (`feat(web): add minimal C0 web page`), con root `/` convertita in pagina HTML minimale, endpoint `/health` preservato, test bootstrap web dedicati aggiunti e quality gates globali verdi (`python -m pytest -q` → `73 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `B3`: chiusura formale e documentale del blocco realistic-backed, a valle di tre incrementi tecnici consolidati (`d87feff`, `c98851b`, `6edb1e2`) e dell'audit read-only finale contro riferimento reale locale e snapshot normalizzato locale, con quality gates globali verdi (`python -m pytest -q` → `70 passed`, `python -m pylint src tests` → `10.00/10`) e branch allineato a `origin/development`.
 - Ultimo consolidamento `B2`: chiusura formale e documentale del blocco, con renderer e boundary `application` difesi su success path e failure path sia golden sia non-golden, inclusi i rispettivi success-call e failure-call contract verso `render_bind_zone_file(...)`, quality gates globali verdi (`67 passed`, `pylint 10.00/10`) e repository allineato a `origin/development`.
@@ -306,9 +307,25 @@ Esporre il core tramite una pagina web minimale coerente con la richiesta inizia
 - la pagina web minimale della v1 è ora presente, versionata e difesa da test bootstrap dedicati;
 - il collegamento del form al generatore BIND e il download diretto del file `.txt` restano correttamente demandati a `C1`.
 
-### C1 — Generazione e download del file — ⬜
-**Obiettivo**  
+### C1 — Generazione e download del file — ✅
+**Obiettivo**
 Permettere l'inserimento del dominio e il download diretto del file `.txt` generato.
+
+**Stato operativo**
+- la root `/` espone ora un form attivo con `action="/generate"` e bottone abilitato per l'avvio del flusso web minimale della v1;
+- la route `GET /generate` integra il use case framework-agnostic `generate_bind_zone_file(...)` senza introdurre nuove dipendenze o logica duplicata fuori dal core;
+- sul success path viene restituito il file BIND come `text/plain` con header `Content-Disposition` orientato al download diretto;
+- sul failure path il web adapter restituisce una pagina HTML con messaggio di errore user-facing derivato dagli `error_code` strutturati del boundary applicativo, preservando la superficie minima della demo;
+- `tests/test_bootstrap.py` è stato esteso per congelare l'entrypoint `C1`, il failure path HTML su input invalido, il success path di download e la presenza della route pubblica `/generate`.
+
+**Evidenze correnti**
+- `python -m pytest -q` → `75 passed`;
+- `python -m pylint src tests` → `10.00/10`;
+- avanzamento tecnico consolidato nel commit `7562486` (`feat(web): add C1 generation and download flow`).
+
+**Nota di chiusura C1**
+- la superficie web della v1 consente ora sia l'inserimento del dominio sia il download diretto del file `.txt` generato;
+- il prossimo step corretto del `Cycle C` è `C2`, dedicato alla rifinitura della demo web e al packaging minimo.
 
 ### C2 — Rifinitura demo web e packaging minimo — ⬜
 **Obiettivo**  

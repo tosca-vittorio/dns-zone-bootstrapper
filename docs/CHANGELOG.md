@@ -3,8 +3,23 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino alla chiusura realistic-backed di `B3` e primo incremento tecnico del `Cycle C` con `C0` minimale su FastAPI, che sostituisce il root JSON con una pagina HTML minima, preserva `/health` e aggiunge test bootstrap dedicati sulla superficie web minimale, mantenendo fuori perimetro il collegamento al generatore e il download diretto del file, demandati a `C1`.
-> Ultimo consolidamento: primo incremento tecnico di `C0` consolidato nel commit `a702f0b`, con pagina web minimale HTML sulla route `/`, endpoint `/health` invariato, test bootstrap dedicati e quality gates globali verdi (`73 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino alla chiusura realistic-backed di `B3` e primi due incrementi tecnici del `Cycle C`, con `C0` minimale su FastAPI e `C1` che collega la pagina al use case di generazione BIND, abilita il download diretto del file `.txt`, preserva `/health` ed estende i test bootstrap della superficie web minimale, mantenendo fuori perimetro la rifinitura demo e il packaging minimo, demandati a `C2`.
+> Ultimo consolidamento: secondo incremento tecnico di `C1` consolidato nel commit `7562486`, con route `/generate` collegata al use case `generate_bind_zone_file(...)`, success path `text/plain` con `Content-Disposition`, fallback HTML con errore user-facing, test bootstrap estesi e quality gates globali verdi (`75 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+
+#### C1 — Generazione e download del file
+> Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`7562486` — `feat(web): add C1 generation and download flow`**
+  - **Type:** `feat` · **Categoria:** Web / Generation + direct download flow
+  - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/interfaces/web/app.py` introducendo la route `GET /generate`, collegata al use case `generate_bind_zone_file(...)`; abilita il form della root `/`, aggiunge rendering HTML del failure path con messaggi user-facing derivati dagli `error_code` strutturati e restituisce sul success path il file BIND come `text/plain` con `Content-Disposition` per il download diretto. Estende inoltre `tests/test_bootstrap.py` per coprire entrypoint `C1`, failure path HTML, success path di download e presenza della route `/generate`.
+  - **Impatto:** chiude il perimetro minimo di `C1` senza introdurre nuove dipendenze o duplicazione della logica di generazione fuori dal core, rende la v1 realmente usabile end-to-end da pagina web e prepara il terreno al successivo blocco `C2` di rifinitura demo e packaging.
+  - **Evidenze:** `python -m pytest -q` → `75 passed`; `python -m pylint src tests` → `10.00/10`; commit `7562486` pubblicato su `origin/development`.
+
+- **`288a0b5` — `docs(project): close C0 and prepare C1`**
+  - **Type:** `docs` · **Categoria:** Owner docs / C0 closure + C1 preparation
+  - **Cosa cambia:** aggiorna `README.md`, `docs/TIMELINE.md` e `docs/CHANGELOG.md` riallineando lo stato del progetto alla chiusura di `C0` e promuovendo `C1` a prossimo blocco operativo del `Cycle C`.
+  - **Impatto:** chiude formalmente il doc gate di `C0`, impedisce che la timeline resti ferma alla sola pagina minimale e prepara correttamente il repository al successivo incremento tecnico sulla generazione e sul download diretto del file.
+  - **Evidenze:** commit `288a0b5` pubblicato su `origin/development`; branch allineato; nessuna modifica runtime in quel passaggio.
 
 #### C0 — Pagina web minimale
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.

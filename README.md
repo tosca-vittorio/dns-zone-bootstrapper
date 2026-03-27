@@ -4,7 +4,7 @@ Prototipo Python per generare file di zona DNS in formato BIND, pronti per l'imp
 
 ## Fase corrente
 
-Il progetto ha chiuso il core engine fino a `B3` e ha consolidato il primo incremento tecnico del `Cycle C` con una pagina web minimale su FastAPI, pronta al successivo collegamento del generatore nel blocco `C1`.
+Il progetto ha chiuso il core engine fino a `B3` e ha consolidato i primi due incrementi tecnici del `Cycle C`, con pagina web minimale su FastAPI e flusso attivo di generazione e download diretto del file `.txt` nel blocco `C1`.
 
 Il file reale di riferimento è stato ricevuto e il contratto v1 è stato chiarito.  
 Per la prima versione, il comportamento atteso è il seguente:
