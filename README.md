@@ -4,7 +4,7 @@ Prototipo Python per generare file di zona DNS in formato BIND, pronti per l'imp
 
 ## Fase corrente
 
-Il progetto si trova in fase di bootstrap, freeze documentale e preparazione del core applicativo.
+Il progetto ha chiuso il core engine fino a `B3` e ha consolidato il primo incremento tecnico del `Cycle C` con una pagina web minimale su FastAPI, pronta al successivo collegamento del generatore nel blocco `C1`.
 
 Il file reale di riferimento è stato ricevuto e il contratto v1 è stato chiarito.  
 Per la prima versione, il comportamento atteso è il seguente:
@@ -14,7 +14,7 @@ Per la prima versione, il comportamento atteso è il seguente:
 - altri valori del template: fissi per ora;
 - output: file `.txt` pronto per l'import su Cloudflare;
 - preview non necessaria;
-- nessuna preferenza di stack imposta dall'azienda.
+- nessuna preferenza di stack imposta.
 
 ## Obiettivi del prototipo
 

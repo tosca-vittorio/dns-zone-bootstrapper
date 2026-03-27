@@ -4,9 +4,10 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1` chiuso e consolidato come baseline code-only del profilo DNS fisso public-safe, semanticamente allineata al template reale, irrigidita da freeze test su contratto e superfici principali e formalizzata nel model layer su vocabolari chiusi e metadata espliciti del `rdata`; `B2` chiuso con renderer BIND minimale già verificato da test dedicato e quality gates globali, poi irrigidito con golden file public-safe esterno, con test esplicito sulla resa dei placeholder derivati, esteso con un primo boundary `application` framework-agnostic per la generazione del file di zona a partire dallo zone apex input, ulteriormente consolidato con hardening test-side condiviso tra renderer puro e use case applicativo end-to-end, con copertura applicativa aggiuntiva dei failure path `domain_too_long`, `empty_input`, `missing_dot`, `leading_dot`, `trailing_dot`, `empty_label`, `invalid_label` e `non_string_input` nel generatore BIND, con coverage renderer-focused esplicita sul quoting dei record `TXT`, sulle annotazioni `cf_tags`, sul freeze della presenza, unicità e ordine dei section headers del renderer BIND e sull'omissione delle annotazioni `cf_tags` per record senza stato proxy esplicito, con un failure contract esplicito e testato per `record_type` non supportato nel renderer, con gestione strutturata del failure path interno del renderer nel boundary `application` tramite `error_code="renderer_failure"`, con grouping delle sezioni del renderer reso indipendente dall'ordine di `profile.records`, difeso da test esplicito su record interleaved e verificato da quality gates globali aggiornati, con allineamento del contratto dichiarato del layer `application` ai failure strutturati su input non stringa già supportati a runtime, con hardening del boundary di traduzione dei failure interni del renderer anche per `RuntimeError` e con freeze test esplicito del contratto di short-circuit applicativo che impedisce l'invocazione del renderer quando la validazione dell'input fallisce e con freeze test esplicito del success-call contract del boundary `application`, che congela l'invocazione del renderer con `zone_apex` validato e `PUBLIC_SAFE_FIXED_DNS_PROFILE`, e con freeze test esplicito dell'ordine relativo dei record dello stesso tipo all'interno di una stessa sezione del renderer BIND e con freeze test esplicito dell'omissione delle sezioni vuote nel renderer BIND per profili parziali e con freeze test esplicito dell'assenza di blank line spurie nel renderer BIND su output a sezione unica e con freeze test esplicito della separazione tramite esattamente una sola blank line tra sezioni popolate consecutive del renderer BIND; `B3` chiuso come blocco realistic-backed dopo tre incrementi tecnici consolidati e audit read-only finale contro riferimento reale locale e snapshot normalizzato locale, che conferma assenza di gap strutturali residui sul candidato v1 oltre alla rimozione dell'header export-only + `SOA`, alla sanitizzazione public-safe dei soli valori sensibili e alla normalizzazione del whitespace, con quality gates globali verdi aggiornati.
+- Fase corrente: `B1`, `B2` e `B3` chiusi e consolidati; `Cycle C` attivato con `C0` chiuso come pagina web minimale FastAPI/HTML difesa da test bootstrap dedicati; `C1` non ancora avviato.
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: aprire operativamente `C0 — Pagina web minimale` come primo step del `Cycle C`, mantenendo invariati stack e core applicativo già consolidato e senza aprire nello stesso passaggio scope su refactor larghi o hardening.
+- Obiettivo immediato: aprire operativamente `C1 — Generazione e download del file` come step successivo del `Cycle C`, mantenendo invariati stack, core applicativo e pagina minima già consolidati e senza aprire nello stesso passaggio refactor larghi o hardening.
+- Ultimo consolidamento `C0`: primo incremento tecnico del `Cycle C` consolidato nel commit `a702f0b` (`feat(web): add minimal C0 web page`), con root `/` convertita in pagina HTML minimale, endpoint `/health` preservato, test bootstrap web dedicati aggiunti e quality gates globali verdi (`python -m pytest -q` → `73 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `B3`: chiusura formale e documentale del blocco realistic-backed, a valle di tre incrementi tecnici consolidati (`d87feff`, `c98851b`, `6edb1e2`) e dell'audit read-only finale contro riferimento reale locale e snapshot normalizzato locale, con quality gates globali verdi (`python -m pytest -q` → `70 passed`, `python -m pylint src tests` → `10.00/10`) e branch allineato a `origin/development`.
 - Ultimo consolidamento `B2`: chiusura formale e documentale del blocco, con renderer e boundary `application` difesi su success path e failure path sia golden sia non-golden, inclusi i rispettivi success-call e failure-call contract verso `render_bind_zone_file(...)`, quality gates globali verdi (`67 passed`, `pylint 10.00/10`) e repository allineato a `origin/development`.
 
@@ -286,20 +287,24 @@ Proteggere il comportamento del generatore tramite test automatici e preparare l
 
 ## Cycle C — Delivery surfaces
 
-### C0 — Pagina web minimale — 🟡
+### C0 — Pagina web minimale — ✅
 **Obiettivo**
 Esporre il core tramite una pagina web minimale coerente con la richiesta iniziale.
 
 **Stato operativo**
-- `Cycle B` risulta chiuso sul core applicativo e il repository espone già sia un entrypoint web minimale sia il use case framework-agnostic `generate_bind_zone_file(...)`;
-- il gap reale residuo non è nel core, ma nella delivery surface web della v1: mancano ancora una pagina con input dominio, il collegamento esplicito al generatore e la superficie minima orientata al successivo download del file;
-- `C0` viene quindi aperto come primo blocco operativo del `Cycle C`, senza introdurre in questo passaggio nuove dipendenze, preview o refactor larghi.
+- il web adapter `FastAPI` espone ora una root `/` HTML minimale in italiano al posto del precedente bootstrap JSON;
+- la pagina mostra titolo, descrizione sintetica, un solo input `Dominio apex` e una CTA disabilitata che esplicita la successiva attivazione del download in `C1`;
+- l'endpoint `/health` resta invariato come superficie tecnica minima;
+- `tests/test_bootstrap.py` è stato esteso per congelare il contratto minimo della superficie web su contenuto HTML, payload health e route pubbliche minime.
 
-**Vincoli della v1**
-- una sola pagina;
-- una sola interazione principale;
-- nessuna preview obbligatoria;
-- meno interazioni possibili.
+**Evidenze correnti**
+- `python -m pytest -q` → `73 passed`;
+- `python -m pylint src tests` → `10.00/10`;
+- avanzamento tecnico consolidato nel commit `a702f0b` (`feat(web): add minimal C0 web page`).
+
+**Nota di chiusura C0**
+- la pagina web minimale della v1 è ora presente, versionata e difesa da test bootstrap dedicati;
+- il collegamento del form al generatore BIND e il download diretto del file `.txt` restano correttamente demandati a `C1`.
 
 ### C1 — Generazione e download del file — ⬜
 **Obiettivo**  
