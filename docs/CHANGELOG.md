@@ -3,8 +3,17 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino alla chiusura realistic-backed di `B3` e chiusura del `Cycle C` fino a `C2`, con demo web riallineata allo stato reale e packaging minimo CLI per l'avvio locale della web demo.
-> Ultimo consolidamento: chiusura tecnica di `C2` consolidata nel commit `c432feb`, con aggiunta del subcommand `dns-zone-cli web`, estensione del bootstrap test sul nuovo entrypoint e quality gates globali verdi (`76 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino a `B4`, chiusura del `Cycle C` fino a `C2` e introduzione del boundary runtime per la risoluzione del profilo DNS fisso senza hardcode diretto sul solo profilo public-safe versionato.
+> Ultimo consolidamento: boundary runtime del profilo fisso consolidato nel commit `98ef332`, con introduzione di `profile_resolver.py`, fallback al profilo public-safe, supporto a override locale gitignored e quality gates globali verdi (`78 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+
+#### B4 — Runtime fixed profile resolution boundary
+> Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`98ef332` — `feat(templates): add runtime fixed profile resolver`**
+  - **Type:** `feat` · **Categoria:** Templates / Application / Runtime profile resolution
+  - **Cosa cambia:** introduce `src/dns_zone_bootstrapper/templates/profile_resolver.py` come boundary dedicato alla risoluzione del profilo fisso attivo; aggiorna `src/dns_zone_bootstrapper/application/bind_zone_generation.py`, che non dipende più direttamente da `PUBLIC_SAFE_FIXED_DNS_PROFILE` ma usa `resolve_active_fixed_dns_profile()`; aggiunge `tests/test_profile_resolver.py` per congelare sia il fallback al profilo public-safe sia l'uso di un eventuale override locale `local.dns_zone_profile.ACTIVE_FIXED_DNS_PROFILE`.
+  - **Impatto:** elimina l'hardcode diretto del runtime sul solo profilo versionato public-safe, crea il gancio corretto per usare in locale valori fixed concreti senza versionare dati privati e prepara il passo successivo verso una generazione non placeholderizzata, mantenendo invariata la baseline safe del repository quando nessun override locale è presente.
+  - **Evidenze:** `python -m pytest -q` → `78 passed`; `python -m pylint src tests` → `10.00/10`; commit `98ef332` pubblicato su `origin/development`.
 
 #### C2 — Rifinitura demo web e packaging minimo
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.

@@ -4,9 +4,10 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1`, `B2`, `B3`, `C0`, `C1` e `C2` chiusi e consolidati; nessun blocco `D*` è stato ancora avviato.
+- Fase corrente: `B1`, `B2`, `B3`, `B4`, `C0`, `C1` e `C2` chiusi e consolidati; nessun blocco `D*` è stato ancora avviato.
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: determinare in modo conservativo il prossimo micro-step corretto dopo la chiusura di `C2`, mantenendo invariati stack e core applicativo già consolidati e senza aprire nello stesso passaggio refactor larghi o blocchi `D*`.
+- Obiettivo immediato: introdurre in area gitignored il primo profilo locale con valori fixed concreti e verificare il file generato oltre la baseline public-safe versionata, senza aprire nello stesso passaggio refactor larghi o blocchi `D*`.
+- Ultimo consolidamento `B4`: boundary runtime del profilo fisso consolidato nel commit `98ef332` (`feat(templates): add runtime fixed profile resolver`), con introduzione di `src/dns_zone_bootstrapper/templates/profile_resolver.py`, disaccoppiamento di `generate_bind_zone_file(...)` dal profilo versionato hardcoded, fallback sicuro a `PUBLIC_SAFE_FIXED_DNS_PROFILE`, supporto a override locale gitignored tramite `local.dns_zone_profile.ACTIVE_FIXED_DNS_PROFILE`, test dedicati in `tests/test_profile_resolver.py` e quality gates globali verdi (`python -m pytest -q` → `78 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C2`: chiusura tecnica del blocco consolidata nel commit `c432feb` (`feat(cli): add minimal web demo entrypoint`), con aggiunta del subcommand `dns-zone-cli web` come entrypoint minimale installato per avviare la demo FastAPI, estensione di `tests/test_bootstrap.py` sul nuovo boundary CLI/web e quality gates globali verdi (`python -m pytest -q` → `76 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C0`: primo incremento tecnico del `Cycle C` consolidato nel commit `a702f0b` (`feat(web): add minimal C0 web page`), con root `/` convertita in pagina HTML minimale, endpoint `/health` preservato, test bootstrap web dedicati aggiunti e quality gates globali verdi (`python -m pytest -q` → `73 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `B3`: chiusura formale e documentale del blocco realistic-backed, a valle di tre incrementi tecnici consolidati (`d87feff`, `c98851b`, `6edb1e2`) e dell'audit read-only finale contro riferimento reale locale e snapshot normalizzato locale, con quality gates globali verdi (`python -m pytest -q` → `70 passed`, `python -m pylint src tests` → `10.00/10`) e branch allineato a `origin/development`.
@@ -283,6 +284,28 @@ Proteggere il comportamento del generatore tramite test automatici e preparare l
 - `diff -u samples/private/company_reference/testdomain.com.txt tests/golden/public_safe_candidate.testdomain-com.bind.txt` → delta confinato a header/export comments + `SOA` escluso, sanitizzazione public-safe dei valori sensibili e normalizzazione del whitespace;
 - `git status -sb` post-push → `## development...origin/development`;
 - audit read-only completato: delta residuo confinato a `SOA` extra nel riferimento reale e a valori sanitizzati/public-safe rispetto ai valori reali; nessun gap strutturale emerso sul candidato v1.
+
+### B4 — Runtime fixed profile resolution boundary — ✅
+**Obiettivo**
+Introdurre un boundary runtime che permetta al generatore di usare, quando disponibile, un profilo fixed locale gitignored con valori concreti, senza rompere la baseline public-safe versionata del repository.
+
+**Stato operativo**
+- introdotto `src/dns_zone_bootstrapper/templates/profile_resolver.py` come boundary dedicato alla risoluzione del profilo fisso attivo a runtime;
+- `generate_bind_zone_file(...)` non dipende più direttamente da `PUBLIC_SAFE_FIXED_DNS_PROFILE`, ma usa ora `resolve_active_fixed_dns_profile()`;
+- il resolver prova a usare `local.dns_zone_profile.ACTIVE_FIXED_DNS_PROFILE` quando presente;
+- in assenza del modulo locale, il runtime ricade in modo deterministico sul profilo versionato public-safe;
+- aggiunti `tests/test_profile_resolver.py` per congelare sia il fallback al profilo public-safe sia l'uso dell'override locale.
+
+**Evidenze correnti**
+- `git status` → `nothing to commit, working tree clean`;
+- `git status -sb` → `## development...origin/development`;
+- `python -m pytest -q` → `78 passed`;
+- `python -m pylint src tests` → `10.00/10`;
+- avanzamento tecnico consolidato nel commit `98ef332` (`feat(templates): add runtime fixed profile resolver`).
+
+**Nota di chiusura B4**
+- il repository dispone ora del gancio architetturale corretto per separare baseline runtime public-safe e valori fixed concreti non versionati;
+- il passo successivo corretto non è un refactor largo né un blocco `D*`, ma l'introduzione di un primo `ACTIVE_FIXED_DNS_PROFILE` locale gitignored e la successiva verifica del file generato con valori concreti.
 
 ---
 

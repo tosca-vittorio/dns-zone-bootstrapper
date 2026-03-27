@@ -45,6 +45,22 @@ Questo permette di:
 ### 4. Rendering separato e testabile
 La generazione del file `.txt` deve vivere in un renderer dedicato, separato dall'interfaccia web, così da poter essere testata e confrontata in modo autonomo.
 
+### 5. Risoluzione runtime del profilo fixed
+
+Il repository versionato mantiene come baseline un profilo DNS fixed public-safe, adatto a test, golden e handoff senza esporre valori operativi concreti.
+
+Per il runtime di generazione, la scelta del profilo attivo avviene tramite un boundary dedicato di risoluzione:
+
+- se esiste un modulo locale gitignored `local.dns_zone_profile` con `ACTIVE_FIXED_DNS_PROFILE`, il generatore usa quel profilo;
+- se il modulo locale non esiste, il runtime ricade sul profilo versionato `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
+
+Questa scelta permette di:
+
+- mantenere il repository public-safe e versionabile;
+- evitare hardcode diretto del runtime su un solo profilo placeholderizzato;
+- introdurre valori fixed concreti solo in area locale/non versionata;
+- preservare la separazione tra core applicativo, definizione del profilo e superficie web.
+
 ## Macro-struttura del repository
 
 ```text
