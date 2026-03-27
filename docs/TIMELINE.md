@@ -4,10 +4,10 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1`, `B2` e `B3` chiusi e consolidati; `Cycle C` attivato con `C0` e `C1` chiusi come superficie web minimale FastAPI/HTML con generazione e download diretto del file `.txt`, entrambi difesi da test bootstrap dedicati; `C2` non ancora avviato.
+- Fase corrente: `B1`, `B2`, `B3`, `C0` e `C1` chiusi e consolidati; `C2` è ora aperto tecnicamente con un primo micro-step già consolidato sulla coerenza della copy user-facing della demo web, mentre il packaging minimo resta non ancora avviato.
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: aprire operativamente `C2 — Rifinitura demo web e packaging minimo` come step successivo del `Cycle C`, mantenendo invariati stack e core applicativo già consolidati e senza aprire nello stesso passaggio refactor larghi o hardening.
-- Ultimo consolidamento `C1`: secondo incremento tecnico del `Cycle C` consolidato nel commit `7562486` (`feat(web): add C1 generation and download flow`), con route `/generate` collegata al use case `generate_bind_zone_file(...)`, ritorno `text/plain` con `Content-Disposition` sul success path, fallback HTML con errore user-facing sul failure path, test bootstrap web estesi e quality gates globali verdi (`python -m pytest -q` → `75 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
+- Obiettivo immediato: proseguire `C2 — Rifinitura demo web e packaging minimo` con micro-step conservativi, mantenendo invariati stack e core applicativo già consolidati e senza aprire refactor larghi o hardening.
+- Ultimo consolidamento `C2`: primo incremento tecnico del blocco consolidato nel commit `cb99280` (`feat(web): refresh demo copy for active generation flow`), con riallineamento della copy della root `/` allo stato reale della demo web, aggiornamento del test bootstrap accoppiato e quality gates globali verdi (`python -m pytest -q` → `75 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C0`: primo incremento tecnico del `Cycle C` consolidato nel commit `a702f0b` (`feat(web): add minimal C0 web page`), con root `/` convertita in pagina HTML minimale, endpoint `/health` preservato, test bootstrap web dedicati aggiunti e quality gates globali verdi (`python -m pytest -q` → `73 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `B3`: chiusura formale e documentale del blocco realistic-backed, a valle di tre incrementi tecnici consolidati (`d87feff`, `c98851b`, `6edb1e2`) e dell'audit read-only finale contro riferimento reale locale e snapshot normalizzato locale, con quality gates globali verdi (`python -m pytest -q` → `70 passed`, `python -m pylint src tests` → `10.00/10`) e branch allineato a `origin/development`.
 - Ultimo consolidamento `B2`: chiusura formale e documentale del blocco, con renderer e boundary `application` difesi su success path e failure path sia golden sia non-golden, inclusi i rispettivi success-call e failure-call contract verso `render_bind_zone_file(...)`, quality gates globali verdi (`67 passed`, `pylint 10.00/10`) e repository allineato a `origin/development`.
@@ -327,9 +327,24 @@ Permettere l'inserimento del dominio e il download diretto del file `.txt` gener
 - la superficie web della v1 consente ora sia l'inserimento del dominio sia il download diretto del file `.txt` generato;
 - il prossimo step corretto del `Cycle C` è `C2`, dedicato alla rifinitura della demo web e al packaging minimo.
 
-### C2 — Rifinitura demo web e packaging minimo — ⬜
+### C2 — Rifinitura demo web e packaging minimo — 🟡
 **Obiettivo**  
-Preparare una demo semplice, pulita e usabile per la consegna.
+Rifinire in modo conservativo la demo web esistente e preparare un packaging minimo di esecuzione, senza toccare il core applicativo.
+
+**Stato operativo**
+- `C2` è stato aperto tecnicamente con un primo micro-step limitato alla coerenza della copy user-facing della root `/`;
+- `src/dns_zone_bootstrapper/interfaces/web/app.py` non presenta più il drift testuale che descriveva `C1` come ancora "in apertura" e dichiara ora correttamente generazione e download diretto del file `.txt` già attivi;
+- `tests/test_bootstrap.py` è stato riallineato al nuovo contratto testuale della pagina iniziale, senza toccare route pubbliche, core applicativo o packaging;
+- il packaging minimo resta fuori dal perimetro di questo primo avanzamento e non è ancora stato avviato.
+
+**Evidenze correnti**
+- `python -m pytest -q` → `75 passed`;
+- `python -m pylint src tests` → `10.00/10`;
+- primo avanzamento tecnico `C2` consolidato nel commit `cb99280` (`feat(web): refresh demo copy for active generation flow`).
+
+**Nota di stato C2**
+- la demo web minima è ora riallineata allo stato reale del progetto sul piano della comunicazione user-facing;
+- `C2` resta correttamente aperto perché il packaging minimo non è ancora stato affrontato e non esistono ancora evidenze sufficienti per la chiusura del blocco.
 
 ---
 

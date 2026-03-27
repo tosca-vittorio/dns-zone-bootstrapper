@@ -3,8 +3,17 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino alla chiusura realistic-backed di `B3` e primi due incrementi tecnici del `Cycle C`, con `C0` minimale su FastAPI e `C1` che collega la pagina al use case di generazione BIND, abilita il download diretto del file `.txt`, preserva `/health` ed estende i test bootstrap della superficie web minimale, mantenendo fuori perimetro la rifinitura demo e il packaging minimo, demandati a `C2`.
-> Ultimo consolidamento: secondo incremento tecnico di `C1` consolidato nel commit `7562486`, con route `/generate` collegata al use case `generate_bind_zone_file(...)`, success path `text/plain` con `Content-Disposition`, fallback HTML con errore user-facing, test bootstrap estesi e quality gates globali verdi (`75 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino alla chiusura realistic-backed di `B3`, chiusura dei primi due incrementi tecnici del `Cycle C` (`C0` e `C1`) e apertura tecnica di `C2` con un primo delta minimo di riallineamento della demo web rispetto allo stato reale, mantenendo ancora fuori perimetro il packaging minimo.
+> Ultimo consolidamento: primo incremento tecnico di `C2` consolidato nel commit `cb99280`, con riallineamento della copy user-facing della root `/`, aggiornamento del test bootstrap accoppiato e quality gates globali verdi (`75 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+
+#### C2 — Rifinitura demo web e packaging minimo
+> Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`cb99280` — `feat(web): refresh demo copy for active generation flow`**
+  - **Type:** `feat` · **Categoria:** Web / Demo copy alignment
+  - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/interfaces/web/app.py` riallineando la copy user-facing della root `/` allo stato reale della demo web, rimuovendo il riferimento ormai superato a `C0/C1` e dichiarando correttamente generazione e download diretto del file `.txt` già attivi. Aggiorna inoltre `tests/test_bootstrap.py`, rinominando il test della root e congelando il nuovo contratto testuale della pagina iniziale.
+  - **Impatto:** apre tecnicamente `C2` con un primo delta piccolo, verificabile e non invasivo, migliora la coerenza della demo senza toccare core, route pubbliche o packaging e lascia ancora aperto il successivo lavoro minimo sul packaging.
+  - **Evidenze:** `python -m pytest -q` → `75 passed`; `python -m pylint src tests` → `10.00/10`; commit `cb99280` pubblicato su `origin/development`.
 
 #### C1 — Generazione e download del file
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
