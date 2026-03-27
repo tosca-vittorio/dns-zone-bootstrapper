@@ -5,6 +5,8 @@ from typer.testing import CliRunner
 from dns_zone_bootstrapper import __version__
 from dns_zone_bootstrapper.interfaces.cli.app import app as cli_app
 from dns_zone_bootstrapper.interfaces.web.app import app as web_app
+from dns_zone_bootstrapper.interfaces.web.app import health
+from dns_zone_bootstrapper.interfaces.web.app import root
 
 runner = CliRunner()
 
@@ -29,3 +31,33 @@ def test_cli_doctor_command() -> None:
 def test_web_metadata() -> None:
     """Web app metadata is present."""
     assert web_app.title == "DNS Zone Bootstrapper"
+
+
+def test_web_root_returns_html_response_with_minimal_c0_content() -> None:
+    """Root route exposes the minimal HTML page for C0."""
+    response = root()
+    html = response.body.decode("utf-8")
+
+    assert response.status_code == 200
+    assert response.media_type == "text/html"
+    assert "DNS Zone Bootstrapper" in html
+    assert "Dominio apex" in html
+    assert "Genera e scarica il file (.txt)" in html
+    assert "C0" in html
+    assert "C1" in html
+
+
+def test_web_health_returns_ok_status_payload() -> None:
+    """Health route preserves the minimal bootstrap health contract."""
+    assert health() == {"status": "ok"}
+
+
+def test_web_app_exposes_root_and_health_routes() -> None:
+    """Web app exposes the minimal expected public routes."""
+    routes = {
+        route.path: sorted(route.methods)
+        for route in web_app.routes
+    }
+
+    assert routes["/"] == ["GET"]
+    assert routes["/health"] == ["GET"]
