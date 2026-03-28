@@ -4,10 +4,18 @@
 
 ### [Unreleased]
 > Scope corrente: blocco documentale essenziale e preparazione della prima comunicazione/consegna verso l'azienda, a valle della validazione empirica Cloudflare già ottenuta e del freeze strategico post-validazione.
-> Ultimo consolidamento: apertura del freeze post-validazione documentazione/consegna nel commit `0b9d7ca`, con aggiornamento di `TIMELINE.md` e `ROADMAP.md`, attivazione di `M5` come priorità corrente e formalizzazione della sequenza `README -> eventuale supporto docs -> report azienda -> UI/Docker` su branch allineato a `origin/development`.
+> Ultimo consolidamento: rafforzamento del `README.md` nel commit `13092db`, con trasformazione del documento in vero punto di ingresso del prodotto e consolidamento esplicito di contesto, value proposition, workflow, lessico minimo, perimetro v1, limiti e boundary `public-safe vs override locale`.
 
 #### Post-A2 / Post-C2 — Freeze strategico, documentazione essenziale e preparazione consegna
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`13092db` — `docs(readme): strengthen product entry document`**
+  - **Type:** `docs` · **Categoria:** README / Product entry documentation
+  - **Cosa cambia:** sostituisce il `README.md` precedente con una versione molto più forte come documento di ingresso al prodotto, introducendo sezioni dedicate a cos'è il progetto, perché esiste, stato attuale, workflow end-to-end, lessico minimo DNS/BIND/Cloudflare, perimetro v1, limiti correnti, avvio rapido, uso della demo e distinzione tra baseline public-safe versionata e override locale gitignored.
+  - **Impatto:** riduce la dipendenza dalla storia del repository per capire il senso del prodotto, migliora nettamente la leggibilità per lettori terzi e rende più difendibile il blocco `M5`, perché il gap principale residuo viene affrontato nel punto corretto: il documento di ingresso.
+  - **Evidenze:** commit `13092db` creato su `development`; diff del solo `README.md` consolidato; nessun impatto runtime o sui quality gates del progetto.
+
+
 
 - **`0b9d7ca` — `docs(timeline): open post-validation documentation and delivery freeze`**
   - **Type:** `docs` · **Categoria:** Timeline / Roadmap / Strategic freeze
