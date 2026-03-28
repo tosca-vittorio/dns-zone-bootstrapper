@@ -3,8 +3,17 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: consolidamento documentale truth-first dopo validazione empirica del workflow di import Cloudflare, a valle del core engine chiuso fino a `B4`, del `Cycle C` chiuso fino a `C2` e del boundary runtime per la risoluzione del profilo DNS fisso locale/public-safe.
-> Ultimo consolidamento: boundary runtime del profilo fisso consolidato nel commit `98ef332`, con introduzione di `profile_resolver.py`, fallback al profilo public-safe, supporto a override locale gitignored e quality gates globali verdi (`78 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+> Scope corrente: validazione empirica del workflow di import Cloudflare già acquisita e successivo hardening conservativo dell'isolamento tra suite applicativa versionata e profilo runtime locale gitignored.
+> Ultimo consolidamento: isolamento della suite `application` dal profilo runtime locale tramite fixture autouse nel commit `4681df0`, con quality gates globali verdi (`78 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+
+#### Post-A2 — Isolamento test/runtime dopo validazione Cloudflare
+> Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`4681df0` — `test(application): isolate public-safe runtime profile in application suite`**
+  - **Type:** `test` · **Categoria:** Application / Test runtime isolation
+  - **Cosa cambia:** aggiorna `tests/test_bind_zone_generation_use_case.py` introducendo una fixture `autouse` che patcha `resolve_active_fixed_dns_profile()` e forza `PUBLIC_SAFE_FIXED_DNS_PROFILE` all'interno della suite applicativa versionata.
+  - **Impatto:** elimina il falso rosso osservato quando nel workspace è presente `local.dns_zone_profile`, preserva golden e call contract costruiti sulla baseline public-safe e mantiene invariato il comportamento runtime reale del generatore fuori dai test.
+  - **Evidenze:** `python -m pytest -q` → `78 passed`; `python -m pylint src tests` → `10.00/10`; commit `4681df0` pubblicato su `origin/development`.
 
 #### B4 — Runtime fixed profile resolution boundary
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
