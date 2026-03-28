@@ -1,7 +1,10 @@
 """Tests for the bind zone generation application use case."""
 
+from collections.abc import Iterator
 from pathlib import Path
 from unittest.mock import patch
+
+import pytest
 
 from tests.shared_bind_zone_assertions import (
     assert_alpha_zone_derived_rendering,
@@ -20,6 +23,17 @@ from dns_zone_bootstrapper.templates.profiles.public_safe_candidate import (
 from dns_zone_bootstrapper.renderers.bind_zone_renderer import (
     render_bind_zone_file,
 )
+
+
+@pytest.fixture(autouse=True)
+def force_public_safe_runtime_profile() -> Iterator[None]:
+    """Keep application tests bound to the versioned public-safe profile."""
+    with patch(
+        "dns_zone_bootstrapper.application.bind_zone_generation.resolve_active_fixed_dns_profile",
+        return_value=PUBLIC_SAFE_FIXED_DNS_PROFILE,
+    ):
+        yield
+
 
 def test_generate_bind_zone_file_returns_structured_success_with_rendered_text() -> None:
     """Return a structured success result with the rendered BIND text."""
