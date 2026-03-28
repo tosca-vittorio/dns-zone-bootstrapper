@@ -1,62 +1,228 @@
 # DNS Zone Bootstrapper
 
-Prototipo Python per generare file di zona DNS in formato BIND, orientati al workflow di import su Cloudflare, a partire da un dominio in input e da un template DNS fisso derivato da un file reale di riferimento, con focus iniziale su automazione orientata.
+Strumento Python-first per generare, a partire da un solo dominio in input, un file di zona DNS in formato BIND pronto per il workflow di import su Cloudflare, applicando un template DNS fisso derivato da un caso reale di riferimento.
 
-## Fase corrente
+## Cos'è
 
-Il progetto ha chiuso il core engine fino a `B4`, ha già consolidato il `Cycle C` fino a `C2` e ha verificato empiricamente in laboratorio Cloudflare l'import del file `.txt` generato su una zona pulita, confermando la validità del workflow v1 import-ready.
+Questo progetto nasce per trasformare un'operazione DNS ripetitiva e soggetta a errori manuali in un flusso deterministico, semplice e riusabile:
 
-L'ultimo consolidamento tecnico (`98ef332`) ha introdotto un boundary runtime per la risoluzione del profilo DNS fisso: `generate_bind_zone_file(...)` non dipende più direttamente dal solo profilo versionato public-safe, ma usa `resolve_active_fixed_dns_profile()`.
+- input minimo: un dominio apex;
+- logica applicativa: applicazione di un profilo DNS fixed;
+- output: file `.txt` in formato BIND orientato all'import su Cloudflare;
+- superficie principale della v1: pagina web minimale.
 
-Il comportamento runtime attuale è ora il seguente:
+Il focus iniziale è uno scenario coerente con un template aziendale fisso e con record utili a un contesto mail-oriented.
 
-- se non esiste alcun override locale gitignored, il runtime usa `PUBLIC_SAFE_FIXED_DNS_PROFILE`;
-- se esiste `local.dns_zone_profile` con `ACTIVE_FIXED_DNS_PROFILE`, il runtime usa quel profilo locale come sorgente dei valori fixed concreti;
-- il repository versionato resta quindi public-safe per default, mentre i valori operativi concreti possono vivere fuori dal versionamento.
+## Perché esiste
 
-Nel laboratorio Cloudflare, il file generato a partire da un override locale gitignored è stato importato con successo su una zona pulita. Un primo errore sul record `www` è stato ricondotto a collisioni con record già presenti nella zona target, non a un difetto del file generato.
+L'obiettivo pratico della v1 è ridurre:
 
-Il file reale di riferimento è stato ricevuto e il contratto v1 è stato chiarito.
-Per la prima versione, il comportamento atteso resta il seguente:
+- copia/incolla manuali sui record DNS;
+- errori di trascrizione;
+- variabilità operativa tra configurazioni simili;
+- tempo necessario per preparare una zona importabile.
 
-- deliverable principale: pagina web;
-- input utente: un solo dominio;
-- altri valori del template: fissi per ora;
-- output target: file `.txt` pronto e validato empiricamente sul workflow di import Cloudflare;
-- preview non necessaria;
-- nessuna preferenza di stack imposta.
+Invece di ricostruire ogni volta i record a mano, il sistema genera un artefatto DNS coerente con un template fisso, mantenendo variabile soltanto il dominio.
 
-## Obiettivi del prototipo
+## Stato attuale
 
-- validare un dominio apex come input minimo;
-- applicare un template DNS fisso derivato dal caso reale;
-- generare un file di zona BIND compatibile con l'import Cloudflare;
-- esporre il core tramite una pagina web minimale;
-- mantenere il nucleo del progetto riusabile per future estensioni.
+La v1 è già funzionante nella sostanza del caso d'uso richiesto:
+
+- accetta un solo input utente: il dominio;
+- genera un file `.txt` BIND import-ready;
+- espone una demo web minimale con generazione e download diretto;
+- è stata validata empiricamente con import Cloudflare riuscito su una zona pulita;
+- mantiene il repository versionato in forma public-safe;
+- conserva la possibilità di usare valori fixed concreti tramite override locale gitignored.
+
+Snapshot tecnico corrente verificato:
+
+- `python -m pytest -q` → `78 passed`
+- `python -m pylint src tests` → `10.00/10`
+
+## Workflow end-to-end
+
+Il flusso reale della v1 è il seguente:
+
+1. l'utente inserisce un dominio apex nella pagina web;
+2. il sistema valida sintatticamente l'input;
+3. il runtime risolve il profilo DNS fixed attivo;
+4. il renderer produce il file di zona in formato BIND;
+5. la web app restituisce il file `.txt` come download diretto;
+6. il file viene importato in Cloudflare.
+
+In laboratorio Cloudflare questo workflow è stato verificato con successo su una zona pulita.
+
+## Lessico minimo
+
+### Dominio apex
+È il dominio radice della zona, ad esempio `example.com`.
+Non è un sottodominio come `www.example.com`.
+
+### Zone file BIND
+È un file testuale che descrive record DNS in un formato standard storicamente associato a BIND.
+In questo progetto è il formato usato come artefatto di output.
+
+### Import Cloudflare
+Cloudflare consente di importare record DNS a partire da un file di zona.
+La v1 genera proprio un file orientato a questo workflow.
+
+### Profilo DNS fixed
+È il set di record e valori che il sistema applica automaticamente al dominio in input.
+Nella v1 il profilo è fisso: cambia il dominio, non cambia la struttura del template.
+
+## Cosa fa la v1
+
+La prima versione fa in modo esplicito e intenzionale queste cose:
+
+- valida il dominio apex come input minimo;
+- applica un template DNS fixed derivato dal caso reale;
+- genera il file di zona in formato BIND;
+- restituisce un `.txt` pronto per il workflow di import su Cloudflare;
+- espone il flusso tramite una pagina web minimale;
+- mantiene il core Python riusabile e separato dalle interfacce.
+
+## Cosa non fa ancora
+
+La v1 non fa ancora, per scelta di scope, le seguenti cose:
+
+- non gestisce profili multipli;
+- non espone campi variabili aggiuntivi oltre al dominio;
+- non offre preview del file prima del download;
+- non integra direttamente le API Cloudflare;
+- non punta ancora a polish UI, responsive refinement o packaging Docker;
+- non replica integralmente l'export Cloudflare originale;
+- non include il record `SOA` nel perimetro runtime della v1.
+
+Questa è una scelta deliberata: il focus è generare il sottoinsieme utile e importabile, non riprodurre tutto l'export sorgente.
+
+## Public-safe versionato vs override locale gitignored
+
+Il repository distingue in modo intenzionale tra baseline versionata e valori concreti locali.
+
+### Baseline versionata public-safe
+Il progetto versiona un profilo fixed public-safe, utile per:
+
+- test automatici;
+- golden file;
+- handoff;
+- condivisione del repository senza esporre valori operativi sensibili.
+
+### Override locale gitignored
+Quando serve usare valori concreti reali in locale, il runtime può caricare un modulo gitignored:
+
+- modulo: `local.dns_zone_profile`
+- simbolo atteso: `ACTIVE_FIXED_DNS_PROFILE`
+
+Il comportamento runtime è questo:
+
+- se l'override locale non esiste, il sistema usa `PUBLIC_SAFE_FIXED_DNS_PROFILE`;
+- se l'override locale esiste, il sistema usa `ACTIVE_FIXED_DNS_PROFILE`.
+
+In questo modo il repository resta public-safe, ma il runtime locale può lavorare con valori fixed concreti non versionati.
+
+## Note operative su Cloudflare
+
+La validazione empirica ha chiarito due punti importanti:
+
+- il file generato è importabile correttamente su una zona Cloudflare pulita;
+- un eventuale errore su record come `www` può dipendere da collisioni con record già presenti nella zona target e non dal generatore.
+
+Quindi, se l'import fallisce su una zona già popolata, bisogna distinguere tra:
+
+- problema del file generato;
+- conflitto ambientale nella zona Cloudflare di destinazione.
+
+## Avvio rapido
+
+### Requisiti minimi
+
+- Python `>= 3.11`
+- ambiente virtuale locale consigliato
+
+### Bootstrap locale
+
+```bash
+python -m pip install -e ".[dev]"
+python -m pytest -q
+python -m pylint src tests
+dns-zone-cli doctor
+```
+
+### Avvio demo web
+
+```bash
+dns-zone-cli web
+```
+
+La demo viene avviata localmente su:
+
+```text
+http://127.0.0.1:8000
+```
+
+Alternativa tecnica equivalente:
+
+```bash
+python -m uvicorn dns_zone_bootstrapper.interfaces.web.app:app --reload
+```
+
+## Uso della demo
+
+La demo web v1 è volutamente minimale:
+
+1. avvia il server locale;
+2. apri la pagina nel browser;
+3. inserisci il dominio apex;
+4. genera il file;
+5. scarica il `.txt`;
+6. importa il file in Cloudflare.
+
+Il comportamento atteso è lineare e con poche interazioni, in coerenza con la richiesta iniziale.
 
 ## Struttura del repository
 
 ```text
 docs/                          documenti owner
 src/dns_zone_bootstrapper/     codice applicativo
-tests/                         test e fixture golden
+tests/                         test automatici e fixture golden
 ```
 
-## Bootstrap locale
+Macro-struttura interna del package:
 
-```bash
-python -m pip install -e ".[dev]"
-pytest -q
-dns-zone-cli doctor
-dns-zone-cli web
-# alternativa tecnica equivalente:
-python -m uvicorn dns_zone_bootstrapper.interfaces.web.app:app --reload
+```text
+src/dns_zone_bootstrapper/
+├─ application/   use case e orchestrazione
+├─ domain/        modelli, regole, validazioni
+├─ interfaces/    web adapter e superfici tecniche
+├─ renderers/     rendering del zone file BIND
+└─ templates/     profili DNS fixed e risoluzione runtime
 ```
 
-## Direzione architetturale corrente
+## Direzione architetturale
 
-* core Python-first;
-* logica applicativa riusabile e indipendente dall'interfaccia;
+Le decisioni architetturali principali attualmente congelate sono:
+
+* core Python-first e framework-agnostic;
+* logica applicativa separata dalla pagina web;
 * pagina web come superficie principale della v1;
-* CLI mantenuta solo come supporto tecnico interno;
-* template DNS trattato come profilo fisso interno, pronto a futura estensione senza riscrivere il nucleo del progetto.
+* CLI mantenuta come supporto tecnico;
+* renderer BIND separato e testabile;
+* boundary dedicato per la risoluzione runtime del profilo fixed;
+* repository public-safe per default, con override locale solo fuori versionamento.
+
+## Limite attuale principale
+
+Il limite residuo principale non è il core applicativo, ma la comprensibilità del prodotto per un lettore esterno.
+Per questo il progetto è entrato in una fase documentale dedicata: prima chiarire bene il prodotto, poi preparare la comunicazione/consegna verso l'azienda, e solo dopo valutare polish UI o Docker.
+
+## Evoluzioni future possibili
+
+Le estensioni future possibili, ma non necessarie per la v1, includono:
+
+* profili DNS multipli;
+* campi variabili aggiuntivi;
+* preview opzionale del file;
+* miglioramenti UI/UX;
+* Docker/exportability;
+* integrazione assistita o diretta con Cloudflare.
