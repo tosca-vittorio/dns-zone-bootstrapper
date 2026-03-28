@@ -4,10 +4,21 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `A2`, `B1`, `B2`, `B3`, `B4`, `C0`, `C1` e `C2` chiusi e consolidati; nessun blocco `D*` è stato ancora avviato.
+- Fase corrente: `A2`, `B1`, `B2`, `B3`, `B4`, `C0`, `C1` e `C2` chiusi e consolidati; blocco `Post-A2 / Post-C2` aperto in stato `🟡`; nessun blocco `D*` è stato ancora avviato.
 - Baseline contrattuale v1: confermata con l'azienda
 - Validazione empirica Cloudflare: import del file generato riuscito su zona pulita; primo failure su `www` ricondotto a collisione con record preesistenti nella zona target.
-- Obiettivo immediato: determinare con audit conservativo il prossimo blocco reale dopo la validazione empirica Cloudflare, senza aprire automaticamente refactor larghi o blocchi `D*`.
+- Obiettivo immediato: avviare il primo micro-step del blocco documentale essenziale, partendo dal rafforzamento del `README.md` come documento di ingresso al prodotto, senza aprire ancora polish UI, Docker o hardening `D*` non prioritari.
+- Valutazione congelata dello stato v1: il prodotto è coerente con la richiesta ricevuta, funziona nella sostanza della v1, il workflow `dominio -> file .txt -> import Cloudflare` è stato validato empiricamente e il lavoro svolto è da considerare positivo e tecnicamente difendibile.
+- Gap principale congelato: il limite residuo non è il core applicativo ma la comprensibilità del prodotto per lettori/utenti terzi; il prossimo avanzamento corretto riguarda quindi chiarimento di contesto, utilità, workflow, lessico tecnico, perimetro v1, limiti e modalità d'uso.
+- Regola documentale congelata: gli owner docs esistenti restano sufficienti come struttura di governo (`TIMELINE`, `CHANGELOG`, `ARCHITECTURE`, `ROADMAP`); il rafforzamento deve avvenire prima di tutto tramite ampliamento del `README.md` e, solo se realmente utile, tramite documenti di supporto non-owner dedicati alla guida utente o al deployment.
+- Finestra di comunicazione verso l'azienda congelata: l'avviso/report di stato con demo v1 è considerato opportuno dopo la chiusura del blocco documentale essenziale, non dopo UI polish, CSS o Docker; questi restano incrementi successivi non bloccanti per la prima consegna.
+- Sequenza prioritaria congelata post-validazione empirica:
+  1. rafforzamento del `README.md` come documento di ingresso al prodotto;
+  2. chiarimento architetturale e concettuale nei documenti owner già esistenti, dove necessario;
+  3. introduzione di una guida d'uso dedicata per utente/demo/import Cloudflare, solo se il README non basta da solo;
+  4. preparazione del testo/report di aggiornamento verso l'azienda con stato, demo e limiti attuali;
+  5. audit conservativo di UI minimale difendibile;
+  6. valutazione Docker/exportability come step successivo e non bloccante.
 - Ultimo consolidamento post-validazione empirica: la suite `application` è ora isolata dal profilo locale gitignored tramite fixture autouse che forza `PUBLIC_SAFE_FIXED_DNS_PROFILE` nei test applicativi, eliminando il falso rosso osservato quando `local.dns_zone_profile` era presente nel workspace; hardening consolidato nel commit `4681df0` (`test(application): isolate public-safe runtime profile in application suite`) con quality gates globali verdi (`python -m pytest -q` → `78 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `B4`: boundary runtime del profilo fisso consolidato nel commit `98ef332` (`feat(templates): add runtime fixed profile resolver`), con introduzione di `src/dns_zone_bootstrapper/templates/profile_resolver.py`, disaccoppiamento di `generate_bind_zone_file(...)` dal profilo versionato hardcoded, fallback sicuro a `PUBLIC_SAFE_FIXED_DNS_PROFILE`, supporto a override locale gitignored tramite `local.dns_zone_profile.ACTIVE_FIXED_DNS_PROFILE`, test dedicati in `tests/test_profile_resolver.py` e quality gates globali verdi (`python -m pytest -q` → `78 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C2`: chiusura tecnica del blocco consolidata nel commit `c432feb` (`feat(cli): add minimal web demo entrypoint`), con aggiunta del subcommand `dns-zone-cli web` come entrypoint minimale installato per avviare la demo FastAPI, estensione di `tests/test_bootstrap.py` sul nuovo boundary CLI/web e quality gates globali verdi (`python -m pytest -q` → `76 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
@@ -105,7 +116,7 @@ Creare un ambiente di verifica reale per:
 - il workflow v1 `dominio -> file .txt -> import Cloudflare` risulta ora validato empiricamente;
 - `A2` si considera chiuso sul piano sostanziale; eventuali export Cloudflare aggiuntivi o fixture golden ulteriori restano miglioramenti futuri e non prerequisiti bloccanti per la v1.
 
-### A3 — Acquisizione e normalizzazione file di esempio aziendale — ✅
+### A3 — Acquisizione e normalizzazione file di esempio — ✅
 **Obiettivo**  
 Ricevere il file reale, assumerlo come template di riferimento e trasformarlo nella baseline contrattuale della v1.
 
@@ -256,7 +267,7 @@ Produrre il renderer del file di zona in formato coerente con l'import Cloudflar
 - la DoD sostanziale del blocco risulta soddisfatta sul repository reale;
 - il renderer BIND minimale è presente, versionato e difeso da golden baseline, golden non-golden, contratti strutturali e test mirati su placeholder derivati, grouping, ordine, blank lines, TXT quoting, `cf_tags` e failure contract per `record_type` non supportato;
 - il boundary `application` è presente, versionato e difeso su success path e failure path, sia golden sia non-golden, con freeze esplicito dei contratti di orchestrazione verso il renderer nei percorsi di successo e di failure;
-- il confronto realistico read-only con il riferimento aziendale non ha evidenziato gap strutturali tali da giustificare ulteriore hardening immediato dentro `B2`;
+- il confronto realistico read-only con il file di riferimento non ha evidenziato gap strutturali tali da giustificare ulteriore hardening immediato dentro `B2`;
 - `B2` si considera chiuso; il passo successivo corretto è `B3`, dedicato alla protezione del generatore con fixture e confronti più realistici, senza aprire nello stesso blocco scope su UI/web.
 
 ### B3 — Test del generatore e preparazione fixture reali — ✅
@@ -378,6 +389,68 @@ Rifinire in modo conservativo la demo web esistente e preparare un packaging min
 **Nota di chiusura C2**
 - la demo web minima della v1 è ora rifinita sia sul piano della comunicazione user-facing sia su quello del packaging minimo di avvio locale;
 - la DoD sostanziale del blocco risulta soddisfatta sul repository reale e `C2` si considera chiuso; l'eventuale blocco successivo dovrà essere determinato separatamente con un nuovo audit conservativo.
+
+
+### Post-A2 / Post-C2 — Freeze strategico, documentazione essenziale e preparazione consegna — 🟡
+**Obiettivo**
+Congelare il significato del prodotto, il suo posizionamento operativo e la sequenza corretta dei prossimi blocchi, così da evitare derive premature su UI polish, Docker o hardening non prioritari.
+
+**Valutazione congelata**
+- il prodotto è da considerare funzionante e coerente con la richiesta chiarita per la v1;
+- la richiesta sostanziale risulta soddisfatta: input unico `dominio`, valori fixed, output `.txt` orientato all'import Cloudflare e superficie principale web;
+- il risultato principale già validato non è un semplice file generato, ma un artefatto DNS deterministico, riproducibile e importabile che riduce lavoro manuale e rischio operativo;
+- il lavoro svolto fino a questo punto è valutato positivamente, ma la difendibilità del progetto non è ancora massima finché il prodotto non risulta comprensibile a terzi anche sul piano documentale.
+
+**Decisioni congelate**
+- non aprire automaticamente `D0`, `D1`, `D2` o altri hardening generici come prossimo passo;
+- non introdurre nuovi owner docs se non strettamente necessario;
+- usare il `README.md` come punto di ingresso principale per spiegare senso del prodotto, contesto, utilità, workflow, lessico di base e perimetro v1;
+- usare `ARCHITECTURE.md` per chiarimenti strutturali e tecnici del funzionamento del software, senza trasformarlo in guida utente;
+- introdurre un documento di supporto tipo guida utente solo se emerge un bisogno reale non assorbibile in modo pulito dal `README.md`;
+- mantenere UI polish e Docker fuori dal perimetro essenziale della prima consegna.
+
+**Contenuti documentali da assorbire nel blocco essenziale**
+- spiegazione di cosa risolve il prodotto e perché esiste;
+- spiegazione di concetti minimi necessari per capire il dominio (`BIND`, zone file, zona apex, import Cloudflare, record DNS rilevanti);
+- spiegazione del workflow reale del software e del rapporto tra template, rendering, import Cloudflare e profili fixed;
+- spiegazione della distinzione tra baseline public-safe versionata e override locale gitignored;
+- esplicitazione di ciò che la v1 fa e di ciò che non fa ancora;
+- guida pratica all'uso per demo, generazione file e interpretazione dei conflitti più comuni.
+
+**Sequenza operativa congelata**
+1. blocco documentale essenziale sul `README.md`;
+2. eventuale riallineamento mirato di `ARCHITECTURE.md` ai chiarimenti concettuali/tecnici necessari;
+3. eventuale guida utente dedicata, solo se la densità del `README.md` diventasse eccessiva;
+4. solo dopo questi punti, preparazione del messaggio/report verso l'azienda con stato attuale, validazione ottenuta, demo disponibile e limiti residui;
+5. successivamente audit su UI minimale difendibile;
+6. successivamente valutazione Docker/exportability.
+
+
+**Deliverable essenziali del blocco documentale**
+- `README.md` rafforzato come documento di ingresso, comprensibile anche a chi non conosce il progetto o il dominio DNS;
+- chiarimenti mirati in `ARCHITECTURE.md` su concetti, flusso software e boundary principali;
+- eventuale guida pratica dedicata (`docs/guides/USER_GUIDE.md` oppure documento equivalente) solo se necessaria per non sovraccaricare il `README.md`;
+- base già pronta dei punti da riportare nel futuro messaggio/report verso l'azienda.
+
+**Criterio di uscita del blocco documentale essenziale**
+- un lettore nuovo deve poter capire cos'è il prodotto, a cosa serve, cosa prende in input, cosa produce in output e quali limiti ha la v1;
+- deve risultare chiara la differenza tra profilo public-safe versionato e profilo locale gitignored;
+- deve risultare chiaro il rapporto tra template fisso, rendering BIND, demo web e import Cloudflare;
+- deve essere pronta la base informativa minima per una comunicazione aziendale pulita, senza dipendere ancora da CSS, polish UI o Docker.
+
+**Backlog non bloccante già classificato**
+- polish UI con CSS, responsive, gerarchia visiva e feedback utente migliori;
+- Docker/exportability e relativi documenti di deployment;
+- eventuali affinamenti estetici o infrastrutturali ulteriori non necessari per la prima comunicazione/consegna.
+
+**Gate di comunicazione**
+- la comunicazione è ritenuta opportuna dopo il completamento del blocco documentale essenziale;
+- il contenuto atteso del futuro report dovrà includere almeno: stato v1, coerenza rispetto alla richiesta, validazione empirica Cloudflare, disponibilità demo web, limiti attuali e distinzione tra miglioramenti essenziali e miglioramenti non bloccanti;
+- UI styles, polish grafico, responsive refinement e Docker non devono bloccare la prima comunicazione/consegna se il blocco documentale essenziale è chiuso e la demo resta verificata.
+
+**Nota operativa**
+- il rischio maggiore attuale non è una regressione del core, ma il fatto che il prodotto possa risultare poco leggibile o poco spiegato a chi non ha seguito la storia del repository;
+- per questo il prossimo blocco corretto è documentale e non estetico/infrastrutturale.
 ---
 
 ## Cycle D — Hardening
