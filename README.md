@@ -4,7 +4,7 @@ Prototipo Python per generare file di zona DNS in formato BIND, orientati al wor
 
 ## Fase corrente
 
-Il progetto ha chiuso il core engine fino a `B4` e ha già consolidato il `Cycle C` fino a `C2`, con demo web minimale FastAPI attiva, flusso di generazione/download del file `.txt` disponibile e packaging minimo locale tramite subcommand `dns-zone-cli web`.
+Il progetto ha chiuso il core engine fino a `B4`, ha già consolidato il `Cycle C` fino a `C2` e ha verificato empiricamente in laboratorio Cloudflare l'import del file `.txt` generato su una zona pulita, confermando la validità del workflow v1 import-ready.
 
 L'ultimo consolidamento tecnico (`98ef332`) ha introdotto un boundary runtime per la risoluzione del profilo DNS fisso: `generate_bind_zone_file(...)` non dipende più direttamente dal solo profilo versionato public-safe, ma usa `resolve_active_fixed_dns_profile()`.
 
@@ -14,13 +14,15 @@ Il comportamento runtime attuale è ora il seguente:
 - se esiste `local.dns_zone_profile` con `ACTIVE_FIXED_DNS_PROFILE`, il runtime usa quel profilo locale come sorgente dei valori fixed concreti;
 - il repository versionato resta quindi public-safe per default, mentre i valori operativi concreti possono vivere fuori dal versionamento.
 
+Nel laboratorio Cloudflare, il file generato a partire da un override locale gitignored è stato importato con successo su una zona pulita. Un primo errore sul record `www` è stato ricondotto a collisioni con record già presenti nella zona target, non a un difetto del file generato.
+
 Il file reale di riferimento è stato ricevuto e il contratto v1 è stato chiarito.
 Per la prima versione, il comportamento atteso resta il seguente:
 
 - deliverable principale: pagina web;
 - input utente: un solo dominio;
 - altri valori del template: fissi per ora;
-- output target: file `.txt` candidato al workflow di import Cloudflare;
+- output target: file `.txt` pronto e validato empiricamente sul workflow di import Cloudflare;
 - preview non necessaria;
 - nessuna preferenza di stack imposta.
 

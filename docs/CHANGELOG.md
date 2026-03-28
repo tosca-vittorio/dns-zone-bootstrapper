@@ -3,7 +3,7 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura bootstrap repository/documentazione (`A0`), consolidamento del core engine fino a `B4`, chiusura del `Cycle C` fino a `C2` e introduzione del boundary runtime per la risoluzione del profilo DNS fisso senza hardcode diretto sul solo profilo public-safe versionato.
+> Scope corrente: consolidamento documentale truth-first dopo validazione empirica del workflow di import Cloudflare, a valle del core engine chiuso fino a `B4`, del `Cycle C` chiuso fino a `C2` e del boundary runtime per la risoluzione del profilo DNS fisso locale/public-safe.
 > Ultimo consolidamento: boundary runtime del profilo fisso consolidato nel commit `98ef332`, con introduzione di `profile_resolver.py`, fallback al profilo public-safe, supporto a override locale gitignored e quality gates globali verdi (`78 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
 
 #### B4 — Runtime fixed profile resolution boundary

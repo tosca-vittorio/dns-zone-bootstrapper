@@ -4,9 +4,10 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `B1`, `B2`, `B3`, `B4`, `C0`, `C1` e `C2` chiusi e consolidati; nessun blocco `D*` è stato ancora avviato.
+- Fase corrente: `A2`, `B1`, `B2`, `B3`, `B4`, `C0`, `C1` e `C2` chiusi e consolidati; nessun blocco `D*` è stato ancora avviato.
 - Baseline contrattuale v1: confermata con l'azienda
-- Obiettivo immediato: introdurre in area gitignored il primo profilo locale con valori fixed concreti e verificare il file generato oltre la baseline public-safe versionata, senza aprire nello stesso passaggio refactor larghi o blocchi `D*`.
+- Validazione empirica Cloudflare: import del file generato riuscito su zona pulita; primo failure su `www` ricondotto a collisione con record preesistenti nella zona target.
+- Obiettivo immediato: determinare con audit conservativo il prossimo blocco reale dopo la validazione empirica Cloudflare, senza aprire automaticamente refactor larghi o blocchi `D*`.
 - Ultimo consolidamento `B4`: boundary runtime del profilo fisso consolidato nel commit `98ef332` (`feat(templates): add runtime fixed profile resolver`), con introduzione di `src/dns_zone_bootstrapper/templates/profile_resolver.py`, disaccoppiamento di `generate_bind_zone_file(...)` dal profilo versionato hardcoded, fallback sicuro a `PUBLIC_SAFE_FIXED_DNS_PROFILE`, supporto a override locale gitignored tramite `local.dns_zone_profile.ACTIVE_FIXED_DNS_PROFILE`, test dedicati in `tests/test_profile_resolver.py` e quality gates globali verdi (`python -m pytest -q` → `78 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C2`: chiusura tecnica del blocco consolidata nel commit `c432feb` (`feat(cli): add minimal web demo entrypoint`), con aggiunta del subcommand `dns-zone-cli web` come entrypoint minimale installato per avviare la demo FastAPI, estensione di `tests/test_bootstrap.py` sul nuovo boundary CLI/web e quality gates globali verdi (`python -m pytest -q` → `76 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C0`: primo incremento tecnico del `Cycle C` consolidato nel commit `a702f0b` (`feat(web): add minimal C0 web page`), con root `/` convertita in pagina HTML minimale, endpoint `/health` preservato, test bootstrap web dedicati aggiunti e quality gates globali verdi (`python -m pytest -q` → `73 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
@@ -80,22 +81,28 @@ Formalizzare i vincoli del problema e separare ciò che è confermato da ciò ch
 - non è necessario rivalutare lo stack per la v1;
 - il progetto può procedere su impostazione Python-first con consegna web-first.
 
-### A2 — Setup laboratorio Cloudflare free + prove import/export — ⬜
+### A2 — Setup laboratorio Cloudflare free + prove import/export — ✅
 **Obiettivo**  
 Creare un ambiente di verifica reale per:
 - import manuale di zone file;
 - export di zone file di riferimento;
 - raccolta di fixture golden da usare nei test.
 
-**Attivazione prevista**
-- creazione account Cloudflare gratuito di laboratorio;
-- uso di un dominio di test non produttivo;
-- prove di import/export per ottenere evidenze reali e fixture confrontabili.
+**Stato operativo**
+- attivato e usato un laboratorio Cloudflare di verifica;
+- generato localmente un file `.txt` BIND import-ready a partire dal runtime con override locale gitignored;
+- osservato un primo failure sul record `www` in presenza di record preesistenti nella zona target, quindi classificato come conflitto ambientale e non come gap del generatore;
+- ripetuto il test su una zona pulita con import Cloudflare riuscito.
 
-**Output attesi**
-- almeno un import riuscito di zone file;
-- almeno un export Cloudflare usabile come riferimento;
-- prime note operative sui vincoli reali del formato.
+**Evidenze correnti**
+- `resolve_active_fixed_dns_profile()` ha caricato correttamente il profilo locale `ACTIVE_FIXED_DNS_PROFILE`;
+- `generate_bind_zone_file("testdomain.com")` ha restituito `is_valid=True`, `error_code=None` e un file scritto localmente per il test di import;
+- il file generato è risultato strutturalmente coerente con il riferimento reale locale, al netto del preambolo export Cloudflare e del record `SOA` fuori perimetro v1;
+- log finale di import Cloudflare: `Success! We successfully imported your records.`
+
+**Nota di chiusura A2**
+- il workflow v1 `dominio -> file .txt -> import Cloudflare` risulta ora validato empiricamente;
+- `A2` si considera chiuso sul piano sostanziale; eventuali export Cloudflare aggiuntivi o fixture golden ulteriori restano miglioramenti futuri e non prerequisiti bloccanti per la v1.
 
 ### A3 — Acquisizione e normalizzazione file di esempio aziendale — ✅
 **Obiettivo**  

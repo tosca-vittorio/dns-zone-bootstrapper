@@ -10,6 +10,7 @@ Il progetto nasce per generare, a partire da un dominio in input, un file di zon
 - la v1 prevede un solo input utente: il dominio;
 - tutti gli altri valori del template sono fissi per ora;
 - il file generato deve essere pronto per l'import su Cloudflare, senza necessità di replicare tutta la forma dell'export originale;
+- il sottoinsieme v1 import-ready, privo di preambolo export e record `SOA`, è stato validato empiricamente con import riuscito su una zona Cloudflare pulita;
 - la preview non è necessaria nella v1;
 - la pagina web è il deliverable principale richiesto;
 - non esiste una preferenza di stack imposta dall'azienda.
@@ -60,6 +61,8 @@ Questa scelta permette di:
 - evitare hardcode diretto del runtime su un solo profilo placeholderizzato;
 - introdurre valori fixed concreti solo in area locale/non versionata;
 - preservare la separazione tra core applicativo, definizione del profilo e superficie web.
+
+Nel runtime osservato, il file prodotto dal generatore attraverso questo boundary è stato importato con successo in Cloudflare quando la zona target era pulita. Un primo failure sul record `www` è stato attribuito a collisioni con record preesistenti nella zona di laboratorio, non al formato del file generato.
 
 ## Macro-struttura del repository
 
