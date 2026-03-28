@@ -3,17 +3,17 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: validazione empirica del workflow di import Cloudflare già acquisita e successivo hardening conservativo dell'isolamento tra suite applicativa versionata e profilo runtime locale gitignored.
-> Ultimo consolidamento: isolamento della suite `application` dal profilo runtime locale tramite fixture autouse nel commit `4681df0`, con quality gates globali verdi (`78 passed`, `pylint 10.00/10`) su branch allineato a `origin/development`.
+> Scope corrente: blocco documentale essenziale e preparazione della prima comunicazione/consegna verso l'azienda, a valle della validazione empirica Cloudflare già ottenuta e del freeze strategico post-validazione.
+> Ultimo consolidamento: apertura del freeze post-validazione documentazione/consegna nel commit `0b9d7ca`, con aggiornamento di `TIMELINE.md` e `ROADMAP.md`, attivazione di `M5` come priorità corrente e formalizzazione della sequenza `README -> eventuale supporto docs -> report azienda -> UI/Docker` su branch allineato a `origin/development`.
 
-#### Post-A2 — Isolamento test/runtime dopo validazione Cloudflare
+#### Post-A2 / Post-C2 — Freeze strategico, documentazione essenziale e preparazione consegna
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
 
-- **`4681df0` — `test(application): isolate public-safe runtime profile in application suite`**
-  - **Type:** `test` · **Categoria:** Application / Test runtime isolation
-  - **Cosa cambia:** aggiorna `tests/test_bind_zone_generation_use_case.py` introducendo una fixture `autouse` che patcha `resolve_active_fixed_dns_profile()` e forza `PUBLIC_SAFE_FIXED_DNS_PROFILE` all'interno della suite applicativa versionata.
-  - **Impatto:** elimina il falso rosso osservato quando nel workspace è presente `local.dns_zone_profile`, preserva golden e call contract costruiti sulla baseline public-safe e mantiene invariato il comportamento runtime reale del generatore fuori dai test.
-  - **Evidenze:** `python -m pytest -q` → `78 passed`; `python -m pylint src tests` → `10.00/10`; commit `4681df0` pubblicato su `origin/development`.
+- **`0b9d7ca` — `docs(timeline): open post-validation documentation and delivery freeze`**
+  - **Type:** `docs` · **Categoria:** Timeline / Roadmap / Strategic freeze
+  - **Cosa cambia:** aggiorna `docs/TIMELINE.md` e `docs/ROADMAP.md` aprendo formalmente il blocco `Post-A2 / Post-C2`, classificando come gap prioritario la comprensibilità del prodotto e non più il core applicativo, attivando `M5` come milestone corrente e congelando la sequenza operativa post-validazione: rafforzamento `README.md`, eventuali chiarimenti mirati in `ARCHITECTURE.md`, eventuale guida utente dedicata, preparazione del report verso l'azienda, quindi solo dopo audit UI minimale e valutazione Docker/exportability.
+  - **Impatto:** sposta ufficialmente il progetto dalla sola validazione tecnica alla fase di documentazione essenziale e preparazione consegna, impedisce derive premature su polish UI, Docker o hardening `D*` non prioritari e rende esplicito che la prima comunicazione verso l'azienda deve avvenire dopo la chiusura del blocco documentale essenziale, non dopo miglioramenti estetici o infrastrutturali.
+  - **Evidenze:** commit `0b9d7ca` pubblicato su `origin/development`; branch allineato; `TIMELINE.md` e `ROADMAP.md` riallineate al freeze strategico post-validazione.
 
 #### B4 — Runtime fixed profile resolution boundary
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
