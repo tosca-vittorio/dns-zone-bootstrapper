@@ -3,11 +3,17 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: blocco documentale essenziale e preparazione della prima comunicazione/consegna verso l'azienda, a valle della validazione empirica Cloudflare già ottenuta e del freeze strategico post-validazione.
-> Ultimo consolidamento: rafforzamento del `README.md` nel commit `13092db`, con trasformazione del documento in vero punto di ingresso del prodotto e consolidamento esplicito di contesto, value proposition, workflow, lessico minimo, perimetro v1, limiti e boundary `public-safe vs override locale`.
+> Scope corrente: chiusura formale di `M5` e preparazione dell'audit conservativo della UI/demo minimale verso `M6`, a valle della validazione empirica Cloudflare già ottenuta, del freeze strategico post-validazione e del riallineamento del bootstrap dichiarato della demo.
+> Ultimo consolidamento rilevante del blocco: fix `b6f498e` sul boundary di risoluzione del profilo fixed locale, con `README.md` già rafforzato nel commit `13092db` come documento di ingresso al prodotto.
 
 #### Post-A2 / Post-C2 — Freeze strategico, documentazione essenziale e preparazione consegna
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+
+- **`b6f498e` — `fix(templates): load local override from working tree fallback`**
+  - **Type:** `fix` · **Categoria:** Templates / Runtime profile resolution / Delivery bootstrap
+  - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/templates/profile_resolver.py` mantenendo come primo tentativo l'import standard di `local.dns_zone_profile`, ma introducendo un fallback esplicito al file gitignored `./local/dns_zone_profile.py` rispetto alla working tree corrente quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato; estende inoltre `tests/test_profile_resolver.py` per congelare sia il fallback public-safe in cwd isolata sia il caricamento dell'override locale direttamente dalla working tree.
+  - **Impatto:** chiude il delta tecnico emerso durante l'audit di consegna, in cui il core e la web app avviata con `python -m uvicorn ...` producevano output concreto mentre `dns-zone-cli web` ricadeva ancora sul profilo public-safe placeholderizzato; il bootstrap dichiarato della demo risulta ora riallineato al comportamento atteso con override locale attivo, senza cambiare il contratto utente, il README o l'architettura AS-IS.
+  - **Evidenze:** `python -m pytest -q tests/test_profile_resolver.py` → `3 passed`; `python -m pylint src tests` → `10.00/10`; smoke reale `dns-zone-cli web` + `curl -i "http://127.0.0.1:8000/generate?domain=testdomain.com"` con download `.txt` a valori concreti e non `__FIXED_*__`.
 
 - **`13092db` — `docs(readme): strengthen product entry document`**
   - **Type:** `docs` · **Categoria:** README / Product entry documentation

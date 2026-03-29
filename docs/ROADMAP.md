@@ -6,7 +6,7 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 
 ## Milestone evolutive
 
-- Priorità attiva corrente: consolidare `M5`, cioè il blocco documentale essenziale che rende il prodotto comprensibile, presentabile e pronto alla prima comunicazione/consegna verso l'azienda.
+- Priorità attiva corrente: valutare in modo conservativo l'eventuale apertura di `M6`, dopo la chiusura formale di `M5` e con focus su audit UI minimale, miglioramenti essenziali pre-consegna e backlog non bloccante.
 
 ### M0 — Baseline repository — ✅
 - bootstrap repository;
@@ -43,7 +43,7 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 - hardening conservativo dell'isolamento tra test applicativi versionati e profilo locale gitignored;
 - congelamento della sequenza post-validazione.
 
-### M5 — Documentazione essenziale e preparazione consegna — 🟡
+### M5 — Documentazione essenziale e preparazione consegna — ✅
 - rafforzare il `README.md` come documento di ingresso al prodotto;
 - chiarire senso del prodotto, value proposition, workflow e perimetro v1;
 - chiarire concetti minimi necessari (`BIND`, zone file, zona apex, import Cloudflare, profili fixed);

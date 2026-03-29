@@ -4,22 +4,21 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `A2`, `B1`, `B2`, `B3`, `B4`, `C0`, `C1` e `C2` chiusi e consolidati; blocco `Post-A2 / Post-C2` aperto in stato `🟡`; nessun blocco `D*` è stato ancora avviato.
-- Baseline contrattuale v1: confermata con l'azienda
-- Validazione empirica Cloudflare: import del file generato riuscito su zona pulita; primo failure su `www` ricondotto a collisione con record preesistenti nella zona target.
-- Obiettivo immediato: valutare in modo conservativo se, dopo il rafforzamento del `README.md`, servano ancora chiarimenti mirati in `ARCHITECTURE.md` oppure se il blocco documentale essenziale possa procedere direttamente verso la preparazione del report/messaggio di stato per l'azienda.
+- Fase corrente: `A2`, `B1`, `B2`, `B3`, `B4`, `C0`, `C1`, `C2` e il blocco `Post-A2 / Post-C2` risultano ora chiusi e consolidati; `M5` si considera formalmente chiusa dopo il doc gate finale allineato al fix `b6f498e` (`fix(templates): load local override from working tree fallback`); nessun blocco `D*` è stato ancora avviato e `M6` non è ancora formalmente aperta.
+- Obiettivo immediato: eseguire un audit conservativo e quantificato della UI/demo minimale per decidere se aprire formalmente `M6`, distinguendo tra miglioramenti essenziali pre-consegna e backlog non bloccante.
 - Ultimo consolidamento `M5`: il `README.md` è stato rafforzato nel commit `13092db` (`docs(readme): strengthen product entry document`), trasformandolo in un documento di ingresso molto più forte sul piano di contesto, value proposition, workflow end-to-end, lessico minimo DNS/BIND/Cloudflare, perimetro v1, limiti e distinzione tra baseline public-safe versionata e override locale gitignored.
-- Valutazione congelata dello stato v1: il prodotto è coerente con la richiesta ricevuta, funziona nella sostanza della v1, il workflow `dominio -> file .txt -> import Cloudflare` è stato validato empiricamente e il lavoro svolto è da considerare positivo e tecnicamente difendibile.
-- Gap principale congelato: il limite residuo non è il core applicativo ma la comprensibilità del prodotto per lettori/utenti terzi; il prossimo avanzamento corretto riguarda quindi chiarimento di contesto, utilità, workflow, lessico tecnico, perimetro v1, limiti e modalità d'uso.
-- Regola documentale congelata: gli owner docs esistenti restano sufficienti come struttura di governo (`TIMELINE`, `CHANGELOG`, `ARCHITECTURE`, `ROADMAP`); il rafforzamento deve avvenire prima di tutto tramite ampliamento del `README.md` e, solo se realmente utile, tramite documenti di supporto non-owner dedicati alla guida utente o al deployment.
-- Finestra di comunicazione verso l'azienda congelata: l'avviso/report di stato con demo v1 è considerato opportuno dopo la chiusura del blocco documentale essenziale, non dopo UI polish, CSS o Docker; questi restano incrementi successivi non bloccanti per la prima consegna.
+- Ultimo consolidamento `M5` / delivery bootstrap: il commit `b6f498e` (`fix(templates): load local override from working tree fallback`) ha reso più robusto `resolve_active_fixed_dns_profile()`, mantenendo come priorità l'import normale di `local.dns_zone_profile` ma introducendo, quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato, un fallback esplicito a `./local/dns_zone_profile.py` rispetto alla working tree corrente; il boundary è stato coperto con test dedicati su fallback public-safe in cwd isolata e su caricamento dell'override locale dalla working tree (`python -m pytest -q tests/test_profile_resolver.py` → `3 passed`, `python -m pylint src tests` → `10.00/10`) e validato di nuovo end-to-end con `dns-zone-cli web` + `curl /generate?domain=testdomain.com`, che ora restituisce valori concreti coerenti con il profilo locale.
+- Valutazione congelata dello stato v1: il prodotto è coerente con la richiesta ricevuta, funziona nella sostanza della v1, il workflow `dominio -> file .txt -> import Cloudflare` resta tecnicamente difendibile e anche il bootstrap dichiarato della demo (`dns-zone-cli web`) risulta ora riallineato al comportamento atteso con override locale attivo.
+- Gap principale congelato: il blocco tecnico residuo sul bootstrap della consegna è stato chiuso; il prossimo gap prioritario non è più sul core o sul delivery path, ma sull'eventuale hardening presentazionale/UI minimale, da trattare solo dopo la chiusura formale di `M5` e da classificare in `M6` come non bloccante.
 - Sequenza prioritaria congelata post-validazione empirica:
   1. rafforzamento del `README.md` come documento di ingresso al prodotto;
   2. chiarimento architetturale e concettuale nei documenti owner già esistenti, dove necessario;
   3. introduzione di una guida d'uso dedicata per utente/demo/import Cloudflare, solo se il README non basta da solo;
   4. preparazione del testo/report di aggiornamento verso l'azienda con stato, demo e limiti attuali;
-  5. audit conservativo di UI minimale difendibile;
-  6. valutazione Docker/exportability come step successivo e non bloccante.
+  5. chiusura del delta tecnico sul bootstrap della demo dichiarata;
+  6. doc sync gate finale e valutazione di chiusura `M5`;
+  7. audit conservativo di UI minimale difendibile come possibile apertura disciplinata di `M6`;
+  8. valutazione Docker/exportability come step successivo e non bloccante.
 - Ultimo consolidamento post-validazione empirica: la suite `application` è ora isolata dal profilo locale gitignored tramite fixture autouse che forza `PUBLIC_SAFE_FIXED_DNS_PROFILE` nei test applicativi, eliminando il falso rosso osservato quando `local.dns_zone_profile` era presente nel workspace; hardening consolidato nel commit `4681df0` (`test(application): isolate public-safe runtime profile in application suite`) con quality gates globali verdi (`python -m pytest -q` → `78 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `B4`: boundary runtime del profilo fisso consolidato nel commit `98ef332` (`feat(templates): add runtime fixed profile resolver`), con introduzione di `src/dns_zone_bootstrapper/templates/profile_resolver.py`, disaccoppiamento di `generate_bind_zone_file(...)` dal profilo versionato hardcoded, fallback sicuro a `PUBLIC_SAFE_FIXED_DNS_PROFILE`, supporto a override locale gitignored tramite `local.dns_zone_profile.ACTIVE_FIXED_DNS_PROFILE`, test dedicati in `tests/test_profile_resolver.py` e quality gates globali verdi (`python -m pytest -q` → `78 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C2`: chiusura tecnica del blocco consolidata nel commit `c432feb` (`feat(cli): add minimal web demo entrypoint`), con aggiunta del subcommand `dns-zone-cli web` come entrypoint minimale installato per avviare la demo FastAPI, estensione di `tests/test_bootstrap.py` sul nuovo boundary CLI/web e quality gates globali verdi (`python -m pytest -q` → `76 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
@@ -392,7 +391,7 @@ Rifinire in modo conservativo la demo web esistente e preparare un packaging min
 - la DoD sostanziale del blocco risulta soddisfatta sul repository reale e `C2` si considera chiuso; l'eventuale blocco successivo dovrà essere determinato separatamente con un nuovo audit conservativo.
 
 
-### Post-A2 / Post-C2 — Freeze strategico, documentazione essenziale e preparazione consegna — 🟡
+### Post-A2 / Post-C2 — Freeze strategico, documentazione essenziale e preparazione consegna — ✅
 **Obiettivo**
 Congelare il significato del prodotto, il suo posizionamento operativo e la sequenza corretta dei prossimi blocchi, così da evitare derive premature su UI polish, Docker o hardening non prioritari.
 
@@ -451,7 +450,7 @@ Congelare il significato del prodotto, il suo posizionamento operativo e la sequ
 
 **Nota operativa**
 - il rischio maggiore attuale non è una regressione del core, ma il fatto che il prodotto possa risultare poco leggibile o poco spiegato a chi non ha seguito la storia del repository;
-- per questo il prossimo blocco corretto è documentale e non estetico/infrastrutturale.
+- per questo, una volta chiuso formalmente `M5`, il prossimo blocco corretto diventa un audit conservativo della UI/demo minimale per valutare in modo disciplinato l'eventuale apertura di `M6`, senza promuovere automaticamente polish estetico o Docker a priorità immediata.
 ---
 
 ## Cycle D — Hardening
