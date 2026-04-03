@@ -3,7 +3,19 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: **consolidato sul branch `development` il primo delta `M6` di hardening UI della demo web nel commit `af20290`; con il presente riallineamento truth-first risulta ora chiuso anche il relativo doc gate owner. Il backlog residuo non bloccante (`responsive refinement`, feedback utente ulteriori, `Docker/exportability`) resta classificato, ma non esiste ancora un freeze documentale separato `M6` consolidato a commit**
+> Scope corrente: **consolidato sul branch `development` il primo delta `M6` di hardening UI della demo web nel commit `af20290`; con il presente riallineamento documentale truth-first, `pytest` e `pylint` risultano formalizzati come quality gates canonici già attivi (`D1` chiusa). `D2` coverage e `Docker/exportability` non sono ancora avviati, mentre `responsive refinement` e feedback utente ulteriori restano backlog non bloccante; nessun freeze documentale separato `M6` è ancora consolidato a commit**
+
+#### D1 — Formalizzazione truth-first dei quality gates canonici
+
+- **`e3ddc52` — `docs(project): formalize D1 quality gates truth-first`**
+  - **Type:** CHANGED · **Categoria:** Owner docs / Timeline / Changelog / Quality gates
+  - **Cosa cambia:** riallinea `docs/TIMELINE.md` e `docs/CHANGELOG.md` formalizzando `pytest` e `pylint` come quality gates canonici già attivi de facto nel repository, sulla base delle evidenze già presenti in `README.md`, `pyproject.toml` e negli snapshot owner correnti, senza introdurre nuovo tooling o nuove dipendenze.
+  - **Impatto:** chiude truth-first `D1` come blocco documentale, elimina il drift tra stato reale del repository e timeline e mantiene `D2` coverage come passo successivo ancora non avviato.
+
+##### Quality gates (snapshot corrente)
+- `python -m pytest -q` → `79 passed`
+- `python -m pylint src tests` → `10.00/10`
+- Stato del blocco: **`D1` chiusa come formalizzazione documentale di gate già operativi; `D2` coverage ancora non avviata**
 
 #### M6.1 — Primo delta di hardening UI della demo web
 

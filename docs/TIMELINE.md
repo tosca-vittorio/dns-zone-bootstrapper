@@ -4,9 +4,10 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` è stata aperta tecnicamente dal commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) e, con il presente riallineamento documentale truth-first, il relativo doc gate owner risulta ora chiuso; nessun blocco `D*` o `E*` è stato ancora avviato.
-- Obiettivo immediato: mantenere il repository allineato truth-first allo stato reale successivo al primo delta `M6`, senza anticipare freeze documentali, handoff o nuove aperture tecniche non ancora giustificate; il backlog residuo non bloccante resta classificato ma separato dal lavoro già consolidato.
+- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` è stata aperta tecnicamente dal commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) e, con il presente riallineamento documentale truth-first, il relativo doc gate owner risulta ora chiuso; `D1` risulta ora formalizzata e chiusa come blocco documentale di consolidamento dei quality gates canonici (`pytest` + `pylint`), mentre `D2`, i restanti blocchi `D*` e tutti i blocchi `E*` non sono ancora avviati.
+- Obiettivo immediato: mantenere il repository allineato truth-first allo stato reale successivo al primo delta `M6` e alla formalizzazione documentale di `D1`; il prossimo audit corretto, se giustificato, resta `D2`, cioè la valutazione conservativa della coverage come metrica complementare, senza anticipare `Docker/exportability` o nuove aperture tecniche non ancora difendibili.
 - Ultimo consolidamento `M6`: il commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) aggiorna `src/dns_zone_bootstrapper/interfaces/web/app.py` con una UI web più solida e presentabile tramite CSS inline, layout a card, copy professionale, hint di input più chiari e blocco errore strutturato, mantenendo invariati route, validazione server-side e download diretto del file `.txt`; il contratto bootstrap della root è stato riallineato in `tests/test_bootstrap.py` e i quality gates globali risultano verdi (`python -m pytest -q` → `79 passed`, `python -m pylint src tests` → `10.00/10`).
+- Ultimo consolidamento `D1`: `python -m pytest -q` e `python -m pylint src tests` risultano già usati in modo stabile come quality gates canonici del repository, esplicitati nel `README.md`, presenti nel tooling (`pyproject.toml`) e richiamati in modo coerente nelle evidenze degli owner docs; il presente riallineamento truth-first chiude `D1` come blocco documentale senza introdurre nuovo tooling, nuove dipendenze o soglie aggiuntive.
 - Ultimo consolidamento `M5` / delivery bootstrap: il commit `b6f498e` (`fix(templates): load local override from working tree fallback`) ha reso più robusto `resolve_active_fixed_dns_profile()`, mantenendo come priorità l'import normale di `local.dns_zone_profile` ma introducendo, quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato, un fallback esplicito a `./local/dns_zone_profile.py` rispetto alla working tree corrente; il boundary è stato coperto con test dedicati su fallback public-safe in cwd isolata e su caricamento dell'override locale dalla working tree (`python -m pytest -q tests/test_profile_resolver.py` → `3 passed`, `python -m pylint src tests` → `10.00/10`) e validato di nuovo end-to-end con `dns-zone-cli web` + `curl /generate?domain=testdomain.com`, che ora restituisce valori concreti coerenti con il profilo locale.
 - Valutazione congelata dello stato v1: il prodotto è coerente con la richiesta ricevuta, funziona nella sostanza della v1, il workflow `dominio -> file .txt -> import Cloudflare` resta tecnicamente difendibile e anche il bootstrap dichiarato della demo (`dns-zone-cli web`) risulta ora riallineato al comportamento atteso con override locale attivo.
 - Gap principale residuo classificato: il core e il delivery path non rappresentano più il focus prioritario; il backlog non bloccante resta concentrato su raffinamenti presentazionali/UI, feedback utente ulteriori e `Docker/exportability`, coerentemente con l'apertura tecnica di `M6` e con la chiusura del relativo doc gate owner.
@@ -452,20 +453,32 @@ Congelare il significato del prodotto, il suo posizionamento operativo e la sequ
 - per questo, una volta chiuso formalmente `M5`, il prossimo blocco corretto diventa un audit conservativo della UI/demo minimale per valutare in modo disciplinato l'eventuale apertura di `M6`, senza promuovere automaticamente polish estetico o Docker a priorità immediata.
 ---
 
-## Cycle D — Hardening controllato, hygiene runtime e quality gates — ⬜
+## Cycle D — Hardening controllato, hygiene runtime e quality gates — 🟡
 
 ### D0 — Gestione edge case e validazioni — ⬜
 **Obiettivo**
 Coprire casi limite, input errati e incoerenze del template.
 
-### D1 — Consolidamento quality gates canonici (`pytest` + `pylint`) — ⬜
+### D1 — Consolidamento quality gates canonici (`pytest` + `pylint`) — ✅
 **Obiettivo**
 Formalizzare `pytest` e `pylint` come quality gates canonici stabili del progetto, esplicitando il loro ruolo nel percorso di hardening e nella futura chiusura del prodotto.
 
-**Vincoli**
-- nessuna sostituzione dei contratti già difesi da test e golden;
-- nessun uso cosmetico dei gate: devono restare collegati a run reali e riproducibili;
-- nessuna estensione prematura dello scope oltre il repository attuale.
+**Stato operativo**
+- `pytest` e `pylint` sono già usati in modo stabile e ripetuto come gate reali del repository;
+- i due gate risultano esplicitati nel `README.md` sia nello snapshot tecnico corrente sia nel bootstrap locale;
+- i due gate risultano presenti nel tooling di progetto (`pyproject.toml`) e richiamati in modo coerente nelle evidenze dei documenti owner;
+- il presente riallineamento truth-first chiude `D1` sul piano documentale senza introdurre nuove dipendenze, nuove soglie o nuovi comandi.
+
+**Evidenze correnti**
+- `README.md` → snapshot tecnico corrente con `python -m pytest -q` → `79 passed` e `python -m pylint src tests` → `10.00/10`;
+- `README.md` → bootstrap locale che include entrambi i comandi come passi canonici;
+- `pyproject.toml` → `pytest` e `pylint` presenti nelle dev dependencies;
+- `docs/TIMELINE.md` e `docs/CHANGELOG.md` → evidenze ripetute dei due gate lungo i consolidamenti principali del repository.
+
+**Nota di chiusura D1**
+- `D1` si considera chiusa come formalizzazione truth-first di quality gates già attivi de facto;
+- nessun tooling di coverage è ancora presente nel repository;
+- il passo successivo corretto, se difendibile, è `D2` come audit conservativo su `coverage`, non `Docker/exportability`.
 
 ### D2 — Introduzione coverage come metrica complementare — ⬜
 **Obiettivo**
