@@ -6,8 +6,6 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 
 ## Milestone evolutive
 
-- Priorità attiva corrente: valutare in modo conservativo l'eventuale apertura di `M6`, dopo la chiusura formale di `M5` e con focus su audit UI minimale, miglioramenti essenziali pre-consegna e backlog non bloccante.
-
 ### M0 — Baseline repository — ✅
 - bootstrap repository;
 - owner docs;
@@ -51,11 +49,14 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 - introdurre una guida utente dedicata solo se realmente necessaria;
 - preparare il report/messaggio di stato verso l'azienda e sbloccare la prima consegna/demo.
 
-### M6 — Hardening esperienza utente ed exportability — ⬜
+- Priorità attiva corrente: `M6` resta consolidata sul primo delta di hardening UI della demo web introdotto dal commit `af20290`; con il presente riallineamento il doc gate owner truth-first risulta chiuso. `Responsive refinement`, feedback utente ulteriori e `Docker/exportability` restano backlog non bloccante, mentre un eventuale freeze documentale/handoff separato dovrà essere valutato solo come passaggio successivo e non ancora consolidato a commit.
+
+### M6 — Primo delta di hardening UI della demo web — 🟡
+- primo delta consolidato: hardening UI della pagina web e riallineamento del contratto bootstrap testuale;
 - UI minimale difendibile con CSS;
-- miglioramenti responsive e feedback utente;
-- Docker e relativa documentazione di deployment;
-- demo più presentabile e più portabile.
+- doc gate owner truth-first ora chiuso sul branch `development`;
+- responsive refinement e feedback utente ulteriori classificati come backlog non bloccante;
+- eventuale freeze documentale/handoff da valutare separatamente come passaggio successivo, non ancora consolidato a commit.
 
 ### M7 — Evoluzione prodotto — ⬜
 - possibili campi variabili aggiuntivi;

@@ -3,31 +3,64 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: chiusura formale di `M5` e preparazione dell'audit conservativo della UI/demo minimale verso `M6`, a valle della validazione empirica Cloudflare già ottenuta, del freeze strategico post-validazione e del riallineamento del bootstrap dichiarato della demo.
-> Ultimo consolidamento rilevante del blocco: fix `b6f498e` sul boundary di risoluzione del profilo fixed locale, con `README.md` già rafforzato nel commit `13092db` come documento di ingresso al prodotto.
+> Scope corrente: **consolidato sul branch `development` il primo delta `M6` di hardening UI della demo web nel commit `af20290`; con il presente riallineamento truth-first risulta ora chiuso anche il relativo doc gate owner. Il backlog residuo non bloccante (`responsive refinement`, feedback utente ulteriori, `Docker/exportability`) resta classificato, ma non esiste ancora un freeze documentale separato `M6` consolidato a commit**
 
-#### Post-A2 / Post-C2 — Freeze strategico, documentazione essenziale e preparazione consegna
-> Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.
+#### M6.1 — Primo delta di hardening UI della demo web
 
-- **`b6f498e` — `fix(templates): load local override from working tree fallback`**
-  - **Type:** `fix` · **Categoria:** Templates / Runtime profile resolution / Delivery bootstrap
-  - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/templates/profile_resolver.py` mantenendo come primo tentativo l'import standard di `local.dns_zone_profile`, ma introducendo un fallback esplicito al file gitignored `./local/dns_zone_profile.py` rispetto alla working tree corrente quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato; estende inoltre `tests/test_profile_resolver.py` per congelare sia il fallback public-safe in cwd isolata sia il caricamento dell'override locale direttamente dalla working tree.
-  - **Impatto:** chiude il delta tecnico emerso durante l'audit di consegna, in cui il core e la web app avviata con `python -m uvicorn ...` producevano output concreto mentre `dns-zone-cli web` ricadeva ancora sul profilo public-safe placeholderizzato; il bootstrap dichiarato della demo risulta ora riallineato al comportamento atteso con override locale attivo, senza cambiare il contratto utente, il README o l'architettura AS-IS.
-  - **Evidenze:** `python -m pytest -q tests/test_profile_resolver.py` → `3 passed`; `python -m pylint src tests` → `10.00/10`; smoke reale `dns-zone-cli web` + `curl -i "http://127.0.0.1:8000/generate?domain=testdomain.com"` con download `.txt` a valori concreti e non `__FIXED_*__`.
+- **`af20290` — `feat(web): harden demo UI and align bootstrap contract`**
+  - **Type:** CHANGED · **Categoria:** Web / Demo UI / Bootstrap contract
+  - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/interfaces/web/app.py` sostituendo la root HTML browser-default con una superficie web più solida e presentabile tramite CSS inline, layout a card, gerarchia tipografica più forte, hint di input più chiari e feedback errore strutturato; aggiorna inoltre `tests/test_bootstrap.py`, riallineando il contratto testuale della root alla nuova UI senza cambiare route, flusso `GET /generate`, validazione server-side o download diretto del `.txt`.
+  - **Impatto:** apre di fatto `M6` sul primo delta UI non invasivo, rende la demo più difendibile per consegna e stakeholder senza introdurre nuove dipendenze, JavaScript, refactor architetturali o modifiche al core, e mantiene verdi i quality gates del repository.
+
+##### Quality gates (snapshot corrente)
+- `python -m pytest -q` → `79 passed`
+- `python -m pylint src tests` → `10.00/10`
+- Stato del blocco: **primo delta tecnico `M6` consolidato nel commit `af20290`; doc gate owner truth-first ora chiuso sul branch `development`; backlog residuo non bloccante classificato, ma nessun freeze documentale `M6` ancora consolidato nella storia Git**
+
+#### M5 — Chiusura documentale essenziale e preparazione audit UI
+
+- **`2642785` — `docs(project): close M5 and prepare UI audit gate`**
+  - **Type:** CHANGED · **Categoria:** Owner docs / M5 / Transition gate
+  - **Cosa cambia:** riallinea gli owner docs per chiudere formalmente `M5` come blocco documentale essenziale e per promuovere un audit conservativo della demo UI come passo corretto successivo, senza aprire ancora un hardening tecnico largo.
+  - **Impatto:** completa la soglia di uscita documentale del blocco `M5`, impedisce derive premature su packaging o refinements non necessari e prepara in modo disciplinato l’ingresso del successivo delta UI minimale.
+
+- **`e1aff03` — `docs(project): sync timeline and changelog after README strengthening`**
+  - **Type:** CHANGED · **Categoria:** Owner docs / README / Timeline / Changelog
+  - **Cosa cambia:** riallinea `docs/TIMELINE.md` e `docs/CHANGELOG.md` al rafforzamento già consolidato di `README.md`, mantenendo coerente il repository dopo il salto di qualità del documento di ingresso al prodotto.
+  - **Impatto:** riduce il rischio di drift tra README e owner docs e rende più leggibile il passaggio dalla fase di freeze post-validazione alla chiusura formale di `M5`.
+
+- **`339e4bb` — `docs(changelog): record post-validation documentation freeze`**
+  - **Type:** CHANGED · **Categoria:** Changelog / Post-validation freeze
+  - **Cosa cambia:** registra nel changelog la sequenza di freeze documentale successiva alla validazione tecnica del prodotto, mantenendo audit trail esplicito sul passaggio dal core funzionante alla documentazione essenziale.
+  - **Impatto:** rende più leggibile la storia evolutiva del repository sul piano documentale e consolida il changelog come documento owner di tracciabilità, non solo come appendice dei commit tecnici.
 
 - **`13092db` — `docs(readme): strengthen product entry document`**
-  - **Type:** `docs` · **Categoria:** README / Product entry documentation
+  - **Type:** CHANGED · **Categoria:** README / Product entry documentation
   - **Cosa cambia:** sostituisce il `README.md` precedente con una versione molto più forte come documento di ingresso al prodotto, introducendo sezioni dedicate a cos'è il progetto, perché esiste, stato attuale, workflow end-to-end, lessico minimo DNS/BIND/Cloudflare, perimetro v1, limiti correnti, avvio rapido, uso della demo e distinzione tra baseline public-safe versionata e override locale gitignored.
   - **Impatto:** riduce la dipendenza dalla storia del repository per capire il senso del prodotto, migliora nettamente la leggibilità per lettori terzi e rende più difendibile il blocco `M5`, perché il gap principale residuo viene affrontato nel punto corretto: il documento di ingresso.
-  - **Evidenze:** commit `13092db` creato su `development`; diff del solo `README.md` consolidato; nessun impatto runtime o sui quality gates del progetto.
-
-
 
 - **`0b9d7ca` — `docs(timeline): open post-validation documentation and delivery freeze`**
-  - **Type:** `docs` · **Categoria:** Timeline / Roadmap / Strategic freeze
+  - **Type:** CHANGED · **Categoria:** Timeline / Roadmap / Strategic freeze
   - **Cosa cambia:** aggiorna `docs/TIMELINE.md` e `docs/ROADMAP.md` aprendo formalmente il blocco `Post-A2 / Post-C2`, classificando come gap prioritario la comprensibilità del prodotto e non più il core applicativo, attivando `M5` come milestone corrente e congelando la sequenza operativa post-validazione: rafforzamento `README.md`, eventuali chiarimenti mirati in `ARCHITECTURE.md`, eventuale guida utente dedicata, preparazione del report verso l'azienda, quindi solo dopo audit UI minimale e valutazione Docker/exportability.
   - **Impatto:** sposta ufficialmente il progetto dalla sola validazione tecnica alla fase di documentazione essenziale e preparazione consegna, impedisce derive premature su polish UI, Docker o hardening `D*` non prioritari e rende esplicito che la prima comunicazione verso l'azienda deve avvenire dopo la chiusura del blocco documentale essenziale, non dopo miglioramenti estetici o infrastrutturali.
-  - **Evidenze:** commit `0b9d7ca` pubblicato su `origin/development`; branch allineato; `TIMELINE.md` e `ROADMAP.md` riallineate al freeze strategico post-validazione.
+
+##### Quality gates (snapshot corrente)
+- `git status -sb` pulito su `development...origin/development` al consolidamento documentale di `M5`
+- `python -m pytest -q` → `78 passed`
+- `python -m pylint src tests` → `10.00/10`
+- Stato del blocco: **`M5` chiusa e consolidata lato owner docs; il passo successivo corretto viene poi incanalato nell’audit UI minimale e nel primo delta `M6`**
+#### Post-A2 / Post-C2 — Riallineamento del bootstrap dichiarato della demo
+
+- **`b6f498e` — `fix(templates): load local override from working tree fallback`**
+  - **Type:** FIXED · **Categoria:** Templates / Runtime profile resolution / Delivery bootstrap
+  - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/templates/profile_resolver.py` mantenendo come primo tentativo l'import standard di `local.dns_zone_profile`, ma introducendo un fallback esplicito al file gitignored `./local/dns_zone_profile.py` rispetto alla working tree corrente quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato; estende inoltre `tests/test_profile_resolver.py` per congelare sia il fallback public-safe in cwd isolata sia il caricamento dell'override locale direttamente dalla working tree.
+  - **Impatto:** chiude il delta tecnico emerso durante l'audit di consegna, in cui il core e la web app avviata con `python -m uvicorn ...` producevano output concreto mentre `dns-zone-cli web` ricadeva ancora sul profilo public-safe placeholderizzato; il bootstrap dichiarato della demo risulta ora riallineato al comportamento atteso con override locale attivo, senza cambiare il contratto utente, il README o l'architettura AS-IS.
+
+##### Quality gates (snapshot corrente)
+- `python -m pytest -q tests/test_profile_resolver.py` → `3 passed`
+- `python -m pylint src tests` → `10.00/10`
+- smoke reale `dns-zone-cli web` + `curl -i "http://127.0.0.1:8000/generate?domain=testdomain.com"` con download `.txt` a valori concreti e non `__FIXED_*__`
+- Stato del blocco: **bootstrap dichiarato della demo riallineato al runtime reale con override locale attivo; blocco successivo correttamente spostato sulla documentazione essenziale `M5`**
 
 #### B4 — Runtime fixed profile resolution boundary
 > Ordinamento: `git log` (più recente → più vecchio) · principio truth-first: qui è riportato solo ciò che è consolidato a commit sul branch `development`.

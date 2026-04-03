@@ -37,7 +37,7 @@ La v1 è già funzionante nella sostanza del caso d'uso richiesto:
 
 Snapshot tecnico corrente verificato:
 
-- `python -m pytest -q` → `78 passed`
+- `python -m pytest -q` → `79 passed`
 - `python -m pylint src tests` → `10.00/10`
 
 ## Workflow end-to-end
@@ -90,7 +90,7 @@ La v1 non fa ancora, per scelta di scope, le seguenti cose:
 - non espone campi variabili aggiuntivi oltre al dominio;
 - non offre preview del file prima del download;
 - non integra direttamente le API Cloudflare;
-- non punta ancora a polish UI, responsive refinement o packaging Docker;
+- non punta ancora a ulteriori raffinamenti UI/UX, responsive refinement o packaging Docker oltre al primo delta minimale di hardening UI già consolidato;
 - non replica integralmente l'export Cloudflare originale;
 - non include il record `SOA` nel perimetro runtime della v1.
 

@@ -4,12 +4,12 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `A2`, `B1`, `B2`, `B3`, `B4`, `C0`, `C1`, `C2` e il blocco `Post-A2 / Post-C2` risultano ora chiusi e consolidati; `M5` si considera formalmente chiusa dopo il doc gate finale allineato al fix `b6f498e` (`fix(templates): load local override from working tree fallback`); nessun blocco `D*` è stato ancora avviato e `M6` non è ancora formalmente aperta.
-- Obiettivo immediato: eseguire un audit conservativo e quantificato della UI/demo minimale per decidere se aprire formalmente `M6`, distinguendo tra miglioramenti essenziali pre-consegna e backlog non bloccante.
-- Ultimo consolidamento `M5`: il `README.md` è stato rafforzato nel commit `13092db` (`docs(readme): strengthen product entry document`), trasformandolo in un documento di ingresso molto più forte sul piano di contesto, value proposition, workflow end-to-end, lessico minimo DNS/BIND/Cloudflare, perimetro v1, limiti e distinzione tra baseline public-safe versionata e override locale gitignored.
+- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` è stata aperta tecnicamente dal commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) e, con il presente riallineamento documentale truth-first, il relativo doc gate owner risulta ora chiuso; nessun blocco `D*` o `E*` è stato ancora avviato.
+- Obiettivo immediato: mantenere il repository allineato truth-first allo stato reale successivo al primo delta `M6`, senza anticipare freeze documentali, handoff o nuove aperture tecniche non ancora giustificate; il backlog residuo non bloccante resta classificato ma separato dal lavoro già consolidato.
+- Ultimo consolidamento `M6`: il commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) aggiorna `src/dns_zone_bootstrapper/interfaces/web/app.py` con una UI web più solida e presentabile tramite CSS inline, layout a card, copy professionale, hint di input più chiari e blocco errore strutturato, mantenendo invariati route, validazione server-side e download diretto del file `.txt`; il contratto bootstrap della root è stato riallineato in `tests/test_bootstrap.py` e i quality gates globali risultano verdi (`python -m pytest -q` → `79 passed`, `python -m pylint src tests` → `10.00/10`).
 - Ultimo consolidamento `M5` / delivery bootstrap: il commit `b6f498e` (`fix(templates): load local override from working tree fallback`) ha reso più robusto `resolve_active_fixed_dns_profile()`, mantenendo come priorità l'import normale di `local.dns_zone_profile` ma introducendo, quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato, un fallback esplicito a `./local/dns_zone_profile.py` rispetto alla working tree corrente; il boundary è stato coperto con test dedicati su fallback public-safe in cwd isolata e su caricamento dell'override locale dalla working tree (`python -m pytest -q tests/test_profile_resolver.py` → `3 passed`, `python -m pylint src tests` → `10.00/10`) e validato di nuovo end-to-end con `dns-zone-cli web` + `curl /generate?domain=testdomain.com`, che ora restituisce valori concreti coerenti con il profilo locale.
 - Valutazione congelata dello stato v1: il prodotto è coerente con la richiesta ricevuta, funziona nella sostanza della v1, il workflow `dominio -> file .txt -> import Cloudflare` resta tecnicamente difendibile e anche il bootstrap dichiarato della demo (`dns-zone-cli web`) risulta ora riallineato al comportamento atteso con override locale attivo.
-- Gap principale congelato: il blocco tecnico residuo sul bootstrap della consegna è stato chiuso; il prossimo gap prioritario non è più sul core o sul delivery path, ma sull'eventuale hardening presentazionale/UI minimale, da trattare solo dopo la chiusura formale di `M5` e da classificare in `M6` come non bloccante.
+- Gap principale residuo classificato: il core e il delivery path non rappresentano più il focus prioritario; il backlog non bloccante resta concentrato su raffinamenti presentazionali/UI, feedback utente ulteriori e `Docker/exportability`, coerentemente con l'apertura tecnica di `M6` e con la chiusura del relativo doc gate owner.
 - Sequenza prioritaria congelata post-validazione empirica:
   1. rafforzamento del `README.md` come documento di ingresso al prodotto;
   2. chiarimento architetturale e concettuale nei documenti owner già esistenti, dove necessario;
@@ -17,8 +17,8 @@
   4. preparazione del testo/report di aggiornamento verso l'azienda con stato, demo e limiti attuali;
   5. chiusura del delta tecnico sul bootstrap della demo dichiarata;
   6. doc sync gate finale e valutazione di chiusura `M5`;
-  7. audit conservativo di UI minimale difendibile come possibile apertura disciplinata di `M6`;
-  8. valutazione Docker/exportability come step successivo e non bloccante.
+  7. apertura disciplinata di `M6` sul primo delta di hardening UI della demo web;
+  8. doc gate owner post-commit del delta UI e successiva valutazione del backlog residuo non bloccante, inclusi Docker/exportability.
 - Ultimo consolidamento post-validazione empirica: la suite `application` è ora isolata dal profilo locale gitignored tramite fixture autouse che forza `PUBLIC_SAFE_FIXED_DNS_PROFILE` nei test applicativi, eliminando il falso rosso osservato quando `local.dns_zone_profile` era presente nel workspace; hardening consolidato nel commit `4681df0` (`test(application): isolate public-safe runtime profile in application suite`) con quality gates globali verdi (`python -m pytest -q` → `78 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `B4`: boundary runtime del profilo fisso consolidato nel commit `98ef332` (`feat(templates): add runtime fixed profile resolver`), con introduzione di `src/dns_zone_bootstrapper/templates/profile_resolver.py`, disaccoppiamento di `generate_bind_zone_file(...)` dal profilo versionato hardcoded, fallback sicuro a `PUBLIC_SAFE_FIXED_DNS_PROFILE`, supporto a override locale gitignored tramite `local.dns_zone_profile.ACTIVE_FIXED_DNS_PROFILE`, test dedicati in `tests/test_profile_resolver.py` e quality gates globali verdi (`python -m pytest -q` → `78 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
 - Ultimo consolidamento `C2`: chiusura tecnica del blocco consolidata nel commit `c432feb` (`feat(cli): add minimal web demo entrypoint`), con aggiunta del subcommand `dns-zone-cli web` come entrypoint minimale installato per avviare la demo FastAPI, estensione di `tests/test_bootstrap.py` sul nuovo boundary CLI/web e quality gates globali verdi (`python -m pytest -q` → `76 passed`, `python -m pylint src tests` → `10.00/10`) su branch allineato a `origin/development`.
@@ -28,6 +28,7 @@
 
 ## Legenda stati
 
+- ☑️ archiviato
 - ✅ completato
 - 🟡 in corso / parziale
 - ⬜ non avviato
@@ -35,7 +36,7 @@
 
 ---
 
-## Cycle A — Discovery, baseline e design
+## Cycle A — Discovery, baseline e design — ☑️
 
 ### A0 — Bootstrap repository e owner docs — ✅
 **Obiettivo**  
@@ -135,7 +136,7 @@ La derivazione tecnica campo-per-campo del template viene demandata al `Cycle B`
 
 ---
 
-## Cycle B — Core engine
+## Cycle B — Core engine — ☑️
 
 ### B0 — Validazione dominio apex — ✅
 **Obiettivo**  
@@ -329,7 +330,7 @@ Introdurre un boundary runtime che permetta al generatore di usare, quando dispo
 
 ---
 
-## Cycle C — Delivery surfaces
+## Cycle C — Delivery surfaces — ☑️
 
 ### C0 — Pagina web minimale — ✅
 **Obiettivo**
@@ -390,7 +391,6 @@ Rifinire in modo conservativo la demo web esistente e preparare un packaging min
 - la demo web minima della v1 è ora rifinita sia sul piano della comunicazione user-facing sia su quello del packaging minimo di avvio locale;
 - la DoD sostanziale del blocco risulta soddisfatta sul repository reale e `C2` si considera chiuso; l'eventuale blocco successivo dovrà essere determinato separatamente con un nuovo audit conservativo.
 
-
 ### Post-A2 / Post-C2 — Freeze strategico, documentazione essenziale e preparazione consegna — ✅
 **Obiettivo**
 Congelare il significato del prodotto, il suo posizionamento operativo e la sequenza corretta dei prossimi blocchi, così da evitare derive premature su UI polish, Docker o hardening non prioritari.
@@ -425,7 +425,6 @@ Congelare il significato del prodotto, il suo posizionamento operativo e la sequ
 5. successivamente audit su UI minimale difendibile;
 6. successivamente valutazione Docker/exportability.
 
-
 **Deliverable essenziali del blocco documentale**
 - `README.md` rafforzato come documento di ingresso, comprensibile anche a chi non conosce il progetto o il dominio DNS;
 - chiarimenti mirati in `ARCHITECTURE.md` su concetti, flusso software e boundary principali;
@@ -453,20 +452,88 @@ Congelare il significato del prodotto, il suo posizionamento operativo e la sequ
 - per questo, una volta chiuso formalmente `M5`, il prossimo blocco corretto diventa un audit conservativo della UI/demo minimale per valutare in modo disciplinato l'eventuale apertura di `M6`, senza promuovere automaticamente polish estetico o Docker a priorità immediata.
 ---
 
-## Cycle D — Hardening
+## Cycle D — Hardening controllato, hygiene runtime e quality gates — ⬜
 
 ### D0 — Gestione edge case e validazioni — ⬜
-**Obiettivo**  
+**Obiettivo**
 Coprire casi limite, input errati e incoerenze del template.
 
-### D1 — Allineamento owner docs — ⬜
-**Obiettivo**  
+### D1 — Consolidamento quality gates canonici (`pytest` + `pylint`) — ⬜
+**Obiettivo**
+Formalizzare `pytest` e `pylint` come quality gates canonici stabili del progetto, esplicitando il loro ruolo nel percorso di hardening e nella futura chiusura del prodotto.
+
+**Vincoli**
+- nessuna sostituzione dei contratti già difesi da test e golden;
+- nessun uso cosmetico dei gate: devono restare collegati a run reali e riproducibili;
+- nessuna estensione prematura dello scope oltre il repository attuale.
+
+### D2 — Introduzione coverage come metrica complementare — ⬜
+**Obiettivo**
+Valutare e introdurre `coverage` come metrica complementare ai gate già presenti, senza trasformarla in una soglia arbitraria o in un indicatore scollegato dalla qualità reale del progetto.
+
+**Vincoli**
+- `coverage` dopo il consolidamento esplicito di `pytest` e `pylint`;
+- nessuna soglia minima imposta senza baseline reale osservata;
+- coverage a supporto dei contratti esistenti, non in sostituzione di test significativi e verifiche truth-first.
+
+### D3 — Fencing degli artefatti runtime in `tmp/` — ⬜
+**Obiettivo**
+Formalizzare un boundary runtime che convogli cache, output temporanei e artefatti intermedi dei run locali dentro la cartella gitignored `tmp/`, riducendo sporco nella working tree e dispersione di file runtime.
+
+**Vincoli**
+- nessuna regressione del contratto utente o del flusso principale `dominio -> file .txt -> import Cloudflare`;
+- nessun artefatto effimero fuori da `tmp/`, salvo output finali esplicitamente previsti dal contratto del programma;
+- nessuna dipendenza da path macchina-specifici;
+- `.gitignore`, README ed eventuali entrypoint vanno riallineati quando il blocco sarà consolidato.
+
+### D4 — Utility Bash di cleanup per cache e artefatti di run — ⬜
+**Obiettivo**
+Introdurre uno script Bash versionato che pulisca in modo sicuro cache e artefatti generati dai run locali, assumendo `tmp/` come boundary canonico di raccolta e pulizia.
+
+**Vincoli**
+- cleanup limitato a percorsi noti, difendibili e reversibili sul piano operativo;
+- nessuna cancellazione di input utente, golden, sample, owner docs o file di progetto persistenti;
+- comportamento leggibile, idempotente e coerente con il workflow locale del repository;
+- lo script deve vivere nel repository come utility esplicita, non come artefatto runtime.
+
+### D5 — Allineamento owner docs — ⬜
+**Obiettivo**
 Consolidare e riallineare i documenti owner quando i blocchi tecnici saranno maturi.
 
-### D2 — Packaging/demo finale — ⬜
-**Obiettivo**  
-Preparare una demo presentabile e riproducibile.
+### D6 — Packaging/demo finale e Docker/exportability — ⬜
+**Obiettivo**
+Preparare una demo presentabile e riproducibile, includendo quando giustificato una superficie Docker minima coerente con il workflow locale già consolidato.
 
-### D3 — Eventuale import diretto via API come extra — ⬜
-**Obiettivo**  
+**Vincoli**
+- Docker solo dopo il consolidamento dei quality gates, del fencing runtime in `tmp/` e della cleanup utility;
+- nessuna duplicazione del core applicativo;
+- nessuna divergenza tra esecuzione locale canonica e packaging containerizzato;
+- documentazione di run/deployment riallineata al comportamento reale.
+
+### D7 — Eventuale import diretto via API come extra — ⬜
+**Obiettivo**
 Valutare come estensione futura l'import assistito o diretto verso Cloudflare.
+
+---
+
+## Cycle E — Valutazione superfici UI alternative — ⬜
+
+### E0 — Valutazione Streamlit come UI alternativa — ⬜
+**Obiettivo**
+Valutare se una superficie Streamlit possa migliorare usabilità demo e consegna senza rompere il core Python attuale.
+
+**Vincoli**
+- nessuna sostituzione del core di generazione;
+- nessuna regressione del flusso `dominio -> file .txt -> import Cloudflare`;
+- valutazione separata dalla chiusura del prodotto attuale;
+- confronto basato su semplicità di adozione, portabilità e coerenza con la v1.
+
+### E1 — Valutazione altro stack UI — ⬜
+**Obiettivo**
+Valutare in un secondo momento un eventuale stack UI alternativo rispetto alla demo attuale, solo se emerge un vantaggio reale rispetto alla superficie web minimale già esistente o a Streamlit.
+
+**Vincoli**
+- core Python e contratto di output invariati;
+- nessuna introduzione prematura di complessità frontend;
+- decisione guidata da bisogno reale, non da preferenza tecnologica;
+- eventuale apertura tecnica solo dopo valutazione comparativa esplicita.
