@@ -50,7 +50,7 @@ def test_web_metadata() -> None:
 
 
 def test_web_root_returns_html_response_with_active_generation_flow() -> None:
-    """Root route exposes the minimal HTML page with active generation flow."""
+    """Root route exposes the HTML page with active generation flow."""
     response = root()
     html = response.body.decode("utf-8")
 
@@ -60,11 +60,11 @@ def test_web_root_returns_html_response_with_active_generation_flow() -> None:
     assert "Dominio apex" in html
     assert 'action="/generate"' in html
     assert "Genera e scarica il file (.txt)" in html
-    assert "disabled" not in html
-    assert "demo web minima della v1" in html
-    assert "generazione e download" in html
+    assert "Inserisci il dominio apex nel formato corretto" in html
+    assert "Cloudflare" in html
     assert ".txt" in html
-    assert "già attivi" in html
+    assert "disabled" not in html
+    assert "demo web minima della v1" not in html
 
 
 def test_web_generate_returns_html_error_for_invalid_empty_domain() -> None:
