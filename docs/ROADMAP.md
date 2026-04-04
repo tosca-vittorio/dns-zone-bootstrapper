@@ -1,5 +1,7 @@
 # ROADMAP
 
+- Priorità attiva corrente: dopo il consolidamento tecnico del commit `100e6a1`, il repository non è più fermo al solo delta `M6` di hardening UI; è presente anche un primo tool repo-owned di cleanup conservativo in `tools/cleanup_runtime_artifacts.py`, che apre ora una nuova area di hygiene runtime e di audit strutturale su repository, boundary `local/`, possibile integrazione ergonomica del cleanup e rafforzamento di `ARCHITECTURE.md`. `Responsive refinement`, feedback utente ulteriori e `Docker/exportability` restano backlog non bloccante.
+
 ## Missione del progetto
 
 Costruire una pagina web capace di generare, a partire da un dominio in input, un file di zona DNS coerente con un template aziendale fisso e pronto per il workflow di import su Cloudflare, con focus iniziale sui record necessari a uno scenario mailcow.
@@ -49,14 +51,24 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 - introdurre una guida utente dedicata solo se realmente necessaria;
 - preparare il report/messaggio di stato verso l'azienda e sbloccare la prima consegna/demo.
 
-- Priorità attiva corrente: `M6` resta consolidata sul primo delta di hardening UI della demo web introdotto dal commit `af20290`; con il presente riallineamento il doc gate owner truth-first risulta chiuso. `Responsive refinement`, feedback utente ulteriori e `Docker/exportability` restano backlog non bloccante, mentre un eventuale freeze documentale/handoff separato dovrà essere valutato solo come passaggio successivo e non ancora consolidato a commit.
-
 ### M6 — Primo delta di hardening UI della demo web — 🟡
 - primo delta consolidato: hardening UI della pagina web e riallineamento del contratto bootstrap testuale;
 - UI minimale difendibile con CSS;
 - doc gate owner truth-first ora chiuso sul branch `development`;
 - responsive refinement e feedback utente ulteriori classificati come backlog non bloccante;
 - eventuale freeze documentale/handoff da valutare separatamente come passaggio successivo, non ancora consolidato a commit.
+
+### M6.5 — Hygiene runtime e razionalizzazione strutturale del repository — ⬜
+- riallineare gli owner docs dopo l'introduzione del cleanup utility Python repo-owned;
+- consolidare la presenza di `tools/cleanup_runtime_artifacts.py` come utility safe-by-default;
+- auditare parti legacy, obsolete o poco leggibili del repository con criterio truth-first;
+- chiarire il ruolo del boundary `local/` gitignored e documentarlo meglio;
+- valutare solo in un secondo momento l'eventuale integrazione del cleanup in CLI o demo web.
+
+### EXTRA — Espansione architetturale completa del repository — ⬜
+- riscrivere/espandere `docs/ARCHITECTURE.md` in forma esaustiva;
+- spiegare moduli, boundary, dataclass, flussi runtime, entrypoint, failure mode, test suite e copertura logica del progetto;
+- trasformare il documento architetturale in una base utile anche per studio, handoff e manutenzione evolutiva.
 
 ### M7 — Evoluzione prodotto — ⬜
 - possibili campi variabili aggiuntivi;

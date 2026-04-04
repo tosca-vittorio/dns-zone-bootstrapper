@@ -3,7 +3,22 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: **consolidato sul branch `development` il primo delta `M6` di hardening UI della demo web nel commit `af20290`; `D1` è formalizzata, `D2` è chiusa in modo conservativo e `D3` è ora chiusa sul boundary canonico dei quality gates grazie al wrapper repo-owned bytecode-free consolidato nel commit `7dd4972`. `Docker/exportability` non è ancora avviata, mentre `responsive refinement` e feedback utente ulteriori restano backlog non bloccante; nessun freeze documentale separato `M6` è ancora consolidato a commit**
+> Scope corrente: **consolidati sul branch `development` il primo delta `M6` di hardening UI della demo web e l'avanzamento iniziale `D4` come utility repo-owned Python di cleanup conservativo nel commit `100e6a1`; `D1`, `D2` e `D3` risultano chiusi, mentre restano ancora non avviati il riallineamento architetturale profondo, l'audit strutturale del repository, la valutazione del boundary `local/` e l'eventuale integrazione ergonomica del cleanup in CLI/Web UI**
+
+#### D4 — Introduzione utility repo-owned Python di cleanup conservativo
+
+- **`100e6a1` — `build(runtime): add conservative cleanup utility tool`**
+  - **Type:** ADDED · **Categoria:** Runtime hygiene / Tooling / Cleanup utility
+  - **Cosa cambia:** introduce `tools/cleanup_runtime_artifacts.py` come utility repo-owned Python per la pulizia conservativa degli artefatti runtime repo-locali e aggiunge `tools/README.md` come documentazione dedicata. Il tool opera in dry-run di default, protegge `.git/` e `tmp/`, esclude per default gli ambienti virtuali, classifica in modo esplicito directory artifacts, compiled files e coverage files e abilita la rimozione reale solo tramite `--apply`, con opt-in separato anche per `--include-venv`.
+  - **Impatto:** sostituisce il precedente orientamento implicito verso una futura utility Bash con un boundary di cleanup Python-first più coerente con il repository, più manutenibile e più facilmente estendibile. Riduce il rumore locale da artefatti rigenerabili senza toccare il contratto utente del prodotto, ma non implica ancora integrazione in `dns-zone-cli`, nella demo web o una chiusura completa dell'audit strutturale del repository.
+
+##### Evidenze operative correnti
+- dry-run e apply del tool verificati sul repository reale;
+- audit residuo successivo all'apply coerente con l'assenza di target residui nel perimetro coperto;
+- commit pubblicato su `origin/development`.
+
+##### Stato del blocco
+- **`D4` aperta in forma truth-first come utility Python repo-owned introdotta e verificata empiricamente; restano da valutare separatamente quality gates globali post-doc-sync, integrazione ergonomica in CLI/Web UI e audit del boundary `local/`**
 
 #### D3 — Fencing runtime canonico dei quality gates e boundary `tmp/`
 
