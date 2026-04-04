@@ -37,8 +37,7 @@ La v1 è già funzionante nella sostanza del caso d'uso richiesto:
 
 Snapshot tecnico corrente verificato:
 
-- `python -m pytest -q` → `79 passed`
-- `python -m pylint src tests` → `10.00/10`
+- `python run_quality_gates.py` → `pytest 83 passed`, `pylint 10.00/10`, `coverage 230 stmt`, `0 miss`, `100%`
 
 ## Workflow end-to-end
 
@@ -144,8 +143,7 @@ Quindi, se l'import fallisce su una zona già popolata, bisogna distinguere tra:
 
 ```bash
 python -m pip install -e ".[dev]"
-python -m pytest -q
-python -m pylint src tests
+python run_quality_gates.py
 dns-zone-cli doctor
 ```
 
