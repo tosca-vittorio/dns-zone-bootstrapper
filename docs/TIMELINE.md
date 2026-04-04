@@ -4,11 +4,12 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` è stata aperta tecnicamente dal commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) e, con il presente riallineamento documentale truth-first, il relativo doc gate owner risulta ora chiuso; `D1` e `D2` risultano ora chiuse come blocchi di consolidamento dei quality gates canonici e della baseline coverage package-only, mentre i restanti blocchi `D*` oltre `D2` e tutti i blocchi `E*` non sono ancora avviati.
-- Obiettivo immediato: mantenere il repository allineato truth-first allo stato reale successivo al primo delta `M6` e alla chiusura documentale di `D2`; il prossimo passo corretto non è ancora tecnico per default, ma una valutazione conservativa del blocco eventualmente apribile dopo `D2`, senza anticipare automaticamente `D3` o `Docker/exportability`.
+- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` è stata aperta tecnicamente dal commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) e, con il presente riallineamento documentale truth-first, il relativo doc gate owner risulta ora chiuso; `D1`, `D2` e il primo micro-step `D3` risultano ora consolidati, mentre i restanti blocchi `D*` oltre `D3` e tutti i blocchi `E*` non sono ancora avviati.
+- Obiettivo immediato: mantenere il repository allineato truth-first allo stato reale successivo al primo delta `M6` e al primo micro-step di `D3`; il prossimo passo corretto non è ancora da aprire automaticamente, ma va determinato con un nuovo audit conservativo sul fencing runtime residuo, senza saltare direttamente a `D4` o `Docker/exportability`.
 - Ultimo consolidamento `M6`: il commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) aggiorna `src/dns_zone_bootstrapper/interfaces/web/app.py` con una UI web più solida e presentabile tramite CSS inline, layout a card, copy professionale, hint di input più chiari e blocco errore strutturato, mantenendo invariati route, validazione server-side e download diretto del file `.txt`; il contratto bootstrap della root è stato riallineato in `tests/test_bootstrap.py` e i quality gates globali risultano verdi (`python -m pytest -q` → `79 passed`, `python -m pylint src tests` → `10.00/10`).
 - Ultimo consolidamento `D1`: `python -m pytest -q` e `python -m pylint src tests` risultano già usati in modo stabile come quality gates canonici del repository, esplicitati nel `README.md`, presenti nel tooling (`pyproject.toml`) e richiamati in modo coerente nelle evidenze degli owner docs; il presente riallineamento truth-first chiude `D1` come blocco documentale senza introdurre nuovo tooling, nuove dipendenze o soglie aggiuntive.
 - Ultimo consolidamento `D2`: il commit `876c421` (`test(coverage): establish package-only baseline and residual coverage`) introduce `coverage` nelle dev dependencies, riallinea il freeze operativo `requirements.txt`, pulisce `src/dns_zone_bootstrapper/interfaces/__init__.py` rimuovendo una legacy CLI duplicata e aggiunge `tests/test_coverage_residuals.py` per coprire i miss residui a basso rischio; la baseline coverage package-only viene misurata sul solo namespace `dns_zone_bootstrapper` con risultato `230 stmt`, `0 miss`, `100%`, senza introdurre soglie minime arbitrarie.
+- Ultimo consolidamento `D3`: il commit `441c954` (`build(runtime): fence pytest and coverage artifacts into tmp`) aggiorna `pyproject.toml` introducendo `cache_dir = "tmp/.pytest_cache"` sotto `[tool.pytest.ini_options]` e `data_file = "tmp/.coverage"` sotto `[tool.coverage.run]`, così da convogliare in `tmp/` la cache pytest e il file coverage, senza modificare il contratto utente o il flusso principale del prodotto; i quality gates restano verdi (`python -m pytest -q` → `83 passed`, `python -m coverage run --source=dns_zone_bootstrapper -m pytest -q` + `python -m coverage report -m` → `230 stmt`, `0 miss`, `100%`).
 - Ultimo consolidamento `M5` / delivery bootstrap: il commit `b6f498e` (`fix(templates): load local override from working tree fallback`) ha reso più robusto `resolve_active_fixed_dns_profile()`, mantenendo come priorità l'import normale di `local.dns_zone_profile` ma introducendo, quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato, un fallback esplicito a `./local/dns_zone_profile.py` rispetto alla working tree corrente; il boundary è stato coperto con test dedicati su fallback public-safe in cwd isolata e su caricamento dell'override locale dalla working tree (`python -m pytest -q tests/test_profile_resolver.py` → `3 passed`, `python -m pylint src tests` → `10.00/10`) e validato di nuovo end-to-end con `dns-zone-cli web` + `curl /generate?domain=testdomain.com`, che ora restituisce valori concreti coerenti con il profilo locale.
 - Valutazione congelata dello stato v1: il prodotto è coerente con la richiesta ricevuta, funziona nella sostanza della v1, il workflow `dominio -> file .txt -> import Cloudflare` resta tecnicamente difendibile e anche il bootstrap dichiarato della demo (`dns-zone-cli web`) risulta ora riallineato al comportamento atteso con override locale attivo.
 - Gap principale residuo classificato: il core e il delivery path non rappresentano più il focus prioritario; il backlog non bloccante resta concentrato su raffinamenti presentazionali/UI, feedback utente ulteriori e `Docker/exportability`, coerentemente con l'apertura tecnica di `M6` e con la chiusura del relativo doc gate owner.
@@ -504,15 +505,26 @@ Valutare e introdurre `coverage` come metrica complementare ai gate già present
 - non è stata introdotta alcuna soglia minima arbitraria;
 - il passo successivo corretto deve essere determinato con un nuovo audit conservativo, senza aprire automaticamente `D3` o `Docker/exportability`.
 
-### D3 — Fencing degli artefatti runtime in `tmp/` — ⬜
+### D3 — Fencing degli artefatti runtime in `tmp/` — 🟡
 **Obiettivo**
 Formalizzare un boundary runtime che convogli cache, output temporanei e artefatti intermedi dei run locali dentro la cartella gitignored `tmp/`, riducendo sporco nella working tree e dispersione di file runtime.
 
-**Vincoli**
-- nessuna regressione del contratto utente o del flusso principale `dominio -> file .txt -> import Cloudflare`;
-- nessun artefatto effimero fuori da `tmp/`, salvo output finali esplicitamente previsti dal contratto del programma;
-- nessuna dipendenza da path macchina-specifici;
-- `.gitignore`, README ed eventuali entrypoint vanno riallineati quando il blocco sarà consolidato.
+**Stato operativo**
+- la cache di `pytest` viene ora instradata in `tmp/.pytest_cache` tramite `pyproject.toml`;
+- il file dati di `coverage` viene ora instradato in `tmp/.coverage` tramite `pyproject.toml`;
+- il micro-step consolidato non modifica il contratto utente, il flusso principale `dominio -> file .txt -> import Cloudflare` o le superfici runtime del prodotto;
+- il fencing runtime non è ancora da considerare chiuso integralmente: il boundary `tmp/` è stato avviato in modo conservativo sui due artefatti di tooling più immediati e verificabili.
+
+**Evidenze correnti**
+- `python -m pytest -q` → `83 passed`;
+- `python -m coverage run --source=dns_zone_bootstrapper -m pytest -q` + `python -m coverage report -m` → `230 stmt`, `0 miss`, `100%`;
+- artefatti osservati dopo i run: `tmp/.pytest_cache` e `tmp/.coverage`;
+- avanzamento tecnico consolidato nel commit `441c954` (`build(runtime): fence pytest and coverage artifacts into tmp`).
+
+**Nota di stato D3**
+- `D3` è ora aperta e parzialmente consolidata sul primo micro-step config-only;
+- il blocco non è ancora chiuso formalmente;
+- il passo successivo corretto va deciso con un nuovo audit conservativo del fencing runtime residuo, senza aprire automaticamente `D4` o `Docker/exportability`.
 
 ### D4 — Utility Bash di cleanup per cache e artefatti di run — ⬜
 **Obiettivo**

@@ -3,7 +3,19 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: **consolidato sul branch `development` il primo delta `M6` di hardening UI della demo web nel commit `af20290`; `D1` risulta formalizzata e `D2` viene ora chiusa in modo conservativo tramite introduzione della coverage package-only come metrica complementare, senza soglie arbitrarie. `Docker/exportability` non è ancora avviata, mentre `responsive refinement` e feedback utente ulteriori restano backlog non bloccante; nessun freeze documentale separato `M6` è ancora consolidato a commit**
+> Scope corrente: **consolidato sul branch `development` il primo delta `M6` di hardening UI della demo web nel commit `af20290`; `D1` è formalizzata, `D2` è chiusa in modo conservativo e `D3` è ora aperta sul primo micro-step di fencing runtime config-only verso `tmp/`. `Docker/exportability` non è ancora avviata, mentre `responsive refinement` e feedback utente ulteriori restano backlog non bloccante; nessun freeze documentale separato `M6` è ancora consolidato a commit**
+
+#### D3 — Primo micro-step di fencing runtime verso `tmp/`
+
+- **`441c954` — `build(runtime): fence pytest and coverage artifacts into tmp`**
+  - **Type:** CHANGED · **Categoria:** Runtime hygiene / Tooling config / Tmp boundary
+  - **Cosa cambia:** aggiorna `pyproject.toml` introducendo `cache_dir = "tmp/.pytest_cache"` sotto `[tool.pytest.ini_options]` e `data_file = "tmp/.coverage"` sotto `[tool.coverage.run]`, così da convogliare in `tmp/` la cache pytest e il file coverage generato dai run locali.
+  - **Impatto:** apre `D3` con un micro-step config-only, riduce la dispersione di artefatti runtime nella root del repository e rende più difendibile il boundary `tmp/`, senza modificare codice applicativo, superfici utente o contratti del prodotto.
+
+##### Quality gates (snapshot corrente)
+- `python -m pytest -q` → `83 passed`
+- `python -m coverage run --source=dns_zone_bootstrapper -m pytest -q` + `python -m coverage report -m` → `230 stmt`, `0 miss`, `100%`
+- Stato del blocco: **`D3` aperta e consolidata sul primo micro-step di fencing runtime config-only; nessuna chiusura formale ancora dichiarata**
 
 #### D2 — Baseline coverage package-only e chiusura del perimetro residuo
 
