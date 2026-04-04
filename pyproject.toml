@@ -35,6 +35,10 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+cache_dir = "tmp/.pytest_cache"
+
+[tool.coverage.run]
+data_file = "tmp/.coverage"
 
 [tool.ruff]
 line-length = 100
