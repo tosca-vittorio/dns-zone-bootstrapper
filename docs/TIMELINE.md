@@ -4,10 +4,11 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` è stata aperta tecnicamente dal commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) e, con il presente riallineamento documentale truth-first, il relativo doc gate owner risulta ora chiuso; `D1` risulta ora formalizzata e chiusa come blocco documentale di consolidamento dei quality gates canonici (`pytest` + `pylint`), mentre `D2`, i restanti blocchi `D*` e tutti i blocchi `E*` non sono ancora avviati.
-- Obiettivo immediato: mantenere il repository allineato truth-first allo stato reale successivo al primo delta `M6` e alla formalizzazione documentale di `D1`; il prossimo audit corretto, se giustificato, resta `D2`, cioè la valutazione conservativa della coverage come metrica complementare, senza anticipare `Docker/exportability` o nuove aperture tecniche non ancora difendibili.
+- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` è stata aperta tecnicamente dal commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) e, con il presente riallineamento documentale truth-first, il relativo doc gate owner risulta ora chiuso; `D1` e `D2` risultano ora chiuse come blocchi di consolidamento dei quality gates canonici e della baseline coverage package-only, mentre i restanti blocchi `D*` oltre `D2` e tutti i blocchi `E*` non sono ancora avviati.
+- Obiettivo immediato: mantenere il repository allineato truth-first allo stato reale successivo al primo delta `M6` e alla chiusura documentale di `D2`; il prossimo passo corretto non è ancora tecnico per default, ma una valutazione conservativa del blocco eventualmente apribile dopo `D2`, senza anticipare automaticamente `D3` o `Docker/exportability`.
 - Ultimo consolidamento `M6`: il commit `af20290` (`feat(web): harden demo UI and align bootstrap contract`) aggiorna `src/dns_zone_bootstrapper/interfaces/web/app.py` con una UI web più solida e presentabile tramite CSS inline, layout a card, copy professionale, hint di input più chiari e blocco errore strutturato, mantenendo invariati route, validazione server-side e download diretto del file `.txt`; il contratto bootstrap della root è stato riallineato in `tests/test_bootstrap.py` e i quality gates globali risultano verdi (`python -m pytest -q` → `79 passed`, `python -m pylint src tests` → `10.00/10`).
 - Ultimo consolidamento `D1`: `python -m pytest -q` e `python -m pylint src tests` risultano già usati in modo stabile come quality gates canonici del repository, esplicitati nel `README.md`, presenti nel tooling (`pyproject.toml`) e richiamati in modo coerente nelle evidenze degli owner docs; il presente riallineamento truth-first chiude `D1` come blocco documentale senza introdurre nuovo tooling, nuove dipendenze o soglie aggiuntive.
+- Ultimo consolidamento `D2`: il commit `876c421` (`test(coverage): establish package-only baseline and residual coverage`) introduce `coverage` nelle dev dependencies, riallinea il freeze operativo `requirements.txt`, pulisce `src/dns_zone_bootstrapper/interfaces/__init__.py` rimuovendo una legacy CLI duplicata e aggiunge `tests/test_coverage_residuals.py` per coprire i miss residui a basso rischio; la baseline coverage package-only viene misurata sul solo namespace `dns_zone_bootstrapper` con risultato `230 stmt`, `0 miss`, `100%`, senza introdurre soglie minime arbitrarie.
 - Ultimo consolidamento `M5` / delivery bootstrap: il commit `b6f498e` (`fix(templates): load local override from working tree fallback`) ha reso più robusto `resolve_active_fixed_dns_profile()`, mantenendo come priorità l'import normale di `local.dns_zone_profile` ma introducendo, quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato, un fallback esplicito a `./local/dns_zone_profile.py` rispetto alla working tree corrente; il boundary è stato coperto con test dedicati su fallback public-safe in cwd isolata e su caricamento dell'override locale dalla working tree (`python -m pytest -q tests/test_profile_resolver.py` → `3 passed`, `python -m pylint src tests` → `10.00/10`) e validato di nuovo end-to-end con `dns-zone-cli web` + `curl /generate?domain=testdomain.com`, che ora restituisce valori concreti coerenti con il profilo locale.
 - Valutazione congelata dello stato v1: il prodotto è coerente con la richiesta ricevuta, funziona nella sostanza della v1, il workflow `dominio -> file .txt -> import Cloudflare` resta tecnicamente difendibile e anche il bootstrap dichiarato della demo (`dns-zone-cli web`) risulta ora riallineato al comportamento atteso con override locale attivo.
 - Gap principale residuo classificato: il core e il delivery path non rappresentano più il focus prioritario; il backlog non bloccante resta concentrato su raffinamenti presentazionali/UI, feedback utente ulteriori e `Docker/exportability`, coerentemente con l'apertura tecnica di `M6` e con la chiusura del relativo doc gate owner.
@@ -480,14 +481,28 @@ Formalizzare `pytest` e `pylint` come quality gates canonici stabili del progett
 - nessun tooling di coverage è ancora presente nel repository;
 - il passo successivo corretto, se difendibile, è `D2` come audit conservativo su `coverage`, non `Docker/exportability`.
 
-### D2 — Introduzione coverage come metrica complementare — ⬜
+### D2 — Introduzione coverage come metrica complementare — ✅
 **Obiettivo**
 Valutare e introdurre `coverage` come metrica complementare ai gate già presenti, senza trasformarla in una soglia arbitraria o in un indicatore scollegato dalla qualità reale del progetto.
 
-**Vincoli**
-- `coverage` dopo il consolidamento esplicito di `pytest` e `pylint`;
-- nessuna soglia minima imposta senza baseline reale osservata;
-- coverage a supporto dei contratti esistenti, non in sostituzione di test significativi e verifiche truth-first.
+**Stato operativo**
+- `coverage` è stata introdotta nelle dev dependencies del progetto tramite `pyproject.toml`;
+- il freeze operativo dell'ambiente è stato riallineato in `requirements.txt` con `coverage==7.13.5`;
+- la misurazione è stata eseguita in modo conservativo sul solo namespace `dns_zone_bootstrapper`, evitando di confondere la baseline con `tests/`, override locali o file temporanei di pytest;
+- è stata rimossa una legacy CLI duplicata da `src/dns_zone_bootstrapper/interfaces/__init__.py`, che falsava la lettura architetturale e la baseline di coverage package-side;
+- è stato aggiunto `tests/test_coverage_residuals.py` per coprire i branch residui a basso rischio di CLI, web e profile resolver;
+- nessuna soglia minima è stata introdotta: coverage resta una metrica complementare e non un gate sostitutivo di test significativi e verifiche truth-first.
+
+**Evidenze correnti**
+- `python -m pytest -q` → `83 passed`;
+- `python -m pylint src tests` → `10.00/10`;
+- `python -m coverage run --source=dns_zone_bootstrapper -m pytest -q` + `python -m coverage report -m` → `230 stmt`, `0 miss`, `100%`;
+- avanzamento tecnico consolidato nel commit `876c421` (`test(coverage): establish package-only baseline and residual coverage`).
+
+**Nota di chiusura D2**
+- `D2` si considera chiusa come introduzione conservativa della coverage e misurazione della baseline package-only;
+- non è stata introdotta alcuna soglia minima arbitraria;
+- il passo successivo corretto deve essere determinato con un nuovo audit conservativo, senza aprire automaticamente `D3` o `Docker/exportability`.
 
 ### D3 — Fencing degli artefatti runtime in `tmp/` — ⬜
 **Obiettivo**

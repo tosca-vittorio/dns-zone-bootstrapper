@@ -3,7 +3,20 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: **consolidato sul branch `development` il primo delta `M6` di hardening UI della demo web nel commit `af20290`; con il presente riallineamento documentale truth-first, `pytest` e `pylint` risultano formalizzati come quality gates canonici già attivi (`D1` chiusa). `D2` coverage e `Docker/exportability` non sono ancora avviati, mentre `responsive refinement` e feedback utente ulteriori restano backlog non bloccante; nessun freeze documentale separato `M6` è ancora consolidato a commit**
+> Scope corrente: **consolidato sul branch `development` il primo delta `M6` di hardening UI della demo web nel commit `af20290`; `D1` risulta formalizzata e `D2` viene ora chiusa in modo conservativo tramite introduzione della coverage package-only come metrica complementare, senza soglie arbitrarie. `Docker/exportability` non è ancora avviata, mentre `responsive refinement` e feedback utente ulteriori restano backlog non bloccante; nessun freeze documentale separato `M6` è ancora consolidato a commit**
+
+#### D2 — Baseline coverage package-only e chiusura del perimetro residuo
+
+- **`876c421` — `test(coverage): establish package-only baseline and residual coverage`**
+  - **Type:** CHANGED · **Categoria:** Coverage / Test / Interface package hygiene
+  - **Cosa cambia:** aggiorna `pyproject.toml` aggiungendo `coverage` alle dev dependencies e riallinea `requirements.txt` come freeze operativo dell'ambiente; pulisce `src/dns_zone_bootstrapper/interfaces/__init__.py` rimuovendo una legacy CLI duplicata e introducendo un package marker minimale; aggiunge `tests/test_coverage_residuals.py` per coprire i branch residui a basso rischio in CLI, web e profile resolver e misura la baseline coverage sul solo namespace `dns_zone_bootstrapper`.
+  - **Impatto:** apre e chiude `D2` in modo conservativo, perché introduce coverage come metrica complementare senza soglie arbitrarie, migliora la leggibilità architetturale del package `interfaces` e rende la baseline package-only difendibile con risultato `100%`.
+
+##### Quality gates (snapshot corrente)
+- `python -m pytest -q` → `83 passed`
+- `python -m pylint src tests` → `10.00/10`
+- `python -m coverage run --source=dns_zone_bootstrapper -m pytest -q` + `python -m coverage report -m` → `230 stmt`, `0 miss`, `100%`
+- Stato del blocco: **`D2` chiusa come introduzione della coverage package-only senza soglie minime arbitrarie; nessun blocco successivo ancora aperto di default**
 
 #### D1 — Formalizzazione truth-first dei quality gates canonici
 
