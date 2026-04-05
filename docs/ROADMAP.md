@@ -58,11 +58,11 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 - responsive refinement e feedback utente ulteriori classificati come backlog non bloccante;
 - eventuale freeze documentale/handoff da valutare separatamente come passaggio successivo, non ancora consolidato a commit.
 
-### M6.5 — Hygiene runtime e razionalizzazione strutturale del repository — ⬜
-- riallineare gli owner docs dopo l'introduzione del cleanup utility Python repo-owned;
-- consolidare la presenza di `tools/cleanup_runtime_artifacts.py` come utility safe-by-default;
+### M6.5 — Hygiene runtime e razionalizzazione strutturale del repository — 🟡
+- consolidati il doc sync owner successivo all'introduzione del cleanup utility Python repo-owned e il riallineamento truth-first del boundary `local/`;
+- consolidato il quality-gate snapshot post-doc-sync su `development`;
 - auditare parti legacy, obsolete o poco leggibili del repository con criterio truth-first;
-- riallineare README, ARCHITECTURE e TIMELINE al contratto auditato del boundary `local/` gitignored, prima di qualunque decisione su mantenimento, ristrutturazione o sostituzione;
+- usare l'audit strutturale del repository come prossimo micro-step chiarificatore prima di eventuali aperture architetturali più larghe;
 - valutare solo in un secondo momento l'eventuale integrazione del cleanup in CLI o demo web.
 
 ### EXTRA — Espansione architetturale completa del repository — ⬜
