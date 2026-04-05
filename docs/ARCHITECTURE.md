@@ -50,17 +50,20 @@ La generazione del file `.txt` deve vivere in un renderer dedicato, separato dal
 
 Il repository versionato mantiene come baseline un profilo DNS fixed public-safe, adatto a test, golden e handoff senza esporre valori operativi concreti.
 
-Per il runtime di generazione, la scelta del profilo attivo avviene tramite un boundary dedicato di risoluzione:
+Il punto unico di accesso versionato al profilo attivo è `src/dns_zone_bootstrapper/templates/profile_resolver.py`. Il layer applicativo non conosce direttamente `local/`, ma consuma solo `resolve_active_fixed_dns_profile()`.
 
-- se esiste un modulo locale gitignored `local.dns_zone_profile` con `ACTIVE_FIXED_DNS_PROFILE`, il generatore usa quel profilo;
-- se il modulo locale non esiste, il runtime ricade sul profilo versionato `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
+Il contratto runtime osservato è questo:
 
-Questa scelta permette di:
+- il resolver prova prima l'import standard di `local.dns_zone_profile`;
+- se il boundary `local` non è risolvibile come package runtime, prova il caricamento esplicito del file `./local/dns_zone_profile.py` rispetto alla current working tree;
+- se anche il file locale non è disponibile, ricade sul profilo versionato `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
 
-- mantenere il repository public-safe e versionabile;
-- evitare hardcode diretto del runtime su un solo profilo placeholderizzato;
-- introdurre valori fixed concreti solo in area locale/non versionata;
-- preservare la separazione tra core applicativo, definizione del profilo e superficie web.
+Questa struttura implica che:
+
+- `local/` è un boundary locale opzionale, gitignored e non pacchettizzato;
+- il profilo public-safe resta la baseline canonica versionata;
+- i valori concreti locali restano fuori dalla storia Git;
+- CLI, Web UI e use case applicativo restano disaccoppiati dal dettaglio implementativo dell'override locale.
 
 Nel runtime osservato, il file prodotto dal generatore attraverso questo boundary è stato importato con successo in Cloudflare quando la zona target era pulita. Un primo failure sul record `www` è stato attribuito a collisioni con record preesistenti nella zona di laboratorio, non al formato del file generato.
 

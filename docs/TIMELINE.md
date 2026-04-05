@@ -56,9 +56,21 @@ Riscrivere/espandere `docs/ARCHITECTURE.md` in forma esaustiva, spiegando in det
 **Obiettivo**
 Valutare se e come esporre il cleanup conservativo tramite una superficie ergonomica aggiuntiva (`dns-zone-cli` oppure demo web), mantenendo opt-in esplicito, protezioni forti e assenza di ambiguità tra run principale del prodotto e operazioni di hygiene locale.
 
-### EXTRA — Audit del boundary `local/` gitignored — ⬜
+### EXTRA — Audit del boundary `local/` gitignored — 🟡
 **Obiettivo**
-Documentare in modo completo il ruolo reale di `local/`, chiarire cosa contiene, perché esiste, quali invarianti supporta nel runtime corrente e se il boundary debba essere mantenuto così com'è, ristrutturato o sostituito da una forma più esplicita, senza rompere il contratto attuale di override locale.
+Congelare in modo truth-first il ruolo reale del boundary `local/`, il contratto di risoluzione runtime e le implicazioni di packaging/onboarding, prima di decidere eventuale riallineamento documentale più ampio o una futura rivalutazione strutturale.
+
+**Evidenze correnti**
+- `local/` osservato come boundary opzionale gitignored e non tracciato, composto da `local/__init__.py` e `local/dns_zone_profile.py`;
+- `local/dns_zone_profile.py` espone `ACTIVE_FIXED_DNS_PROFILE` con valori fixed concreti costruiti sui model versionati;
+- `src/dns_zone_bootstrapper/templates/profile_resolver.py` è il punto unico di accesso e applica il contratto: import standard `local.dns_zone_profile` → fallback esplicito a `./local/dns_zone_profile.py` rispetto alla current working tree → fallback a `PUBLIC_SAFE_FIXED_DNS_PROFILE`;
+- `generate_bind_zone_file(...)` resta disaccoppiato dal boundary locale e consuma solo `resolve_active_fixed_dns_profile()`;
+- `pyproject.toml` pacchettizza solo `src`, mentre `.gitignore` esclude `/local/`, quindi il boundary locale è runtime-only e non entra nel package installato.
+
+**Stato**
+- audit read-only eseguito e classificazione AS-IS chiarita;
+- resta da riallineare in modo chirurgico la documentazione owner che oggi descrive il boundary in forma semplificata e non ancora completamente aderente al contratto reale;
+- nessuna decisione è ancora stata aperta su refactor, sostituzione o integrazione diversa del boundary.
 
 ## Cycle A — Discovery, baseline e design — ☑️
 
@@ -563,7 +575,8 @@ Introdurre e consolidare un tool repo-owned che pulisca in modo sicuro artefatti
 - il tool deriva la root reale del repository dalla posizione del file, protegge sempre `.git/` e `tmp/`, esclude per default `.venv/`/`venv/`/`env/`/`ENV/` e applica la rimozione reale solo con opt-in esplicito `--apply`;
 - la classificazione dei target copre directory artifacts (`__pycache__`, `.pytest_cache`, `.mypy_cache`, `.ruff_cache`, `htmlcov`, `.tox`, `.nox`, `build`, `dist`, `*.egg-info`), compiled files (`*.pyc`, `*.pyo`) e coverage files (`.coverage`, `.coverage.*`, `coverage.xml`);
 - la pulizia soft della venv è ammessa solo tramite `--include-venv`, limitata a `__pycache__/`, `*.pyc` e `*.pyo`;
-- il blocco resta aperto perché non sono ancora stati eseguiti: riallineamento architetturale completo, audit del boundary `local/`, valutazione di integrazione ergonomica in CLI/Web UI e quality gates globali post-commit su questo delta.
+- il blocco resta aperto perché non sono ancora stati eseguiti: quality gates globali post-doc-sync su questo delta, riallineamento architetturale completo e valutazione separata dell'eventuale integrazione ergonomica del cleanup in CLI/Web UI;
+- l'audit read-only del boundary `local/` è stato invece eseguito e ha chiarito il ruolo del boundary come override runtime opzionale gitignored/non pacchettizzato, ma il relativo riallineamento owner docs non è ancora consolidato a commit.
 
 **Evidenze correnti**
 - commit consolidato e pubblicato: `100e6a1` — `build(runtime): add conservative cleanup utility tool`;
@@ -573,7 +586,7 @@ Introdurre e consolidare un tool repo-owned che pulisca in modo sicuro artefatti
 - `tools/cleanup_runtime_artifacts.py` e `tools/README.md` presenti nel repository.
 
 **Nota operativa**
-- il passo successivo corretto non è ampliare subito il tool o integrarlo in UI, ma scegliere tramite audit conservativo un solo approfondimento successivo tra boundary `local/`, quality gates post-doc-sync, ristrutturazione repository ed espansione architetturale.
+- il passo successivo corretto non è ampliare subito il tool o integrarlo in UI, ma chiudere prima il doc sync truth-first del boundary `local/` già auditato e solo dopo rivalutare quality gates post-doc-sync, ristrutturazione repository ed espansione architetturale.
 
 ### D5 — Allineamento owner docs — ⬜
 **Obiettivo**

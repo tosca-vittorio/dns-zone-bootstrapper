@@ -3,7 +3,7 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: **consolidati sul branch `development` il primo delta `M6` di hardening UI della demo web e l'avanzamento iniziale `D4` come utility repo-owned Python di cleanup conservativo nel commit `100e6a1`; `D1`, `D2` e `D3` risultano chiusi, mentre restano ancora non avviati il riallineamento architetturale profondo, l'audit strutturale del repository, la valutazione del boundary `local/` e l'eventuale integrazione ergonomica del cleanup in CLI/Web UI**
+> Scope corrente: **consolidati sul branch `development` il primo delta `M6` di hardening UI della demo web e l'avanzamento iniziale `D4` come utility repo-owned Python di cleanup conservativo nel commit `100e6a1`; `D1`, `D2` e `D3` risultano chiusi, mentre restano ancora non avviati il riallineamento architetturale profondo, l'audit strutturale del repository e l'eventuale integrazione ergonomica del cleanup in CLI/Web UI; l'audit read-only del boundary `local/` è stato eseguito e ha chiarito il suo ruolo di override runtime opzionale gitignored/non pacchettizzato, ma il relativo doc sync truth-first non è ancora consolidato**
 
 #### D4 — Introduzione utility repo-owned Python di cleanup conservativo
 
@@ -18,7 +18,7 @@
 - commit pubblicato su `origin/development`.
 
 ##### Stato del blocco
-- **`D4` aperta in forma truth-first come utility Python repo-owned introdotta e verificata empiricamente; restano da valutare separatamente quality gates globali post-doc-sync, integrazione ergonomica in CLI/Web UI e audit del boundary `local/`**
+- **`D4` aperta in forma truth-first come utility Python repo-owned introdotta e verificata empiricamente; restano da valutare separatamente quality gates globali post-doc-sync e integrazione ergonomica in CLI/Web UI, mentre l'audit read-only del boundary `local/` è stato eseguito ma il relativo doc sync truth-first non è ancora consolidato**
 
 #### D3 — Fencing runtime canonico dei quality gates e boundary `tmp/`
 

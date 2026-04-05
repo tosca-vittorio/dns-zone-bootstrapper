@@ -108,17 +108,20 @@ Il progetto versiona un profilo fixed public-safe, utile per:
 - condivisione del repository senza esporre valori operativi sensibili.
 
 ### Override locale gitignored
-Quando serve usare valori concreti reali in locale, il runtime può caricare un modulo gitignored:
+Quando serve usare valori concreti reali in locale, il runtime può risolvere un override gitignored esterno al package versionato.
 
-- modulo: `local.dns_zone_profile`
+- modulo logico atteso: `local.dns_zone_profile`
+- file locale supportato: `./local/dns_zone_profile.py` rispetto alla current working tree
 - simbolo atteso: `ACTIVE_FIXED_DNS_PROFILE`
 
 Il comportamento runtime è questo:
 
-- se l'override locale non esiste, il sistema usa `PUBLIC_SAFE_FIXED_DNS_PROFILE`;
-- se l'override locale esiste, il sistema usa `ACTIVE_FIXED_DNS_PROFILE`.
+- il boundary applicativo chiama solo `resolve_active_fixed_dns_profile()`;
+- il resolver prova prima l'import standard di `local.dns_zone_profile`;
+- se il top-level package `local` non è risolvibile, prova il caricamento esplicito del file `./local/dns_zone_profile.py` rispetto alla current working tree;
+- se anche il file locale non esiste, il sistema usa `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
 
-In questo modo il repository resta public-safe, ma il runtime locale può lavorare con valori fixed concreti non versionati.
+In questo modo il repository resta public-safe e versionabile, mentre il runtime locale può usare valori fixed concreti non versionati senza far entrare `local/` nel package installato.
 
 ## Note operative su Cloudflare
 

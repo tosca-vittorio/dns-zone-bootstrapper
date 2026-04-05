@@ -62,7 +62,7 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 - riallineare gli owner docs dopo l'introduzione del cleanup utility Python repo-owned;
 - consolidare la presenza di `tools/cleanup_runtime_artifacts.py` come utility safe-by-default;
 - auditare parti legacy, obsolete o poco leggibili del repository con criterio truth-first;
-- chiarire il ruolo del boundary `local/` gitignored e documentarlo meglio;
+- riallineare README, ARCHITECTURE e TIMELINE al contratto auditato del boundary `local/` gitignored, prima di qualunque decisione su mantenimento, ristrutturazione o sostituzione;
 - valutare solo in un secondo momento l'eventuale integrazione del cleanup in CLI o demo web.
 
 ### EXTRA — Espansione architetturale completa del repository — ⬜
