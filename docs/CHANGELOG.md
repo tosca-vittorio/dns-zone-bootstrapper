@@ -3,7 +3,7 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: **consolidati sul branch `development` il primo delta `M6` di hardening UI della demo web e l'avanzamento iniziale `D4` come utility repo-owned Python di cleanup conservativo nel commit `100e6a1`; `D1`, `D2` e `D3` risultano chiusi; l'audit read-only del boundary `local/` è stato eseguito e il relativo doc sync truth-first è stato consolidato nel commit `a1a749f`, seguito da quality-gate snapshot post-doc-sync verde; restano ancora non avviati il riallineamento architetturale profondo, l'audit strutturale del repository e l'eventuale integrazione ergonomica del cleanup in CLI/Web UI**
+> Scope corrente: **chiusura truth-first dello stato operativo del branch `development`: `M6`, `D1`, `D2`, `D3` e `D4` vengono considerati chiusi nella forma realmente consolidata sul repository; il boundary `local/` risulta già auditato e documentato; non restano blocchi tecnici attivi da proseguire sulla v1, mentre audit strutturale completo del repository, integrazione ergonomica del cleanup in CLI/Web UI ed espansione architetturale completa vengono riclassificati come backlog/extra non bloccante**
 
 #### D4 — Introduzione utility repo-owned Python di cleanup conservativo
 
@@ -18,7 +18,7 @@
 - commit pubblicato su `origin/development`.
 
 ##### Stato del blocco
-- **`D4` aperta in forma truth-first come utility Python repo-owned introdotta e verificata empiricamente; l'audit del boundary `local/`, il relativo doc sync owner e il quality-gate snapshot post-doc-sync risultano consolidati, mentre restano da valutare separatamente audit strutturale del repository, riallineamento architetturale profondo e integrazione ergonomica in CLI/Web UI**
+- **`D4` chiusa in forma truth-first come utility Python repo-owned introdotta, verificata empiricamente, documentata e consolidata con doc sync owner + quality-gate snapshot post-doc-sync; audit strutturale completo del repository, riallineamento architetturale profondo e integrazione ergonomica in CLI/Web UI vengono riclassificati come backlog/extra non bloccante e non come prerequisiti di chiusura del progetto**
 
 #### D3 — Fencing runtime canonico dei quality gates e boundary `tmp/`
 
@@ -72,7 +72,7 @@
 ##### Quality gates (snapshot corrente)
 - `python -m pytest -q` → `79 passed`
 - `python -m pylint src tests` → `10.00/10`
-- Stato del blocco: **primo delta tecnico `M6` consolidato nel commit `af20290`; doc gate owner truth-first ora chiuso sul branch `development`; backlog residuo non bloccante classificato, ma nessun freeze documentale `M6` ancora consolidato nella storia Git**
+- Stato del blocco: **`M6` chiusa nella forma realmente consolidata sul repository: primo delta tecnico UI introdotto dal commit `af20290`, doc gate owner truth-first chiuso su `development` e backlog residuo riclassificato come non bloccante, senza ulteriori aperture tecniche necessarie per la chiusura del progetto**
 
 #### M5 — Chiusura documentale essenziale e preparazione audit UI
 

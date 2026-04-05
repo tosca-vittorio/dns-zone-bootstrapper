@@ -212,10 +212,12 @@ Le decisioni architetturali principali attualmente congelate sono:
 * boundary dedicato per la risoluzione runtime del profilo fixed;
 * repository public-safe per default, con override locale solo fuori versionamento.
 
-## Limite attuale principale
+## Stato di chiusura attuale
 
-Il limite residuo principale non è il core applicativo, ma la comprensibilità del prodotto per un lettore esterno.
-Per questo il progetto è entrato in una fase documentale dedicata: prima chiarire bene il prodotto, poi preparare la comunicazione/consegna verso l'azienda, e solo dopo valutare polish UI o Docker.
+Il progetto si considera chiuso nella forma attuale della v1.
+La demo web, il core applicativo, la validazione empirica Cloudflare, i quality gates e i documenti owner risultano sufficientemente consolidati per una chiusura stabile del repository.
+
+Restano soltanto backlog ed extra non bloccanti, come eventuali raffinamenti UI/UX, Docker/exportability, integrazione ergonomica del cleanup ed estensioni future del prodotto.
 
 ## Evoluzioni future possibili
 

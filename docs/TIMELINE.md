@@ -4,8 +4,8 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` resta consolidata sul primo delta UI introdotto dal commit `af20290`; `D1`, `D2` e `D3` risultano chiusi; `D4` non è più da intendere come utility Bash ma è ora aperta in forma truth-first come **utility repo-owned Python di cleanup conservativo**, introdotta dal commit `100e6a1` (`build(runtime): add conservative cleanup utility tool`); `D5`, `D6`, `D7` e tutti i blocchi `E*` non sono ancora avviati.
-- Obiettivo immediato: aprire un audit read-only della struttura reale del repository successivo al consolidamento documentale del boundary `local/` e al quality-gate snapshot post-doc-sync di `D4`, senza aprire automaticamente integrazione del cleanup in CLI/Web UI o espansioni architetturali larghe.
+- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` si considera chiusa nella forma effettivamente consolidata dal commit `af20290`; `D1`, `D2`, `D3` e `D4` risultano chiusi nella forma realmente raggiunta sul repository; non sono presenti blocchi tecnici attivi da proseguire sulla v1. `D5`, `D6`, `D7` e tutti i blocchi `E*` restano non avviati e classificati come backlog/extra non bloccante, non come lavoro aperto.
+- Obiettivo immediato: chiusura truth-first dello stato operativo del progetto nella forma attuale, senza aprire ulteriori audit strutturali, integrazione del cleanup in CLI/Web UI o espansioni architetturali larghe.
 - Ultimo consolidamento `D1`: `python -m pytest -q` e `python -m pylint src tests` risultano già usati in modo stabile come quality gates canonici del repository, esplicitati nel `README.md`, presenti nel tooling (`pyproject.toml`) e richiamati in modo coerente nelle evidenze degli owner docs; il presente riallineamento truth-first chiude `D1` come blocco documentale senza introdurre nuovo tooling, nuove dipendenze o soglie aggiuntive.
 - Ultimo consolidamento `D2`: il commit `876c421` (`test(coverage): establish package-only baseline and residual coverage`) introduce `coverage` nelle dev dependencies, riallinea il freeze operativo `requirements.txt`, pulisce `src/dns_zone_bootstrapper/interfaces/__init__.py` rimuovendo una legacy CLI duplicata e aggiunge `tests/test_coverage_residuals.py` per coprire i miss residui a basso rischio; la baseline coverage package-only viene misurata sul solo namespace `dns_zone_bootstrapper` con risultato `230 stmt`, `0 miss`, `100%`, senza introdurre soglie minime arbitrarie.
 - Ultimo consolidamento `D3`: il commit `7dd4972` (`build(runtime): add bytecode-free quality gates wrapper`) introduce `run_quality_gates.py` come wrapper repo-owned per eseguire `pytest`, `pylint` e `coverage` in modo bytecode-free nei touchpoint che rigeneravano `__pycache__/` e `*.pyc`; insieme al micro-step già consolidato nel commit `441c954` su `tmp/.pytest_cache` e `tmp/.coverage`, il boundary runtime dei quality gates risulta ora difendibile senza modificare il contratto utente o il flusso principale del prodotto. I quality gates restano verdi (`python run_quality_gates.py` → `pytest 83 passed`, `pylint 10.00/10`, `coverage 230 stmt`, `0 miss`, `100%`) e l’audit post-run del wrapper non osserva `__pycache__/` o `*.pyc` fuori da `tmp`.
@@ -56,7 +56,7 @@ Riscrivere/espandere `docs/ARCHITECTURE.md` in forma esaustiva, spiegando in det
 **Obiettivo**
 Valutare se e come esporre il cleanup conservativo tramite una superficie ergonomica aggiuntiva (`dns-zone-cli` oppure demo web), mantenendo opt-in esplicito, protezioni forti e assenza di ambiguità tra run principale del prodotto e operazioni di hygiene locale.
 
-### EXTRA — Audit del boundary `local/` gitignored — 🟡
+### EXTRA — Audit del boundary `local/` gitignored — ✅
 **Obiettivo**
 Congelare in modo truth-first il ruolo reale del boundary `local/`, il contratto di risoluzione runtime e le implicazioni di packaging/onboarding, prima di decidere eventuale riallineamento documentale più ampio o una futura rivalutazione strutturale.
 
@@ -558,7 +558,7 @@ Formalizzare un boundary runtime che convogli cache, output temporanei e artefat
 - `D3` si considera chiusa come boundary canonico dei quality gates e dei relativi artefatti runtime;
 - il passo successivo corretto va determinato con un nuovo audit conservativo, senza aprire automaticamente `D4` o `Docker/exportability`.
 
-### D4 — Utility repo-owned Python di cleanup conservativo degli artefatti runtime — 🟡
+### D4 — Utility repo-owned Python di cleanup conservativo degli artefatti runtime — ✅
 **Obiettivo**
 Introdurre e consolidare un tool repo-owned che pulisca in modo sicuro artefatti runtime rigenerabili, mantenendo boundary protetti, comportamento conservativo e output verificabile.
 
@@ -577,7 +577,7 @@ Introdurre e consolidare un tool repo-owned che pulisca in modo sicuro artefatti
 - la pulizia soft della venv è ammessa solo tramite `--include-venv`, limitata a `__pycache__/`, `*.pyc` e `*.pyo`;
 - quality gates globali post-doc-sync su questo delta eseguiti con esito verde (`python run_quality_gates.py` → `pytest 83 passed`, `pylint 10.00/10`, `coverage 230 stmt`, `0 miss`, `100%`) e working tree pulita prima/dopo il run;
 - audit read-only del boundary `local/` eseguito e relativo doc sync truth-first consolidato a commit;
-- il blocco resta comunque aperto perché non sono ancora stati eseguiti: riallineamento architetturale completo e valutazione separata dell'eventuale integrazione ergonomica del cleanup in CLI/Web UI.
+- il blocco si considera chiuso nella forma realmente consolidata: il tool repo-owned Python è stato introdotto, verificato empiricamente, documentato e seguito da doc sync + quality-gate snapshot verde; eventuale riallineamento architetturale completo o integrazione ergonomica del cleanup in CLI/Web UI vengono riclassificati come backlog/extra non bloccante e non come prerequisiti di chiusura del progetto.
 
 **Evidenze correnti**
 - commit consolidato e pubblicato: `100e6a1` — `build(runtime): add conservative cleanup utility tool`;
@@ -586,8 +586,10 @@ Introdurre e consolidare un tool repo-owned che pulisca in modo sicuro artefatti
 - audit residuo successivo all'apply → nessun target residuo osservato nel perimetro coperto dal tool;
 - `tools/cleanup_runtime_artifacts.py` e `tools/README.md` presenti nel repository.
 
-**Nota operativa**
-- il passo successivo corretto non è ampliare subito il tool o integrarlo in UI, ma aprire prima un audit read-only della struttura reale del repository e solo dopo rivalutare eventuale espansione architetturale o integrazione ergonomica del cleanup.
+**Nota di chiusura D4**
+- `D4` si considera chiusa in modo conservativo e truth-first;
+- il repository ha raggiunto un assetto stabile e difendibile per la v1;
+- gli eventuali approfondimenti ulteriori su audit strutturale completo del repository, integrazione ergonomica del cleanup e rafforzamento architetturale restano extra futuri, non lavoro attivo.
 
 ### D5 — Allineamento owner docs — ⬜
 **Obiettivo**

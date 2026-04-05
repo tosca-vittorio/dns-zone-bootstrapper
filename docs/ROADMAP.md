@@ -1,6 +1,6 @@
 # ROADMAP
 
-- Priorità attiva corrente: dopo il consolidamento tecnico del commit `100e6a1`, il repository non è più fermo al solo delta `M6` di hardening UI; è presente anche un primo tool repo-owned di cleanup conservativo in `tools/cleanup_runtime_artifacts.py`, che apre ora una nuova area di hygiene runtime e di audit strutturale su repository, boundary `local/`, possibile integrazione ergonomica del cleanup e rafforzamento di `ARCHITECTURE.md`. `Responsive refinement`, feedback utente ulteriori e `Docker/exportability` restano backlog non bloccante.
+- Priorità attiva corrente: nessun blocco tecnico attivo da proseguire sulla v1. Il repository viene considerato chiuso nella forma attuale e stabile raggiunta su `development`: demo web minimale funzionante, generazione file `.txt` import-ready, validazione empirica Cloudflare, owner docs riallineati e hygiene runtime sufficiente. Eventuali approfondimenti ulteriori su audit strutturale del repository, integrazione ergonomica del cleanup, espansione architetturale completa, responsive refinement, feedback utente aggiuntivi e `Docker/exportability` restano backlog/extra non bloccante.
 
 ## Missione del progetto
 
@@ -51,19 +51,19 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 - introdurre una guida utente dedicata solo se realmente necessaria;
 - preparare il report/messaggio di stato verso l'azienda e sbloccare la prima consegna/demo.
 
-### M6 — Primo delta di hardening UI della demo web — 🟡
+### M6 — Primo delta di hardening UI della demo web — ✅
 - primo delta consolidato: hardening UI della pagina web e riallineamento del contratto bootstrap testuale;
 - UI minimale difendibile con CSS;
-- doc gate owner truth-first ora chiuso sul branch `development`;
+- doc gate owner truth-first chiuso sul branch `development`;
 - responsive refinement e feedback utente ulteriori classificati come backlog non bloccante;
-- eventuale freeze documentale/handoff da valutare separatamente come passaggio successivo, non ancora consolidato a commit.
+- milestone chiusa nella forma effettivamente raggiunta, senza ulteriori aperture tecniche necessarie per la chiusura del progetto.
 
-### M6.5 — Hygiene runtime e razionalizzazione strutturale del repository — 🟡
+### M6.5 — Hygiene runtime e razionalizzazione strutturale del repository — ✅
 - consolidati il doc sync owner successivo all'introduzione del cleanup utility Python repo-owned e il riallineamento truth-first del boundary `local/`;
 - consolidato il quality-gate snapshot post-doc-sync su `development`;
-- auditare parti legacy, obsolete o poco leggibili del repository con criterio truth-first;
-- usare l'audit strutturale del repository come prossimo micro-step chiarificatore prima di eventuali aperture architetturali più larghe;
-- valutare solo in un secondo momento l'eventuale integrazione del cleanup in CLI o demo web.
+- classificato in modo sufficiente e conservativo il perimetro di hygiene runtime utile alla chiusura del progetto;
+- eventuali audit strutturali più ampi del repository, integrazione del cleanup in CLI/demo web e rafforzamenti architetturali ulteriori rinviati a backlog/extra non bloccante;
+- milestone chiusa nella forma realmente necessaria alla chiusura del progetto.
 
 ### EXTRA — Espansione architetturale completa del repository — ⬜
 - riscrivere/espandere `docs/ARCHITECTURE.md` in forma esaustiva;
