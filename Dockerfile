@@ -1,0 +1,29 @@
+FROM python:3.11-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY pyproject.toml README.md /app/
+COPY src /app/src
+
+RUN python -m pip install --upgrade pip && \
+    python -m pip install --no-cache-dir /app
+
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY --from=builder /usr/local /usr/local
+
+RUN useradd --create-home --shell /usr/sbin/nologin appuser
+USER appuser
+
+EXPOSE 8000
+
+CMD ["python", "-m", "uvicorn", "dns_zone_bootstrapper.interfaces.web.app:app", "--host", "0.0.0.0", "--port", "8000"]
