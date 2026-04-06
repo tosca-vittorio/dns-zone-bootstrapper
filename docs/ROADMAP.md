@@ -1,6 +1,6 @@
 # ROADMAP
 
-- Priorità attiva corrente: nessun blocco tecnico attivo da proseguire sulla v1. Il repository viene considerato chiuso nella forma attuale e stabile raggiunta su `development`: demo web minimale funzionante, generazione file `.txt` import-ready, validazione empirica Cloudflare, owner docs riallineati e hygiene runtime sufficiente. Eventuali approfondimenti ulteriori su audit strutturale del repository, integrazione ergonomica del cleanup, espansione architetturale completa, responsive refinement, feedback utente aggiuntivi e `Docker/exportability` restano backlog/extra non bloccante.
+- Priorità attiva corrente: la baseline v1 public-safe, inclusa la baseline Docker minimale, è consolidata; il prossimo passo corretto non è ancora l’audit strutturale largo del repository, ma l’apertura conservativa di `D8`, per congelare il contratto finale del profilo fixed concreto e riclassificare `local/` come boundary tecnico transitorio rispetto al target di prodotto a input unico (`dominio`).
 
 ## Missione del progetto
 
@@ -64,6 +64,20 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 - classificato in modo sufficiente e conservativo il perimetro di hygiene runtime utile alla chiusura del progetto;
 - eventuali audit strutturali più ampi del repository, integrazione del cleanup in CLI/demo web e rafforzamenti architetturali ulteriori rinviati a backlog/extra non bloccante;
 - milestone chiusa nella forma realmente necessaria alla chiusura del progetto.
+
+### D6 — Packaging/demo finale e Docker/exportability — ✅
+- `.dockerignore` e `Dockerfile` introdotti nel commit `1e0b68e`;
+- build reale del container eseguita con successo;
+- smoke runtime verificato su `GET /` e `GET /generate?domain=testdomain.com`;
+- baseline container attuale chiusa come public-safe: `local/` è escluso dal build context e l’output nel container usa quindi i placeholder versionati;
+- un successivo tentativo di bind mount di `local/` da Git Bash su Windows non ha materializzato `/app/local` nel container e non costituisce quindi evidenza di supporto consolidato agli override locali nel runtime containerizzato;
+- milestone chiusa nella forma realmente consolidata: packaging Docker minimale public-safe, riproducibile e smoke-testato; eventuale supporto futuro ai valori locali concreti nel container rinviato a backlog/extra separato.
+
+### D8 — Canonicalizzazione del profilo fixed concreto e superamento del boundary `local/` — 🟡
+- congelare la decisione progettuale secondo cui il prodotto finale è a template fixed canonico;
+- chiarire che `local/` non appartiene al contratto utente finale ma all’AS-IS tecnico transitorio;
+- preparare un riallineamento conservativo che porti il profilo fixed concreto in una forma finale esplicita, stabile e compatibile con la distribuzione del prodotto;
+- solo dopo questo chiarimento sarà sensato aprire l’audit strutturale largo del repository e la pulizia dei residui legacy.
 
 ### EXTRA — Espansione architetturale completa del repository — ⬜
 - riscrivere/espandere `docs/ARCHITECTURE.md` in forma esaustiva;

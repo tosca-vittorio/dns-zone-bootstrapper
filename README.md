@@ -89,7 +89,7 @@ La v1 non fa ancora, per scelta di scope, le seguenti cose:
 - non espone campi variabili aggiuntivi oltre al dominio;
 - non offre preview del file prima del download;
 - non integra direttamente le API Cloudflare;
-- non punta ancora a ulteriori raffinamenti UI/UX, responsive refinement o packaging Docker oltre al primo delta minimale di hardening UI già consolidato;
+- non supporta automaticamente nel runtime Docker il boundary gitignored `local/`: la baseline containerizzata validata resta public-safe e usa di default il profilo versionato;
 - non replica integralmente l'export Cloudflare originale;
 - non include il record `SOA` nel perimetro runtime della v1.
 
@@ -168,6 +168,25 @@ Alternativa tecnica equivalente:
 python -m uvicorn dns_zone_bootstrapper.interfaces.web.app:app --reload
 ```
 
+## Esecuzione Docker minima
+
+Baseline validata empiricamente del packaging containerizzato:
+
+```bash
+docker build -t dns-zone-bootstrapper:local .
+docker run --rm -p 8000:8000 dns-zone-bootstrapper:local
+```
+
+Contratto osservato della prima immagine Docker validata:
+
+* il container espone correttamente la demo su `http://127.0.0.1:8000`;
+* `GET /` restituisce `200 OK`;
+* `GET /generate?domain=testdomain.com` restituisce `200 OK`;
+* l'output nel container usa il profilo public-safe versionato e quindi mostra placeholder `__FIXED_*__`;
+* questo comportamento è atteso, perché `.dockerignore` esclude `local/` e il `Dockerfile` copia solo gli asset versionati minimi necessari al runtime.
+
+Questa validazione Docker chiude la baseline minima containerizzata public-safe della demo web: build reale, avvio del container e smoke runtime risultano verificati. L’eventuale supporto futuro ai valori fixed concreti locali nel container richiederà un meccanismo esplicito e documentato e non fa parte della chiusura attuale.
+
 ## Uso della demo
 
 La demo web v1 è volutamente minimale:
@@ -214,10 +233,13 @@ Le decisioni architetturali principali attualmente congelate sono:
 
 ## Stato di chiusura attuale
 
-Il progetto si considera chiuso nella forma attuale della v1.
-La demo web, il core applicativo, la validazione empirica Cloudflare, i quality gates e i documenti owner risultano sufficientemente consolidati per una chiusura stabile del repository.
+Il repository si considera stabile e difendibile come baseline v1 public-safe: demo web, core applicativo, validazione empirica Cloudflare, quality gates e baseline Docker minimale risultano consolidati.
 
-Restano soltanto backlog ed extra non bloccanti, come eventuali raffinamenti UI/UX, Docker/exportability, integrazione ergonomica del cleanup ed estensioni future del prodotto.
+Non si considera però ancora chiusa, senza ulteriori riallineamenti, la forma finale del prodotto autonomo. Allo stato attuale il repository versionato mantiene un profilo public-safe e supporta ancora il boundary `local/` come override runtime opzionale per valori fixed concreti.
+
+Decisione progettuale congelata: il target finale del prodotto resta un workflow a input unico (`dominio`) con template fixed canonico applicato automaticamente dal software. In questa prospettiva `local/` non va considerato parte del contratto utente finale, ma un boundary tecnico transitorio dell'AS-IS, da superare o riclassificare in modo esplicito con un successivo blocco conservativo.
+
+Restano quindi backlog ed extra non bloccanti su UI/UX, cleanup ergonomico e possibili estensioni future del prodotto, ma prima dell’audit strutturale largo del repository resta aperto il chiarimento/assestamento definitivo del profilo fixed concreto.
 
 ## Evoluzioni future possibili
 

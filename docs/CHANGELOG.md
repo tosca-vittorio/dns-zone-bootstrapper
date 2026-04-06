@@ -3,7 +3,24 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: **chiusura truth-first dello stato operativo del branch `development`: `M6`, `D1`, `D2`, `D3` e `D4` vengono considerati chiusi nella forma realmente consolidata sul repository; il boundary `local/` risulta già auditato e documentato; non restano blocchi tecnici attivi da proseguire sulla v1, mentre audit strutturale completo del repository, integrazione ergonomica del cleanup in CLI/Web UI ed espansione architetturale completa vengono riclassificati come backlog/extra non bloccante**
+> Scope corrente: **chiusa in forma truth-first `D6` come baseline Docker minimale public-safe realmente introdotta e validata empiricamente sul branch `development`; `M6`, `D1`, `D2`, `D3` e `D4` restano chiusi nella forma consolidata sul repository; viene però riaperto in forma conservativa un blocco attivo di chiarimento del profilo fixed concreto, congelando la decisione progettuale secondo cui il prodotto finale resta a template fixed canonico e `local/` va considerato boundary tecnico transitorio, non contratto utente finale**
+
+#### D6 — Packaging/demo finale e Docker/exportability
+
+- **`1e0b68e` — `build(docker): add minimal hardened container runtime`**
+  - **Type:** ADDED · **Categoria:** Docker / Packaging / Container runtime
+  - **Cosa cambia:** introduce `.dockerignore` e `Dockerfile` multi-stage minimale con runtime non-root (`appuser`), installazione del package dal progetto versionato e avvio della demo tramite `uvicorn` su `0.0.0.0:8000`.
+  - **Impatto:** apre `D6` in forma conservativa, perché il repository dispone ora di una prima superficie containerizzata realmente buildabile ed eseguibile. La validazione empirica mostra però che l'immagine corrente usa solo il profilo public-safe versionato: `local/` è escluso dal build context, quindi il container non carica automaticamente valori fixed concreti locali.
+
+##### Evidenze operative correnti
+- `docker build -t dns-zone-bootstrapper:local .` → build completata con successo;
+- `docker run -d --name dns-zone-bootstrapper-smoke -p 8000:8000 dns-zone-bootstrapper:local` → container avviato;
+- `curl -i http://127.0.0.1:8000/` → `200 OK`;
+- `curl -i "http://127.0.0.1:8000/generate?domain=testdomain.com"` → `200 OK`;
+- `docker logs dns-zone-bootstrapper-smoke` → startup `uvicorn` regolare, nessun crash osservato.
+
+##### Stato del blocco
+- **`D6` chiusa in forma truth-first come packaging Docker minimale public-safe introdotto, buildato e smoke-testato; il successivo tentativo di bind mount di `local/` da Git Bash su Windows non ha materializzato `/app/local` nel container e quindi non costituisce evidenza di supporto consolidato agli override locali nel runtime containerizzato, che resta backlog/extra separato**
 
 #### D4 — Introduzione utility repo-owned Python di cleanup conservativo
 

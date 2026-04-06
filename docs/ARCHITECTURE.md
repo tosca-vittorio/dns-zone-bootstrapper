@@ -67,6 +67,49 @@ Questa struttura implica che:
 
 Nel runtime osservato, il file prodotto dal generatore attraverso questo boundary è stato importato con successo in Cloudflare quando la zona target era pulita. Un primo failure sul record `www` è stato attribuito a collisioni con record preesistenti nella zona di laboratorio, non al formato del file generato.
 
+### 5.1 Decisione progettuale congelata sul ruolo di `local/`
+
+Lo stato AS-IS del repository supporta ancora un override runtime opzionale tramite `local/`, utile a tenere fuori dal versionamento valori fixed concreti e sensibili.
+
+Tuttavia, in assenza di nuovi vincoli esterni e coerentemente con il contratto funzionale del prodotto chiarito in discovery, viene congelata una decisione progettuale più forte: il target finale del software resta un prodotto a input unico (`dominio`) che applica automaticamente un template fixed canonico.
+
+Ne consegue che:
+
+- `local/` non va considerato parte del contratto utente finale;
+- `local/` rappresenta un boundary tecnico transitorio dell’AS-IS;
+- la baseline public-safe versionata resta utile come superficie sicura per test, handoff e condivisione del repository;
+- la chiusura finale del prodotto autonomo richiederà un riallineamento successivo e conservativo del profilo fixed concreto, così da superare o sostituire in modo esplicito la dipendenza architetturale da override locali impliciti.
+
+### 6. Packaging Docker minimale e boundary del contesto build
+
+Il repository dispone ora di una prima baseline containerizzata valida, introdotta tramite `Dockerfile` multi-stage e `.dockerignore`.
+
+Il comportamento architetturale osservato è questo:
+
+- il `Dockerfile` copia solo `pyproject.toml`, `README.md` e `src/`;
+- il package viene installato dentro l'immagine a partire dagli asset versionati;
+- il runtime espone la demo FastAPI tramite `uvicorn` sulla porta `8000`;
+- il processo applicativo gira come utente non-root `appuser`.
+
+Il `.dockerignore` esclude dal build context aree non necessarie al runtime containerizzato, tra cui:
+
+- ambienti virtuali;
+- cache e artefatti di coverage/test;
+- `tmp/`;
+- `docs/`;
+- `tests/`;
+- `local/`;
+- file locali di supporto non necessari alla demo runtime.
+
+Ne deriva un contratto importante:
+
+- la prima immagine Docker validata è riproducibile e public-safe;
+- il container non dipende da asset locali gitignored;
+- il boundary `local/` non entra automaticamente nell'immagine;
+- l'endpoint `/generate` nel container usa quindi il profilo versionato `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
+
+Questo significa che la containerizzazione attuale valida la portabilità della demo web, ma non replica automaticamente il comportamento locale con valori concreti presenti in `local/`. Un eventuale supporto futuro ai valori locali concreti nel container dovrà essere introdotto con un meccanismo esplicito e documentato, non implicito.
+
 ## Macro-struttura del repository
 
 ```text

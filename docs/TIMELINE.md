@@ -4,15 +4,15 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5` è chiusa; `M6` si considera chiusa nella forma effettivamente consolidata dal commit `af20290`; `D1`, `D2`, `D3` e `D4` risultano chiusi nella forma realmente raggiunta sul repository; non sono presenti blocchi tecnici attivi da proseguire sulla v1. `D5`, `D6`, `D7` e tutti i blocchi `E*` restano non avviati e classificati come backlog/extra non bloccante, non come lavoro aperto.
-- Obiettivo immediato: chiusura truth-first dello stato operativo del progetto nella forma attuale, senza aprire ulteriori audit strutturali, integrazione del cleanup in CLI/Web UI o espansioni architetturali larghe.
+- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5`, `M6`, `D1`, `D2`, `D3`, `D4` e `D6` risultano chiusi nella forma realmente raggiunta sul repository; viene ora aperto `D8` come blocco attivo di chiarimento e assestamento del contratto del profilo fixed concreto rispetto al target finale del prodotto; `D0`, `D5`, `D7` e i blocchi `E*` restano non avviati.
+- Obiettivo immediato: congelare in forma truth-first la decisione progettuale secondo cui il prodotto finale deve applicare un template fixed canonico con unico input utente `dominio`, riclassificando `local/` come boundary tecnico transitorio dell’AS-IS e preparando il successivo riallineamento conservativo del profilo fixed concreto.
 - Ultimo consolidamento `D1`: `python -m pytest -q` e `python -m pylint src tests` risultano già usati in modo stabile come quality gates canonici del repository, esplicitati nel `README.md`, presenti nel tooling (`pyproject.toml`) e richiamati in modo coerente nelle evidenze degli owner docs; il presente riallineamento truth-first chiude `D1` come blocco documentale senza introdurre nuovo tooling, nuove dipendenze o soglie aggiuntive.
 - Ultimo consolidamento `D2`: il commit `876c421` (`test(coverage): establish package-only baseline and residual coverage`) introduce `coverage` nelle dev dependencies, riallinea il freeze operativo `requirements.txt`, pulisce `src/dns_zone_bootstrapper/interfaces/__init__.py` rimuovendo una legacy CLI duplicata e aggiunge `tests/test_coverage_residuals.py` per coprire i miss residui a basso rischio; la baseline coverage package-only viene misurata sul solo namespace `dns_zone_bootstrapper` con risultato `230 stmt`, `0 miss`, `100%`, senza introdurre soglie minime arbitrarie.
 - Ultimo consolidamento `D3`: il commit `7dd4972` (`build(runtime): add bytecode-free quality gates wrapper`) introduce `run_quality_gates.py` come wrapper repo-owned per eseguire `pytest`, `pylint` e `coverage` in modo bytecode-free nei touchpoint che rigeneravano `__pycache__/` e `*.pyc`; insieme al micro-step già consolidato nel commit `441c954` su `tmp/.pytest_cache` e `tmp/.coverage`, il boundary runtime dei quality gates risulta ora difendibile senza modificare il contratto utente o il flusso principale del prodotto. I quality gates restano verdi (`python run_quality_gates.py` → `pytest 83 passed`, `pylint 10.00/10`, `coverage 230 stmt`, `0 miss`, `100%`) e l’audit post-run del wrapper non osserva `__pycache__/` o `*.pyc` fuori da `tmp`.
 - Ultimo consolidamento `D4`: il commit `100e6a1` (`build(runtime): add conservative cleanup utility tool`) introduce `tools/cleanup_runtime_artifacts.py` e `tools/README.md` come utility repo-owned di pulizia conservativa degli artefatti runtime repo-locali. Il tool opera in dry-run di default, protegge sempre `.git/` e `tmp/`, esclude per default gli ambienti virtuali, consente opt-in esplicito tramite `--apply`, `--verbose`, `--include-venv` e `--skip-root-guard`, ed è stato verificato empiricamente sia in dry-run sia in apply con rimozione dei target individuati e successivo audit a repo pulita rispetto ai target coperti. Il consolidamento tecnico load-bearing del blocco resta il commit `100e6a1`; successivamente, dopo il doc sync del boundary `local/`, è stato eseguito anche il quality-gate snapshot post-doc-sync con esito verde (`python run_quality_gates.py` → `pytest 83 passed`, `pylint 10.00/10`, `coverage 230 stmt`, `0 miss`, `100%`) e working tree pulita prima/dopo il run.
 - Ultimo consolidamento `M5` / delivery bootstrap: il commit `b6f498e` (`fix(templates): load local override from working tree fallback`) ha reso più robusto `resolve_active_fixed_dns_profile()`, mantenendo come priorità l'import normale di `local.dns_zone_profile` ma introducendo, quando il top-level package `local` non è risolvibile nel contesto del console entrypoint installato, un fallback esplicito a `./local/dns_zone_profile.py` rispetto alla working tree corrente; il boundary è stato coperto con test dedicati su fallback public-safe in cwd isolata e su caricamento dell'override locale dalla working tree (`python -m pytest -q tests/test_profile_resolver.py` → `3 passed`, `python -m pylint src tests` → `10.00/10`) e validato di nuovo end-to-end con `dns-zone-cli web` + `curl /generate?domain=testdomain.com`, che ora restituisce valori concreti coerenti con il profilo locale.
 - Valutazione congelata dello stato v1: il prodotto è coerente con la richiesta ricevuta, funziona nella sostanza della v1, il workflow `dominio -> file .txt -> import Cloudflare` resta tecnicamente difendibile e anche il bootstrap dichiarato della demo (`dns-zone-cli web`) risulta ora riallineato al comportamento atteso con override locale attivo.
-- Gap principale residuo classificato: il core e il delivery path non rappresentano più il focus prioritario; il backlog non bloccante resta concentrato su raffinamenti presentazionali/UI, feedback utente ulteriori e `Docker/exportability`, coerentemente con l'apertura tecnica di `M6` e con la chiusura del relativo doc gate owner.
+- Gap principale residuo classificato: il focus prioritario non è più sul core o sulla delivery surface della baseline v1, ma sul chiarimento del contratto finale del profilo fixed concreto rispetto al target di prodotto a input unico; raffinamenti UI, feedback utente ulteriori, audit strutturale largo del repository e ulteriori estensioni Docker restano secondari o backlog non bloccante.
 - Sequenza prioritaria congelata post-validazione empirica:
   1. rafforzamento del `README.md` come documento di ingresso al prodotto;
   2. chiarimento architetturale e concettuale nei documenti owner già esistenti, dove necessario;
@@ -70,7 +70,7 @@ Congelare in modo truth-first il ruolo reale del boundary `local/`, il contratto
 **Stato**
 - audit read-only eseguito e classificazione AS-IS chiarita;
 - doc sync truth-first consolidato nei documenti owner tramite commit `a1a749f` pubblicato su `origin/development`;
-- nessuna decisione è ancora stata aperta su refactor, sostituzione o integrazione diversa del boundary.
+- successivamente il repository ha aperto in forma conservativa `D8`, congelando la decisione progettuale secondo cui `local/` non appartiene al contratto utente finale ma rappresenta un boundary tecnico transitorio rispetto al target di prodotto a input unico.
 
 ## Cycle A — Discovery, baseline e design — ☑️
 
@@ -595,19 +595,67 @@ Introdurre e consolidare un tool repo-owned che pulisca in modo sicuro artefatti
 **Obiettivo**
 Consolidare e riallineare i documenti owner quando i blocchi tecnici saranno maturi.
 
-### D6 — Packaging/demo finale e Docker/exportability — ⬜
+### D6 — Packaging/demo finale e Docker/exportability — ✅
 **Obiettivo**
 Preparare una demo presentabile e riproducibile, includendo quando giustificato una superficie Docker minima coerente con il workflow locale già consolidato.
 
 **Vincoli**
 - Docker solo dopo il consolidamento dei quality gates, del fencing runtime in `tmp/` e della cleanup utility;
 - nessuna duplicazione del core applicativo;
-- nessuna divergenza tra esecuzione locale canonica e packaging containerizzato;
+- nessuna divergenza non documentata tra esecuzione locale canonica e packaging containerizzato;
 - documentazione di run/deployment riallineata al comportamento reale.
+
+**Stato operativo**
+- introdotti `.dockerignore` e `Dockerfile` nel commit `1e0b68e` (`build(docker): add minimal hardened container runtime`);
+- il `Dockerfile` usa una build multi-stage su `python:3.11-slim`, installa il package dal progetto versionato, espone `8000` e avvia `uvicorn` come utente non-root `appuser`;
+- `.dockerignore` esclude dal build context aree non necessarie al runtime containerizzato, tra cui ambienti virtuali, cache, `tmp/`, `docs/`, `tests/`, `local/` e file locali di supporto;
+- build reale del container eseguita con successo tramite `docker build -t dns-zone-bootstrapper:local .`;
+- smoke runtime eseguito con successo tramite `docker run -d --name dns-zone-bootstrapper-smoke -p 8000:8000 dns-zone-bootstrapper:local`, `curl -i http://127.0.0.1:8000/` e `curl -i "http://127.0.0.1:8000/generate?domain=testdomain.com"`, con `200 OK` in entrambi i casi;
+- il contratto osservato della baseline Docker corrente è public-safe: poiché `local/` è escluso dal build context e non viene copiato nell'immagine, il container usa il profilo versionato `PUBLIC_SAFE_FIXED_DNS_PROFILE` e l'output `/generate` mostra placeholder `__FIXED_*__`;
+- non è ancora presente un meccanismo versionato, esplicito e documentato per iniettare nel container i valori fixed concreti locali senza rompere il principio public-safe del repository.
+
+**Evidenze correnti**
+- commit consolidato e pubblicato: `1e0b68e` — `build(docker): add minimal hardened container runtime`;
+- `docker build -t dns-zone-bootstrapper:local .` → build completata con successo;
+- `docker ps` → container `dns-zone-bootstrapper-smoke` in esecuzione con mapping `0.0.0.0:8000->8000/tcp`;
+- `curl -i http://127.0.0.1:8000/` → `200 OK`;
+- `curl -i "http://127.0.0.1:8000/generate?domain=testdomain.com"` → `200 OK`, output BIND public-safe con placeholder versionati;
+- `docker logs dns-zone-bootstrapper-smoke` → startup `uvicorn` regolare, nessun crash osservato;
+- `docker stop dns-zone-bootstrapper-smoke` + `docker rm dns-zone-bootstrapper-smoke` → cleanup smoke completato.
+
+**Nota operativa**
+- il passo successivo corretto non è ampliare subito il Docker packaging verso override locali, cleanup UI/CLI o deployment esterni;
+- va prima chiuso il doc gate owner di `D6`, esplicitando che la prima immagine Docker validata è una baseline containerizzata public-safe e riproducibile;
+- solo dopo questo riallineamento sarà difendibile decidere se il supporto ai valori locali concreti nel container debba esistere davvero, e con quale meccanismo esplicito.
+
+**Nota di chiusura D6**
+- `D6` si considera chiusa come baseline Docker minimale public-safe realmente buildata e smoke-testata;
+- la divergenza rispetto al runtime locale con override concreti non resta implicita, ma è ora esplicitata e documentata;
+- il successivo tentativo di bind mount di `local/` da Git Bash su Windows non ha materializzato `/app/local` nel container e non riapre `D6`, perché non costituisce evidenza consolidata di supporto al boundary locale nel runtime containerizzato;
+- l’eventuale supporto futuro ai valori fixed concreti locali nel container resta un’estensione separata, non parte della chiusura corrente.
 
 ### D7 — Eventuale import diretto via API come extra — ⬜
 **Obiettivo**
 Valutare come estensione futura l'import assistito o diretto verso Cloudflare.
+
+### D8 — Canonicalizzazione del profilo fixed concreto e superamento del boundary `local/` — 🟡
+**Obiettivo**
+Chiudere in modo difendibile il contratto finale del prodotto rispetto ai valori fixed concreti del template DNS, così che il software resti davvero a input unico (`dominio`) senza dipendere, nel target finale, da override locali impliciti o da file gitignored.
+
+**Decisione progettuale congelata**
+- in assenza di nuovi vincoli dal committente, il prodotto finale viene considerato a template fixed canonico;
+- l’unico input utente resta il dominio apex;
+- `local/` non è parte del contratto utente finale, ma solo un boundary tecnico transitorio osservato nell’AS-IS del repository;
+- la baseline public-safe versionata resta utile per test, handoff e condivisione sicura del repository, ma non coincide ancora da sola con la forma finale del prodotto autonomo.
+
+**Stato operativo**
+- la richiesta funzionale chiarita con il referente conferma input unico `dominio`, valori restanti fissi e assenza di preview richiesta;
+- il file reale di riferimento contiene valori fixed concreti che non derivano dal dominio e che quindi, per la chiusura del prodotto finale autonomo, dovranno essere internalizzati in una forma canonica del prodotto oppure resi disponibili tramite un meccanismo esplicito di configurazione distribuita e documentata;
+- il repository AS-IS supporta ancora `local/` come override runtime opzionale e usa il profilo public-safe versionato come fallback;
+- la chiusura già consolidata di `D6` non viene rimessa in discussione: riguarda la baseline Docker public-safe realmente osservata, non la decisione finale sul destino architetturale di `local/`.
+
+**Criterio di uscita**
+- sarà difendibile dichiarare il prodotto chiuso anche come forma finale autonoma solo quando il ruolo di `local/` sarà superato oppure riclassificato in modo esplicito e non ambiguo nel contratto finale del software.
 
 ---
 
