@@ -50,35 +50,37 @@ La generazione del file `.txt` deve vivere in un renderer dedicato, separato dal
 
 Il repository versionato mantiene come baseline un profilo DNS fixed public-safe, adatto a test, golden e handoff senza esporre valori operativi concreti.
 
-Il punto unico di accesso versionato al profilo attivo è `src/dns_zone_bootstrapper/templates/profile_resolver.py`. Il layer applicativo non conosce direttamente `local/`, ma consuma solo `resolve_active_fixed_dns_profile()`.
+Il punto unico di accesso versionato al profilo attivo è `src/dns_zone_bootstrapper/templates/profile_resolver.py`. Il layer applicativo non conosce direttamente né `local/` né sorgenti esterne di profilo, ma consuma solo `resolve_active_fixed_dns_profile()`.
 
-Il contratto runtime osservato è questo:
+Il contratto runtime osservato è ora questo:
 
-- il resolver prova prima l'import standard di `local.dns_zone_profile`;
+- il resolver prova prima un path esplicito da variabile d'ambiente `DNS_ZONE_PROFILE_PATH`;
+- se il path esplicito non è configurato, prova l'import standard di `local.dns_zone_profile`;
 - se il boundary `local` non è risolvibile come package runtime, prova il caricamento esplicito del file `./local/dns_zone_profile.py` rispetto alla current working tree;
 - se anche il file locale non è disponibile, ricade sul profilo versionato `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
 
 Questa struttura implica che:
 
-- `local/` è un boundary locale opzionale, gitignored e non pacchettizzato;
 - il profilo public-safe resta la baseline canonica versionata;
-- i valori concreti locali restano fuori dalla storia Git;
-- CLI, Web UI e use case applicativo restano disaccoppiati dal dettaglio implementativo dell'override locale.
+- esiste ora un primo meccanismo esplicito, distribuito e documentabile per fornire al runtime un profilo fixed concreto;
+- `local/` resta un boundary locale opzionale, gitignored, non pacchettizzato e non più necessario come unico canale implicito per i valori concreti;
+- CLI, Web UI e use case applicativo restano disaccoppiati dal dettaglio implementativo della sorgente concreta del profilo.
 
 Nel runtime osservato, il file prodotto dal generatore attraverso questo boundary è stato importato con successo in Cloudflare quando la zona target era pulita. Un primo failure sul record `www` è stato attribuito a collisioni con record preesistenti nella zona di laboratorio, non al formato del file generato.
 
 ### 5.1 Decisione progettuale congelata sul ruolo di `local/`
 
-Lo stato AS-IS del repository supporta ancora un override runtime opzionale tramite `local/`, utile a tenere fuori dal versionamento valori fixed concreti e sensibili.
+Lo stato AS-IS del repository supporta ancora un fallback runtime opzionale tramite `local/`, utile per retrocompatibilità tecnica e per non interrompere il workspace locale già esistente.
 
 Tuttavia, in assenza di nuovi vincoli esterni e coerentemente con il contratto funzionale del prodotto chiarito in discovery, viene congelata una decisione progettuale più forte: il target finale del software resta un prodotto a input unico (`dominio`) che applica automaticamente un template fixed canonico.
 
 Ne consegue che:
 
 - `local/` non va considerato parte del contratto utente finale;
-- `local/` rappresenta un boundary tecnico transitorio dell’AS-IS;
+- `local/` rappresenta un fallback tecnico transitorio/back-compat dell’AS-IS;
+- `DNS_ZONE_PROFILE_PATH` costituisce il primo meccanismo esplicito e documentabile per caricare il profilo fixed concreto senza dipendere da un override implicito gitignored;
 - la baseline public-safe versionata resta utile come superficie sicura per test, handoff e condivisione del repository;
-- la chiusura finale del prodotto autonomo richiederà un riallineamento successivo e conservativo del profilo fixed concreto, così da superare o sostituire in modo esplicito la dipendenza architetturale da override locali impliciti.
+- il blocco `D8` può considerarsi sostanzialmente chiuso sul piano tecnico, perché il prodotto non dipende più in modo ambiguo dal solo boundary `local/` per ricevere i valori fixed concreti.
 
 ### 6. Packaging Docker minimale e boundary del contesto build
 

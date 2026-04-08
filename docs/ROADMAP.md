@@ -1,6 +1,6 @@
 # ROADMAP
 
-- Priorità attiva corrente: la baseline v1 public-safe, inclusa la baseline Docker minimale, è consolidata; il prossimo passo corretto non è ancora l’audit strutturale largo del repository, ma l’apertura conservativa di `D8`, per congelare il contratto finale del profilo fixed concreto e riclassificare `local/` come boundary tecnico transitorio rispetto al target di prodotto a input unico (`dominio`).
+- Priorità attiva corrente: `D8` è stata chiusa introducendo un meccanismo runtime esplicito (`DNS_ZONE_PROFILE_PATH`) per il profilo fixed concreto; il prossimo passo corretto non è aprire automaticamente l’audit strutturale largo del repository, ma congelare lo stato stabile post-`D8` e decidere con audit conservativo il blocco successivo realmente necessario.
 
 ## Missione del progetto
 
@@ -73,11 +73,12 @@ Costruire una pagina web capace di generare, a partire da un dominio in input, u
 - un successivo tentativo di bind mount di `local/` da Git Bash su Windows non ha materializzato `/app/local` nel container e non costituisce quindi evidenza di supporto consolidato agli override locali nel runtime containerizzato;
 - milestone chiusa nella forma realmente consolidata: packaging Docker minimale public-safe, riproducibile e smoke-testato; eventuale supporto futuro ai valori locali concreti nel container rinviato a backlog/extra separato.
 
-### D8 — Canonicalizzazione del profilo fixed concreto e superamento del boundary `local/` — 🟡
-- congelare la decisione progettuale secondo cui il prodotto finale è a template fixed canonico;
-- chiarire che `local/` non appartiene al contratto utente finale ma all’AS-IS tecnico transitorio;
-- preparare un riallineamento conservativo che porti il profilo fixed concreto in una forma finale esplicita, stabile e compatibile con la distribuzione del prodotto;
-- solo dopo questo chiarimento sarà sensato aprire l’audit strutturale largo del repository e la pulizia dei residui legacy.
+### D8 — Canonicalizzazione del profilo fixed concreto e superamento del boundary `local/` — ✅
+- audit read-only `public_safe vs local vs snapshot` chiuso con esito `same contract / different values`;
+- introdotto nel commit `61a4f73` il path runtime esplicito `DNS_ZONE_PROFILE_PATH` come meccanismo distribuito e documentabile per il profilo fixed concreto;
+- `local/` riclassificato in modo difendibile come fallback tecnico transitorio/back-compat dell'AS-IS e non come contratto utente finale;
+- quality gates verdi al consolidamento: `python run_quality_gates.py` → `pytest 86 passed`, `pylint 10.00/10`, `coverage 250 stmt`, `0 miss`, `100%`;
+- blocco chiuso: il prodotto non dipende più, sul piano del contratto finale, da un override locale implicito come unica strada per i valori fixed concreti.
 
 ### EXTRA — Espansione architetturale completa del repository — ⬜
 - riscrivere/espandere `docs/ARCHITECTURE.md` in forma esaustiva;

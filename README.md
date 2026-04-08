@@ -33,11 +33,11 @@ La v1 è già funzionante nella sostanza del caso d'uso richiesto:
 - espone una demo web minimale con generazione e download diretto;
 - è stata validata empiricamente con import Cloudflare riuscito su una zona pulita;
 - mantiene il repository versionato in forma public-safe;
-- conserva la possibilità di usare valori fixed concreti tramite override locale gitignored.
+- conserva una baseline versionata public-safe e supporta un meccanismo runtime esplicito per caricare un profilo fixed concreto, mantenendo `local/` solo come fallback tecnico transitorio.
 
 Snapshot tecnico corrente verificato:
 
-- `python run_quality_gates.py` → `pytest 83 passed`, `pylint 10.00/10`, `coverage 230 stmt`, `0 miss`, `100%`
+- `python run_quality_gates.py` → `pytest 86 passed`, `pylint 10.00/10`, `coverage 250 stmt`, `0 miss`, `100%`
 
 ## Workflow end-to-end
 
@@ -95,9 +95,9 @@ La v1 non fa ancora, per scelta di scope, le seguenti cose:
 
 Questa è una scelta deliberata: il focus è generare il sottoinsieme utile e importabile, non riprodurre tutto l'export sorgente.
 
-## Public-safe versionato vs override locale gitignored
+## Public-safe versionato, path esplicito runtime e fallback locale
 
-Il repository distingue in modo intenzionale tra baseline versionata e valori concreti locali.
+Il repository distingue in modo intenzionale tra baseline versionata e profilo fixed concreto.
 
 ### Baseline versionata public-safe
 Il progetto versiona un profilo fixed public-safe, utile per:
@@ -107,21 +107,35 @@ Il progetto versiona un profilo fixed public-safe, utile per:
 - handoff;
 - condivisione del repository senza esporre valori operativi sensibili.
 
-### Override locale gitignored
-Quando serve usare valori concreti reali in locale, il runtime può risolvere un override gitignored esterno al package versionato.
+### Meccanismo esplicito runtime
+Quando serve usare valori fixed concreti in modo distribuito e non ambiguo, il runtime supporta un path Python esplicito tramite variabile d'ambiente.
+
+- variabile: `DNS_ZONE_PROFILE_PATH`
+- valore atteso: path a un file `.py`
+- simbolo atteso: `ACTIVE_FIXED_DNS_PROFILE`
+
+### Fallback locale transitorio
+Per compatibilità con l'AS-IS resta supportato anche il boundary locale gitignored:
 
 - modulo logico atteso: `local.dns_zone_profile`
 - file locale supportato: `./local/dns_zone_profile.py` rispetto alla current working tree
-- simbolo atteso: `ACTIVE_FIXED_DNS_PROFILE`
 
 Il comportamento runtime è questo:
 
 - il boundary applicativo chiama solo `resolve_active_fixed_dns_profile()`;
-- il resolver prova prima l'import standard di `local.dns_zone_profile`;
-- se il top-level package `local` non è risolvibile, prova il caricamento esplicito del file `./local/dns_zone_profile.py` rispetto alla current working tree;
-- se anche il file locale non esiste, il sistema usa `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
+- il resolver prova prima `DNS_ZONE_PROFILE_PATH`;
+- poi l'import standard di `local.dns_zone_profile`;
+- poi il caricamento esplicito del file `./local/dns_zone_profile.py`;
+- se nessun profilo concreto è disponibile, il sistema usa `PUBLIC_SAFE_FIXED_DNS_PROFILE`.
 
-In questo modo il repository resta public-safe e versionabile, mentre il runtime locale può usare valori fixed concreti non versionati senza far entrare `local/` nel package installato.
+Esempio minimale di uso esplicito:
+
+```bash
+export DNS_ZONE_PROFILE_PATH=/path/to/dns_zone_profile.py
+dns-zone-cli web
+```
+
+In questo modo il repository resta public-safe e versionabile, mentre il prodotto non dipende più, sul piano del contratto, dal solo override implicito `local/`: `local/` resta un fallback tecnico transitorio dell'AS-IS.
 
 ## Note operative su Cloudflare
 
@@ -185,7 +199,7 @@ Contratto osservato della prima immagine Docker validata:
 * l'output nel container usa il profilo public-safe versionato e quindi mostra placeholder `__FIXED_*__`;
 * questo comportamento è atteso, perché `.dockerignore` esclude `local/` e il `Dockerfile` copia solo gli asset versionati minimi necessari al runtime.
 
-Questa validazione Docker chiude la baseline minima containerizzata public-safe della demo web: build reale, avvio del container e smoke runtime risultano verificati. L’eventuale supporto futuro ai valori fixed concreti locali nel container richiederà un meccanismo esplicito e documentato e non fa parte della chiusura attuale.
+Questa validazione Docker chiude la baseline minima containerizzata public-safe della demo web: build reale, avvio del container e smoke runtime risultano verificati. Il runtime applicativo supporta ora un meccanismo esplicito tramite `DNS_ZONE_PROFILE_PATH`, ma la baseline containerizzata validata non lo configura automaticamente e resta quindi public-safe di default. 
 
 ## Uso della demo
 

@@ -3,7 +3,22 @@
 ## Branch: [development]
 
 ### [Unreleased]
-> Scope corrente: **chiusa in forma truth-first `D6` come baseline Docker minimale public-safe realmente introdotta e validata empiricamente sul branch `development`; `M6`, `D1`, `D2`, `D3` e `D4` restano chiusi nella forma consolidata sul repository; viene però riaperto in forma conservativa un blocco attivo di chiarimento del profilo fixed concreto, congelando la decisione progettuale secondo cui il prodotto finale resta a template fixed canonico e `local/` va considerato boundary tecnico transitorio, non contratto utente finale**
+> Scope corrente: **chiuse in forma truth-first `D6` e `D8`; il repository resta stabile come baseline v1 public-safe, mentre `61a4f73` introduce un meccanismo runtime esplicito e documentabile per il profilo fixed concreto (`DNS_ZONE_PROFILE_PATH`), riclassificando `local/` a fallback tecnico transitorio/back-compat dell’AS-IS; nessun nuovo blocco tecnico più ampio viene ancora promosso automaticamente**
+
+#### D8 — Canonicalizzazione del profilo fixed concreto e superamento del boundary `local/`
+
+- **`61a4f73` — `feat(templates): add explicit runtime profile path support`**
+  - **Type:** CHANGED · **Categoria:** Templates / Runtime profile resolution / Explicit distributed profile path
+  - **Cosa cambia:** aggiorna `src/dns_zone_bootstrapper/templates/profile_resolver.py` introducendo `DNS_ZONE_PROFILE_PATH` come primo touchpoint di risoluzione runtime del profilo fixed concreto, prima del fallback su `local.dns_zone_profile`, `./local/dns_zone_profile.py` e infine `PUBLIC_SAFE_FIXED_DNS_PROFILE`; estende inoltre `tests/test_profile_resolver.py` con copertura del path esplicito di successo, del file esplicito mancante e del modulo esplicito privo di `ACTIVE_FIXED_DNS_PROFILE`.
+  - **Impatto:** introduce il primo meccanismo esplicito, distribuito e documentabile per fornire al prodotto un profilo fixed concreto senza rendere `local/` parte del contratto utente finale. `local/` resta fallback tecnico transitorio/back-compat dell'AS-IS, mentre la baseline Docker public-safe di `D6` non viene alterata automaticamente.
+
+##### Evidenze operative correnti
+- audit read-only del contratto `public_safe vs local vs snapshot` → `PASS: public_safe_vs_local_contract`, `PASS: local_vs_snapshot_exact`, `PASS: D8_contract_frozen`;
+- `DNS_ZONE_PROFILE_PATH=local/dns_zone_profile.py` + `resolve_active_fixed_dns_profile().profile_name` → `local_runtime_fixed_profile`;
+- `python run_quality_gates.py` → `pytest 86 passed`, `pylint 10.00/10`, `coverage 250 stmt`, `0 miss`, `100%`.
+
+##### Stato del blocco
+- **`D8` chiusa in forma truth-first: il contratto finale del prodotto non dipende più in modo ambiguo dal boundary `local/`, perché esiste ora un meccanismo runtime esplicito e documentabile per caricare il profilo fixed concreto; `local/` resta solo fallback tecnico transitorio/back-compat dell'AS-IS**
 
 #### D6 — Packaging/demo finale e Docker/exportability
 

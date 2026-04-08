@@ -4,8 +4,9 @@
 
 - Repo: `dns-zone-bootstrapper`
 - Branch operativo: `development`
-- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5`, `M6`, `D1`, `D2`, `D3`, `D4` e `D6` risultano chiusi nella forma realmente raggiunta sul repository; viene ora aperto `D8` come blocco attivo di chiarimento e assestamento del contratto del profilo fixed concreto rispetto al target finale del prodotto; `D0`, `D5`, `D7` e i blocchi `E*` restano non avviati.
-- Obiettivo immediato: congelare in forma truth-first la decisione progettuale secondo cui il prodotto finale deve applicare un template fixed canonico con unico input utente `dominio`, riclassificando `local/` come boundary tecnico transitorio dell’AS-IS e preparando il successivo riallineamento conservativo del profilo fixed concreto.
+- Fase corrente: `Cycle A`, `Cycle B`, `Cycle C` e il blocco `Post-A2 / Post-C2` risultano chiusi e archiviati; `M5`, `M6`, `D1`, `D2`, `D3`, `D4`, `D6` e `D8` risultano chiusi nella forma realmente raggiunta sul repository; `D0`, `D5`, `D7` e i blocchi `E*` restano non avviati.
+- Obiettivo immediato: consolidare il doc gate owner successivo al commit `61a4f73` e congelare lo stato stabile post-`D8`, senza aprire automaticamente un nuovo blocco tecnico più ampio.
+- Ultimo consolidamento `D8`: il commit `61a4f73` (`feat(templates): add explicit runtime profile path support`) introduce `DNS_ZONE_PROFILE_PATH` come primo touchpoint esplicito e documentabile per il profilo fixed concreto, prima del fallback su `local.dns_zone_profile`, `./local/dns_zone_profile.py` e `PUBLIC_SAFE_FIXED_DNS_PROFILE`. L’audit read-only del contratto `public_safe vs local vs snapshot` ha confermato esito `same contract / different values`, senza emersione di contract delta strutturale, e i quality gates globali risultano verdi (`python run_quality_gates.py` → `pytest 86 passed`, `pylint 10.00/10`, `coverage 250 stmt`, `0 miss`, `100%`).
 - Ultimo consolidamento `D1`: `python -m pytest -q` e `python -m pylint src tests` risultano già usati in modo stabile come quality gates canonici del repository, esplicitati nel `README.md`, presenti nel tooling (`pyproject.toml`) e richiamati in modo coerente nelle evidenze degli owner docs; il presente riallineamento truth-first chiude `D1` come blocco documentale senza introdurre nuovo tooling, nuove dipendenze o soglie aggiuntive.
 - Ultimo consolidamento `D2`: il commit `876c421` (`test(coverage): establish package-only baseline and residual coverage`) introduce `coverage` nelle dev dependencies, riallinea il freeze operativo `requirements.txt`, pulisce `src/dns_zone_bootstrapper/interfaces/__init__.py` rimuovendo una legacy CLI duplicata e aggiunge `tests/test_coverage_residuals.py` per coprire i miss residui a basso rischio; la baseline coverage package-only viene misurata sul solo namespace `dns_zone_bootstrapper` con risultato `230 stmt`, `0 miss`, `100%`, senza introdurre soglie minime arbitrarie.
 - Ultimo consolidamento `D3`: il commit `7dd4972` (`build(runtime): add bytecode-free quality gates wrapper`) introduce `run_quality_gates.py` come wrapper repo-owned per eseguire `pytest`, `pylint` e `coverage` in modo bytecode-free nei touchpoint che rigeneravano `__pycache__/` e `*.pyc`; insieme al micro-step già consolidato nel commit `441c954` su `tmp/.pytest_cache` e `tmp/.coverage`, il boundary runtime dei quality gates risulta ora difendibile senza modificare il contratto utente o il flusso principale del prodotto. I quality gates restano verdi (`python run_quality_gates.py` → `pytest 83 passed`, `pylint 10.00/10`, `coverage 230 stmt`, `0 miss`, `100%`) e l’audit post-run del wrapper non osserva `__pycache__/` o `*.pyc` fuori da `tmp`.
@@ -638,24 +639,34 @@ Preparare una demo presentabile e riproducibile, includendo quando giustificato 
 **Obiettivo**
 Valutare come estensione futura l'import assistito o diretto verso Cloudflare.
 
-### D8 — Canonicalizzazione del profilo fixed concreto e superamento del boundary `local/` — 🟡
+### D8 — Canonicalizzazione del profilo fixed concreto e superamento del boundary `local/` — ✅
 **Obiettivo**
 Chiudere in modo difendibile il contratto finale del prodotto rispetto ai valori fixed concreti del template DNS, così che il software resti davvero a input unico (`dominio`) senza dipendere, nel target finale, da override locali impliciti o da file gitignored.
 
 **Decisione progettuale congelata**
 - in assenza di nuovi vincoli dal committente, il prodotto finale viene considerato a template fixed canonico;
 - l’unico input utente resta il dominio apex;
-- `local/` non è parte del contratto utente finale, ma solo un boundary tecnico transitorio osservato nell’AS-IS del repository;
-- la baseline public-safe versionata resta utile per test, handoff e condivisione sicura del repository, ma non coincide ancora da sola con la forma finale del prodotto autonomo.
+- `local/` non è parte del contratto utente finale, ma solo un fallback tecnico transitorio/back-compat osservato nell’AS-IS del repository;
+- la baseline public-safe versionata resta utile per test, handoff e condivisione sicura del repository;
+- `DNS_ZONE_PROFILE_PATH` costituisce ora il primo meccanismo esplicito, distribuito e documentabile per fornire al runtime il profilo fixed concreto.
 
 **Stato operativo**
-- la richiesta funzionale chiarita con il referente conferma input unico `dominio`, valori restanti fissi e assenza di preview richiesta;
-- il file reale di riferimento contiene valori fixed concreti che non derivano dal dominio e che quindi, per la chiusura del prodotto finale autonomo, dovranno essere internalizzati in una forma canonica del prodotto oppure resi disponibili tramite un meccanismo esplicito di configurazione distribuita e documentata;
-- il repository AS-IS supporta ancora `local/` come override runtime opzionale e usa il profilo public-safe versionato come fallback;
-- la chiusura già consolidata di `D6` non viene rimessa in discussione: riguarda la baseline Docker public-safe realmente osservata, non la decisione finale sul destino architetturale di `local/`.
+- l’audit read-only del contratto tra profilo public-safe versionato, profilo locale concreto e snapshot realistic-backed ha confermato esito `same contract / different values`, senza evidenza di contract delta strutturale;
+- il commit `61a4f73` (`feat(templates): add explicit runtime profile path support`) aggiorna `resolve_active_fixed_dns_profile()` introducendo come ordine di risoluzione: `DNS_ZONE_PROFILE_PATH` → `local.dns_zone_profile` → `./local/dns_zone_profile.py` → `PUBLIC_SAFE_FIXED_DNS_PROFILE`;
+- `tests/test_profile_resolver.py` è stato esteso per coprire il path esplicito di successo, il file esplicito mancante e il modulo esplicito privo di `ACTIVE_FIXED_DNS_PROFILE`;
+- `local/` resta supportato solo come fallback tecnico transitorio/back-compat dell’AS-IS e non come unica strada implicita per i valori concreti;
+- la chiusura già consolidata di `D6` non viene rimessa in discussione: la baseline Docker resta public-safe e non carica automaticamente valori concreti locali.
 
-**Criterio di uscita**
-- sarà difendibile dichiarare il prodotto chiuso anche come forma finale autonoma solo quando il ruolo di `local/` sarà superato oppure riclassificato in modo esplicito e non ambiguo nel contratto finale del software.
+**Evidenze correnti**
+- audit read-only del contratto → `PASS: public_safe_vs_local_contract`, `PASS: local_vs_snapshot_exact`, `PASS: D8_contract_frozen`;
+- `DNS_ZONE_PROFILE_PATH=local/dns_zone_profile.py` + `resolve_active_fixed_dns_profile().profile_name` → `local_runtime_fixed_profile`;
+- `python run_quality_gates.py` → `pytest 86 passed`, `pylint 10.00/10`, `coverage 250 stmt`, `0 miss`, `100%`.
+
+**Nota di chiusura D8**
+- `D8` si considera chiusa in forma truth-first;
+- il prodotto non dipende più, sul piano del contratto finale, da un override locale implicito come unica strada per i valori fixed concreti;
+- il repository dispone ora di un meccanismo esplicito e documentabile coerente con il target di prodotto a input unico;
+- il prossimo passo corretto va deciso con un nuovo audit conservativo separato, senza aprire automaticamente un blocco strutturale più ampio.
 
 ---
 
