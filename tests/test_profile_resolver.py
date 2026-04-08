@@ -77,3 +77,83 @@ def test_resolve_active_fixed_dns_profile_uses_local_override() -> None:
 
     assert resolved_profile is expected_profile
     mock_import_module.assert_called_once_with("local.dns_zone_profile")
+
+def test_resolve_active_fixed_dns_profile_uses_explicit_env_path(
+    monkeypatch,
+    tmp_path,
+):
+    """Use the explicit environment path when configured."""
+    profile_file = tmp_path / "explicit_dns_zone_profile.py"
+    profile_file.write_text(
+        """
+from dns_zone_bootstrapper.templates.profile_model import (
+    DnsRecordTemplate,
+    FixedDnsProfile,
+    RdataTemplateSpec,
+)
+
+ACTIVE_FIXED_DNS_PROFILE = FixedDnsProfile(
+    profile_name="explicit_env_profile",
+    records=(
+        DnsRecordTemplate(
+            record_type="A",
+            owner_template="@",
+            ttl=1,
+            record_class="IN",
+            rdata=RdataTemplateSpec(
+                kind="fixed",
+                template="203.0.113.10",
+            ),
+            cf_proxied=True,
+        ),
+    ),
+)
+""".strip(),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setenv("DNS_ZONE_PROFILE_PATH", str(profile_file))
+
+    profile = resolve_active_fixed_dns_profile()
+
+    assert profile.profile_name == "explicit_env_profile"
+    assert len(profile.records) == 1
+    assert profile.records[0].rdata.template == "203.0.113.10"
+
+def test_resolve_active_fixed_dns_profile_fails_for_missing_explicit_profile_file(
+    monkeypatch,
+    tmp_path,
+):
+    """Fail when the explicit environment path points to a missing file."""
+    missing_profile = tmp_path / "missing_dns_zone_profile.py"
+    monkeypatch.setenv("DNS_ZONE_PROFILE_PATH", str(missing_profile))
+
+    try:
+        resolve_active_fixed_dns_profile()
+    except RuntimeError as error:
+        assert "Configured DNS_ZONE_PROFILE_PATH is missing or unreadable" in str(error)
+    else:
+        raise AssertionError("Expected RuntimeError for missing explicit profile path.")
+
+
+def test_resolve_active_fixed_dns_profile_fails_when_explicit_module_has_no_active_profile(
+    monkeypatch,
+    tmp_path,
+):
+    """Fail when the explicit environment module lacks ACTIVE_FIXED_DNS_PROFILE."""
+    profile_file = tmp_path / "broken_dns_zone_profile.py"
+    profile_file.write_text(
+        """
+BROKEN = True
+""".strip(),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setenv("DNS_ZONE_PROFILE_PATH", str(profile_file))
+
+    try:
+        resolve_active_fixed_dns_profile()
+    except RuntimeError as error:
+        assert "Missing ACTIVE_FIXED_DNS_PROFILE in DNS_ZONE_PROFILE_PATH." == str(error)
+    else:
+        raise AssertionError("Expected RuntimeError for missing ACTIVE_FIXED_DNS_PROFILE.")
